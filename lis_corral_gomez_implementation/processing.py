@@ -32,10 +32,12 @@ def main():
         cv2.namedWindow("core", cv2.WINDOW_NORMAL)
         cv2.namedWindow("contour", cv2.WINDOW_NORMAL)
         cv2.namedWindow("composite", cv2.WINDOW_NORMAL)
+        cv2.namedWindow("test", cv2.WINDOW_NORMAL)
 
 
     # displaying vid - Fix some stuff
     testing = False
+    test_counter = 0
     while vid.isOpened():
         ret, frame = vid.read()
         if not ret:
@@ -60,6 +62,22 @@ def main():
             cv2.imshow("core", core_t)
             cv2.imshow("contour", contour_t)
             cv2.imshow("composite", composite_flame)
+
+            # Height
+            test = cv2.cvtColor(core_t, cv2.COLOR_GRAY2BGR)
+            contours_core, hierarchy_core = cv2.findContours(core_t, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            #cv2.drawContours(frame, contours_core, -1, (0,0,255), 5)
+            x,y,w,h = cv2.boundingRect(contours_core[0])
+            cv2.rectangle(test, (x,y),(x+w,y+h), (0,255,0),2)
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            origin = (50,50)
+            fontScale = 1
+            color = (0,255,0)
+            thickness = 2
+            test_text = cv2.putText(test, "Height of BBOX: {} px".format(h), origin, font, fontScale, color, thickness, cv2.LINE_AA)
+            cv2.imshow("test", test_text)
+            cv2.imwrite("test/sample_frame_{}.png".format(test_counter), test_text)
+            test_counter += 1
             if cv2.waitKey(1) == ord('q'):
                 break
     vid.release()
