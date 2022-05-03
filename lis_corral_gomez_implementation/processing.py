@@ -76,15 +76,23 @@ def main():
         else:
             # 1 - Convert input to grayscale
             gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            # 2 - Umbralizacion : Core 191
+            # 2 - Umbralize
             t_core_ret, core_t = cv2.threshold(gray_frame,CORE_THRESHOLD, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
             t_contour_ret, contour_t = cv2.threshold(gray_frame, CONTOUR_THRESHOLD, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
 
             # Height
             test = cv2.cvtColor(core_t, cv2.COLOR_GRAY2BGR)
             contours_core, hierarchy_core = cv2.findContours(core_t, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            # [FIX]: Make this into an actual function // Maybe it would be needed
+            area = 0.0
+            save_contour = []
+            for i in contours_core:
+                i_area = cv2.contourArea(i)
+                if(i_area > area):
+                    area = i_area
+                    save_contour = i
             #cv2.drawContours(frame, contours_core, -1, (0,0,255), 5)
-            x,y,w,h = cv2.boundingRect(contours_core[0])
+            x,y,w,h = cv2.boundingRect(save_contour)
             cv2.rectangle(test, (x,y),(x+w,y+h), (0,255,0),2)
             font = cv2.FONT_HERSHEY_SIMPLEX
             origin = (50,50)
