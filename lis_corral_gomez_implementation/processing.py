@@ -5,8 +5,76 @@ from matplotlib import pyplot as plt
 
 # Default values
 MAX_PIXEL_VALUE = 255
-CORE_THRESHOLD_PERCENT = 0.35
-CONTOUR_THRESHOLD_PERCENT = 0.75
+CORE_THRESHOLD_PERCENT = 0.75
+CONTOUR_THRESHOLD_PERCENT = 0.35
+MAX_CENTROID_TOLERANCE = 50.0
+DERIVATIVE_COMP = 2e-5
+# -> Convertion values
+M_PX_CM = 0.1038
+C_PX_CM = 3.55
+
+class FlameEstimator:
+    def __init__(self):
+        self.h_px = []
+        self.H_px = []
+        self.h_mm = []
+        self.H_mm = []
+
+def px2mm(input_value):
+    d = (M_PX_CM*input_value) + C_PX_CM
+    return d
+def write2Frame(input_frame, pos, scale, color, thick,text):
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    return_frame = cv2.putText(input_frame, text, pos, font, scale, color, thick, cv2.LINE_AA)
+    return return_frame
+
+# Revisit this
+def getConnectedComponents(threshold_image, connect, display_process):
+    cc = cv2.connectedComponentsWithStats(threshold_image, connect, cv2.CV_32S)
+    # Unpack de information
+    n_labels, labels, stats, centroids = cc
+    # Range from 1 to n_labels to disregard background
+    return_dict = {
+        'x':0,
+        'y':0,
+        'w':0,
+        'h':0,
+        'area':-1,
+        'cX':0,
+        'cY':0,
+        'cmask':None
+    }
+
+    for i in range(1,n_labels):
+        area = stats[i, cv2.CC_STAT_AREA]
+        if(area > return_dict['area']):
+            x = stats[i, cv2.CC_STAT_LEFT]
+            y = stats[i, cv2.CC_STAT_TOP]
+            w = stats[i, cv2.CC_STAT_WIDTH]
+            h = stats[i, cv2.CC_STAT_HEIGHT]
+            (cX,cY) = centroids[i]
+            component_mask = (labels==i).astype("uint8")*255
+            return_dict = {
+                'x':x,
+                'y':y,
+                'w':w,
+                'h':h,
+                'area':area,
+                'cX':cX,
+                'cY':cY,
+                'cmask':component_mask
+            }
+            if(display_process):
+                display_cc = threshold_image.copy()
+                display_cc = cv2.cvtColor(display_cc, cv2.COLOR_GRAY2BGR)
+                cv2.rectangle(display_cc, (x,y), (x+w, y+h), (0,255,0),3)
+                cv2.circle(display_cc, (int(cX), int(cY)), 4, (0,0,255),-1)
+                cv2.namedWindow("CC+Stats", cv2.WINDOW_NORMAL)
+                cv2.namedWindow("CC", cv2.WINDOW_NORMAL)
+                cv2.imshow("CC+Stats", display_cc)
+                cv2.imshow("CC", component_mask)
+                cv2.waitKey(0)
+    return return_dict
 
 
 
@@ -17,8 +85,9 @@ def main():
     parser.add_argument("-v", "--Video", help="Input video to process")
     # [FIX]: Add image processing, like external frames
     parser.add_argument("-d", "--Display", action='store_true', help="Displays the processing process")
-    parser.add_argument("-tcore", "--TresholdCore", help="% of the max value to use as threshold for the core region")
-    parser.add_argument("-tcontour", "--TresholdContour", help="% of the max value to use as threshold for the contour region")
+    parser.add_argument("-tcore", "--TresholdCore", help="Percentage of the max value to use as threshold for the core region")
+    parser.add_argument("-tcontour", "--TresholdContour", help="Percentage of the max value to use as threshold for the contour region")
+    parser.add_argument("-bb","--Boxes", help="Shows bounding boxes for the regions", action='store_true')
     args = parser.parse_args()
 
     # Set Threshold values
@@ -60,14 +129,12 @@ def main():
     # [FIX]: Find a better way to display the frames
     if(args.Display):
         cv2.namedWindow("input", cv2.WINDOW_NORMAL)
-        cv2.namedWindow("core", cv2.WINDOW_NORMAL)
-        cv2.namedWindow("contour", cv2.WINDOW_NORMAL)
-        cv2.namedWindow("composite", cv2.WINDOW_NORMAL)
-        cv2.namedWindow("test", cv2.WINDOW_NORMAL)
 
-
-    test_counter = 0
     # Playing video frame by frame to process.
+    reference_cX = None
+    first_frame = True
+    values = FlameEstimator()
+    invalid_frames = 0
     while vid.isOpened():
         ret, frame = vid.read()
         if not ret:
@@ -80,37 +147,59 @@ def main():
             t_core_ret, core_t = cv2.threshold(gray_frame,CORE_THRESHOLD, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
             t_contour_ret, contour_t = cv2.threshold(gray_frame, CONTOUR_THRESHOLD, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
 
-            # Height
-            test = cv2.cvtColor(core_t, cv2.COLOR_GRAY2BGR)
-            contours_core, hierarchy_core = cv2.findContours(core_t, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            # [FIX]: Make this into an actual function // Maybe it would be needed
-            area = 0.0
-            save_contour = []
-            for i in contours_core:
-                i_area = cv2.contourArea(i)
-                if(i_area > area):
-                    area = i_area
-                    save_contour = i
-            #cv2.drawContours(frame, contours_core, -1, (0,0,255), 5)
-            x,y,w,h = cv2.boundingRect(save_contour)
-            cv2.rectangle(test, (x,y),(x+w,y+h), (0,255,0),2)
-            font = cv2.FONT_HERSHEY_SIMPLEX
-            origin = (50,50)
-            fontScale = 1
-            color = (0,255,0)
-            thickness = 2
-            test_text = cv2.putText(test, "Height of BBOX: {} px".format(h), origin, font, fontScale, color, thickness, cv2.LINE_AA)
-            cv2.imshow("test", test_text)
-            cv2.imwrite("test/sample_frame_{}.png".format(test_counter), test_text)
-            test_counter += 1
+            # 3 - Height: From connected components get the info
+            core_components = getConnectedComponents(core_t, 4, False)
+            contour_components = getConnectedComponents(contour_t, 4, False)
 
-            cv2.imshow("input", frame)
-            cv2.imshow("core", core_t)
-            cv2.imshow("contour", contour_t)
-            if cv2.waitKey(1) == ord('q'):
-                break
+            contour_height = contour_components['h']
+            contour_height_mm = px2mm(contour_height)
+            # For this operation, consider that (0,0) is top left corner
+            tip_height =  core_components['y'] -contour_components['y']
+            tip_height_mm = px2mm(tip_height)
+            # If needed, show bounding boxes for core and countour
+            if(args.Boxes):
+                cv2.rectangle(frame, (contour_components['x'],contour_components['y']), (contour_components['x']+contour_components['w'], contour_components['y']+contour_components['h']), (0,255,0),3)
+                cv2.rectangle(frame, (core_components['x'],core_components['y']), (core_components['x']+core_components['w'], core_components['y']+core_components['h']), (0,0,255),3)
+            # write info to frame
+            info_text = "h: {} px H: {} px".format(contour_height, tip_height)
+            frame_info = write2Frame(frame, (50,50), 1, (0,255,0),2, info_text)
+            info_text = "h: {:.2f} mm H: {:.2f} mm".format(contour_height_mm, tip_height_mm)
+            frame_info = write2Frame(frame, (50,100), 1, (0,255,0),2, info_text)
+            # --> Save the first frame centroid
+            if(first_frame):
+                reference_cX = contour_components["cX"]
+                first_frame = False
+            else:
+                centroid_diff = abs(contour_components["cX"] -  reference_cX)
+                if(centroid_diff <= MAX_CENTROID_TOLERANCE):
+                    values.h_px.append(contour_height)
+                    values.H_px.append(tip_height)
+                    values.h_mm.append(contour_height_mm)
+                    values.H_mm.append(tip_height_mm)
+                else:
+                    invalid_frames += 1
+
+            invalid_text = "N# invalid frames: {}".format(invalid_frames)
+            frame_info = write2Frame(frame_info, (50,150),1,(0,0,255),2,invalid_text)
+            if(args.Display):
+                cv2.imshow("input", frame_info)
+                if cv2.waitKey(1) == ord('q'):
+                    break
     vid.release()
-    cv2.destroyAllWindows()
+    if(args.Display):
+        cv2.destroyAllWindows()
+
+    # 4. Process results
+    # Fit poly
+    tenth_poly = np.polyfit(values.h_mm, values.H_mm,10)
+    der_tenth_poly = np.polyder(tenth_poly)
+    for flame_height in values.h_mm:
+        eval = abs(np.polyval(der_tenth_poly,flame_height))
+        print(eval)
+        if(eval <= DERIVATIVE_COMP):
+            print("SMOKE POINT AT {} mm".format(flame_height))
+            break
+
     return 0
 
 
