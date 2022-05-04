@@ -2,6 +2,8 @@ import cv2 as cv2
 import numpy as np
 import argparse
 from matplotlib import pyplot as plt
+from progress.bar import Bar # Util for displaying progress through terminal
+import csv
 
 # Default values
 MAX_PIXEL_VALUE = 255
@@ -19,6 +21,15 @@ class FlameEstimator:
         self.H_px = []
         self.h_mm = []
         self.H_mm = []
+
+def save2File(fields, rows, outfile, print):
+    with open(outfile, 'w') as file:
+        write = csv.writer(file)
+        write.writerow(fields)
+        write.writerow(rows)
+    if(print):
+        print("[INFO] outfile was saved!")
+
 
 def px2mm(input_value):
     d = (M_PX_CM*input_value) + C_PX_CM
@@ -120,6 +131,8 @@ def main():
         try:
             print("[INFO] Video {} will be processed".format(args.Video))
             vid = cv2.VideoCapture(args.Video)
+            # Extract number of frames for progress bar
+            n_frames = int(vid.get(cv2. CAP_PROP_FRAME_COUNT))
         except cv2.error as e:
             print("[ERROR] Video couldn't be opened or found!")
     else:
@@ -135,6 +148,8 @@ def main():
     first_frame = True
     values = FlameEstimator()
     invalid_frames = 0
+    # Generating a progress bar
+    bar = Bar('Processing', max=n_frames)
     while vid.isOpened():
         ret, frame = vid.read()
         if not ret:
@@ -185,17 +200,23 @@ def main():
                 cv2.imshow("input", frame_info)
                 if cv2.waitKey(1) == ord('q'):
                     break
+            bar.next()
+    bar.finish()
     vid.release()
     if(args.Display):
         cv2.destroyAllWindows()
 
+        # Debuging plots
+    plt.plot(values.h_mm, values.H_mm)
+    plt.xlabel('Flame Height (Contour Height) mm')
+    plt.ylabel('Flame Tip Height (Contour - Core) mm')
+    plt.show()
     # 4. Process results
     # Fit poly
     tenth_poly = np.polyfit(values.h_mm, values.H_mm,10)
-    der_tenth_poly = np.polyder(tenth_poly)
+    der_tenth_poly = np.polyder(tenth_poly,2)
     for flame_height in values.h_mm:
         eval = abs(np.polyval(der_tenth_poly,flame_height))
-        print(eval)
         if(eval <= DERIVATIVE_COMP):
             print("SMOKE POINT AT {} mm".format(flame_height))
             break
