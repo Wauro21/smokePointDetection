@@ -4,7 +4,7 @@ import argparse
 from matplotlib import pyplot as plt
 from progress.bar import Bar # Util for displaying progress through terminal
 import csv
-
+import math
 # Default values
 MAX_PIXEL_VALUE = 255
 CORE_THRESHOLD_PERCENT = 0.75
@@ -22,13 +22,22 @@ class FlameEstimator:
         self.h_mm = []
         self.H_mm = []
 
-def save2File(fields, rows, outfile, print):
+def savePoly(poly, outfile, print_flag):
     with open(outfile, 'w') as file:
         write = csv.writer(file)
-        write.writerow(fields)
-        write.writerow(rows)
-    if(print):
-        print("[INFO] outfile was saved!")
+        write.writerow(poly)
+    if(print_flag):
+        print("[INFO] {} was saved!".format(outfile))
+
+def saveHeights(h, H, outfile, print_flag):
+    with open(outfile, 'w') as file:
+        write = csv.writer(file)
+        l = len(h)
+        write.writerow(['h','H'])
+        for i in range(l):
+            write.writerow([h[i], H[i]])
+    if(print_flag):
+        print("[INFO] {} was saved!".format(outfile))
 
 
 def px2mm(input_value):
@@ -99,6 +108,8 @@ def main():
     parser.add_argument("-tcore", "--TresholdCore", help="Percentage of the max value to use as threshold for the core region")
     parser.add_argument("-tcontour", "--TresholdContour", help="Percentage of the max value to use as threshold for the contour region")
     parser.add_argument("-bb","--Boxes", help="Shows bounding boxes for the regions", action='store_true')
+    parser.add_argument("-sv","--SaveValues", help="Generates a file, saving the estimated height values, the coefficientes of the polynoms and the resulting plots")
+    parser.add_argument("-mm", help= "Uses the px to mm convertion for thes calculations", action='store_true')
     args = parser.parse_args()
 
     # Set Threshold values
@@ -206,15 +217,71 @@ def main():
     if(args.Display):
         cv2.destroyAllWindows()
 
-        # Debuging plots
-    plt.plot(values.h_mm, values.H_mm)
-    plt.xlabel('Flame Height (Contour Height) mm')
-    plt.ylabel('Flame Tip Height (Contour - Core) mm')
-    plt.show()
     # 4. Process results
     # Fit poly
     tenth_poly = np.polyfit(values.h_mm, values.H_mm,10)
     der_tenth_poly = np.polyder(tenth_poly,2)
+
+
+    # Debuging plots
+    main_process = plt.figure()
+    plt.subplot(2,1,1)
+    plt.scatter(values.h_mm, values.H_mm, color='b', label="Alturas medidas")
+    plt.xlabel('Flame Height (Contour Height) mm')
+    plt.ylabel('Flame Tip Height (Contour - Core) mm')
+    plt.grid()
+    plt.title("Flame Height v/s Flame Tip Height in mm")
+    lower_bound = math.floor(min(values.h_mm))
+    upper_bound = math.ceil(max(values.h_mm))
+    samples = len(values.h_mm)
+    show_values = np.linspace(lower_bound, upper_bound, samples)
+    tenth_vals = np.polyval(tenth_poly, show_values)
+    plt.plot(show_values, tenth_vals, color='r', label="Polinomio 10 orden")
+    plt.legend()
+
+    plt.subplot(2,1,2)
+    derivative_values = np.polyval(der_tenth_poly, values.h_mm)
+    plt.scatter(values.h_mm,derivative_values,color='b', label="Valores evaludos")
+    plt.title("Derivada mm")
+    plt.xlabel("Flame Height (Contour Height) mm")
+    plt.ylabel("Derivative")
+    plt.grid()
+    plt.plot(show_values, derivative_values, color='r', label="Derivada polinomio")
+
+    main_px = plt.figure()
+    plt.subplot(2,1,1)
+    plt.scatter(values.h_px, values.H_px, color='b', label='Alturas medidas')
+    plt.xlabel('Flame Height (Contour Height) px')
+    plt.ylabel('Flame Tip Height (Contour - Core) px')
+    plt.grid()
+    plt.title("Flame Height v/s Flame Tip Height in px")
+    tenth_px = np.polyfit(values.h_px,values.H_px,10)
+    der_px = np.polyder(tenth_px,2)
+    low_px = math.floor(min(values.h_px))
+    high_px = math.ceil(max(values.h_px))
+    px_samples = len(values.h_px)
+    show_px = np.linspace(low_px, high_px, px_samples)
+    px_values = np.polyval(tenth_px, show_px)
+    plt.plot(show_px, px_values, color='r', label="Polinomio")
+
+    plt.subplot(2,1,2)
+    deri_vals = np.polyval(der_px, values.h_px)
+    plt.scatter(values.h_px, deri_vals, color='b', label="Valores evaluados")
+    plt.xlabel("Flame Height (Contour Height) px")
+    plt.ylabel("Derivative")
+    plt.title("Derivada px")
+    plt.grid()
+    plt.plot(show_px, deri_vals, color='r', label="Derivada polinomio")
+
+
+
+    plt.show()
+    if(args.SaveValues):
+        saveHeights(values.h_mm, values.H_mm, args.SaveValues+"_mm.csv",True)
+        saveHeights(values.h_px, values.H_px, args.SaveValues+"_px.csv", True)
+        savePoly(tenth_poly, args.SaveValues+"_10th_poly.csv", True)
+        savePoly(der_tenth_poly, args.SaveValues+"_derived_poly.csv", True)
+
     for flame_height in values.h_mm:
         eval = abs(np.polyval(der_tenth_poly,flame_height))
         if(eval <= DERIVATIVE_COMP):
