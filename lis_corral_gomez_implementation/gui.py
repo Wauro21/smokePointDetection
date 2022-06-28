@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 import ttkthemes
-from tkinter.filedialog import askopenfile
+from tkinter.filedialog import askopenfilename
+
 
 class  MainWindow:
 
@@ -26,8 +27,9 @@ class FileBox:
 
 
     def openFile(self):
-        file = askopenfile(mode='r', filetypes = [('Python Files', '*.py')])
-
+        # This method for when processing A video
+        file = askopenfilename(filetypes = [('Video Files', '*.avi')])
+        return file
 
 
 def main():
