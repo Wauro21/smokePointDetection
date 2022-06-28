@@ -7,6 +7,7 @@ name = "pypi"
 opencv-python = "*"
 matplotlib = "*"
 progress = "*"
+ttkthemes = "*"
 
 [dev-packages]
 
