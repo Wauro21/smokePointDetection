@@ -1,7 +1,0 @@
-# Ignore sample data and results
-sample_data_color/
-sample_results/
-
-#Ignore temp results from algorithm
-*.pdf
-*.pgf
