@@ -28,13 +28,8 @@ class FrameHolder(QWidget):
         gray_fill = QPixmap(680,480)
         gray_fill.fill(QColor('darkGray'))
         self.frame_label.setPixmap(gray_fill)
-
-
-        self.top_text = QLabel('This is a video test')
-
         # Layout
         vbox = QVBoxLayout()
-        vbox.addWidget(self.top_text)
         vbox.addWidget(self.frame_label)
         # Add to widget
         self.setLayout(vbox)
