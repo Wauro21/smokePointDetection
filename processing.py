@@ -8,9 +8,7 @@ import math
 from processing_options import argsHandler
 # Default values
 MAX_PIXEL_VALUE = 255
-CORE_THRESHOLD_PERCENT = 0.75
-CONTOUR_THRESHOLD_PERCENT = 0.35
-MAX_CENTROID_TOLERANCE = 50.0
+MAX_CENTROID_TOLERANCE = 10
 DERIVATIVE_COMP = 2e-5
 # -> Convertion values
 M_PX_CM = 0.1038
@@ -101,39 +99,22 @@ def getConnectedComponents(threshold_image, connect, display_process):
 
 def smokepoint(args):
     # Set Threshold values
-    # - Redefine core's threshold
-    if(args.TresholdCore):
-        try:
-            core_percent = float(args.TresholdCore)/100
-        except ValueError:
-            print("[ERROR] Couldn't convert value to float. Core's threshold value may be invalid!")
-            exit(1)
-    else:
-        core_percent = CORE_THRESHOLD_PERCENT
+    core_percent = args.ThresholdCore/100
     CORE_THRESHOLD = round(MAX_PIXEL_VALUE*core_percent)
-    # - Redefine core's threshold
-    if(args.TresholdContour):
-        try:
-            contour_percent = float(args.TresholdContour)/100
-        except ValueError:
-            print("[ERROR] Couldn't convert value to float. Contours's threshold value may be invalid!")
-            exit(1)
-    else:
-        contour_percent = CONTOUR_THRESHOLD_PERCENT
-    CONTOUR_THRESHOLD = round(MAX_PIXEL_VALUE*CONTOUR_THRESHOLD_PERCENT)
-
-    # Inform the user the values that will be used for thresholding
-    print("[INFO] The threshold values are:\n\tCore: {}\n\tContour: {}".format(CORE_THRESHOLD,CONTOUR_THRESHOLD))
+    contour_percent = args.ThresholdContour/100
+    CONTOUR_THRESHOLD = round(MAX_PIXEL_VALUE*contour_percent)
+    if(args.Verbose):
+        print("[INFO] The threshold values are:\n\tCore: {}\n\tContour: {}".format(CORE_THRESHOLD,CONTOUR_THRESHOLD))
 
     # [FIX]: Add image (batch) processing not only video
-    if(args.Video):
+    if(args.Input):
         try:
-            print("[INFO] Video {} will be processed".format(args.Video))
-            vid = cv2.VideoCapture(args.Video)
+            print("[INFO] Video {} will be processed".format(args.Input))
+            vid = cv2.VideoCapture(args.Input)
             # Extract number of frames for progress bar
             n_frames = int(vid.get(cv2. CAP_PROP_FRAME_COUNT))
         except cv2.error as e:
-            print("[ERROR] Video couldn't be opened or found!")
+            print("[ERROR] Video could not be opened or found!")
     else:
         print("[WARNING] No input video was given! Ending program.")
         exit(1)
@@ -148,32 +129,30 @@ def smokepoint(args):
     values = FlameEstimator()
     invalid_frames = 0
     # Generating a progress bar
-    bar = Bar('Processing', max=n_frames)
+    if args.Verbose:
+        bar = Bar('Processing', max=n_frames)
     while vid.isOpened():
         ret, frame = vid.read()
         if not ret:
             print("[INFO] End of stream, processing is done")
             break
-        else:
-            # 1 - Convert input to grayscale
-            gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            # 2 - Umbralize
-            t_core_ret, core_t = cv2.threshold(gray_frame,CORE_THRESHOLD, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
-            t_contour_ret, contour_t = cv2.threshold(gray_frame, CONTOUR_THRESHOLD, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
-
-            # 3 - Height: From connected components get the info
-            core_components = getConnectedComponents(core_t, 4, False)
-            contour_components = getConnectedComponents(contour_t, 4, False)
-
-            contour_height = contour_components['h']
-            contour_height_mm = px2mm(contour_height)
-            # For this operation, consider that (0,0) is top left corner
-            tip_height =  core_components['y'] -contour_components['y']
-            tip_height_mm = px2mm(tip_height)
-            # If needed, show bounding boxes for core and countour
-            if(args.Boxes):
-                cv2.rectangle(frame, (contour_components['x'],contour_components['y']), (contour_components['x']+contour_components['w'], contour_components['y']+contour_components['h']), (0,255,0),3)
-                cv2.rectangle(frame, (core_components['x'],core_components['y']), (core_components['x']+core_components['w'], core_components['y']+core_components['h']), (0,0,255),3)
+        # 1 - Convert input to grayscale
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # 2 - Umbralize
+        t_core_ret, core_t = cv2.threshold(gray_frame,CORE_THRESHOLD, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
+        t_contour_ret, contour_t = cv2.threshold(gray_frame, CONTOUR_THRESHOLD, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
+        # 3 - Height: From connected components get the info
+        core_components = getConnectedComponents(core_t, 4, False)
+        contour_components = getConnectedComponents(contour_t, 4, False)
+        contour_height = contour_components['h']
+        contour_height_mm = px2mm(contour_height)
+        # For this operation, consider that (0,0) is top left corner
+        tip_height =  core_components['y'] -contour_components['y']
+        tip_height_mm = px2mm(tip_height)
+        # If needed, show bounding boxes for core and countour
+        if(args.Boxes):
+            cv2.rectangle(frame, (contour_components['x'],contour_components['y']), (contour_components['x']+contour_components['w'], contour_components['y']+contour_components['h']), (0,255,0),3)
+            cv2.rectangle(frame, (core_components['x'],core_components['y']), (core_components['x']+core_components['w'], core_components['y']+core_components['h']), (0,0,255),3)
             # write info to frame
             info_text = "h: {} px H: {} px".format(contour_height, tip_height)
             frame_info = write2Frame(frame, (50,50), 1, (0,255,0),2, info_text)
@@ -199,8 +178,10 @@ def smokepoint(args):
                 cv2.imshow("input", frame_info)
                 if cv2.waitKey(1) == ord('q'):
                     break
-            bar.next()
-    bar.finish()
+            if args.Verbose:
+                bar.next()
+    if args.Verbose:
+        bar.finish()
     vid.release()
     if(args.Display):
         cv2.destroyAllWindows()
