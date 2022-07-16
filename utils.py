@@ -61,3 +61,29 @@ def px2mm(value):
 
 def heightBox(frame, cc, color):
     cv2.rectangle(frame, (cc['x'],cc['y']), (cc['x']+cc['w'], cc['y']+cc['h']), box_colors[color],3)
+
+
+def resultPlotting(sp_results):
+    fig = plt.figure()
+    # Unpack data
+    h = sp_results['height']
+    H = sp_results['tip_height']
+
+    # Analysis of raw data
+    plt.subplot(3,1,1)
+    # -> Raw height data
+    plt.scatter(h,H, color='b', label='Tip Height')
+    # -> Poly fitted
+    low_bound = math.floor(min(h))
+    upp_bound = math.ceil(max(h))
+    samples = len(h)
+    show_heights = np.linspace(low_bound, upp_bound, samples)
+    show_poly_val = np.polyval(tenth_poly, show_heights)
+    plt.plot(show_heights, show_poly_val,'r',label='Tenth order poly fitted')
+    plt.xlabel('Flame height px')
+    plt.ylabel('Flame tip height px')
+    plt.grid()
+    plt.title('Raw Data Analysis')
+
+    # Derivative analysis
+    
