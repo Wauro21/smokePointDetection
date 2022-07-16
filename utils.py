@@ -1,4 +1,7 @@
 import cv2
+from matplotlib import pyplot as plt
+import math
+import numpy as np
 
 # Colors for height boxes
 box_colors = {
@@ -68,6 +71,13 @@ def resultPlotting(sp_results):
     # Unpack data
     h = sp_results['height']
     H = sp_results['tip_height']
+    tenth_poly = sp_results['tenth_poly']
+    der_poly = sp_results['tenth_der']
+    linear_poly = sp_results['linear_poly']
+    linear_region_start = sp_results['linear_region_start']
+    linear_region_end = sp_results['linear_region_end']
+    sp_height = sp_results['sp_height']
+    sp_Height = sp_results['sp_Height']
 
     # Analysis of raw data
     plt.subplot(3,1,1)
@@ -84,6 +94,37 @@ def resultPlotting(sp_results):
     plt.ylabel('Flame tip height px')
     plt.grid()
     plt.title('Raw Data Analysis')
+    plt.legend()
 
     # Derivative analysis
-    
+    plt.subplot(3,1,2)
+    h_sorted = h
+    h_sorted.sort()
+    show_der_val = np.polyval(der_poly, h_sorted)
+    # -> plot raw der values
+    plt.scatter(h,show_der_val, color='b', label='Derivative raw data')
+    # -> plot der poly
+    plt.plot(h_sorted, show_der_val, color='b', label='Derivative of 10th poly')
+    # -> Linear region mark
+    plt.axvspan(h[linear_region_start], h[linear_region_end], color='r', alpha=0.3, label='Linear Region')
+    plt.title('Derivative Analysis')
+    plt.xlabel('Flame height px')
+    plt.ylabel('2nd derivative of tip height')
+    plt.grid()
+    plt.legend()
+
+    # SP plot
+    plt.subplot(3,1,3)
+    plt.plot(show_heights, show_poly_val, color='r', label='10th order poly')
+    # -> Linear region reference
+    show_linear_poly = np.polyval(linear_poly, h)
+    plt.plot(h_sorted, show_linear_poly, color='c', label='Linear Fit')
+    # -> Plot SP
+    plt.scatter(sp_height, sp_Height, s=50, color='m', label='Smoke Point')
+    plt.axhline(y=sp_Height, color='k', linestyle='dashed')
+    plt.axvline(x=sp_height, color='k', linestyle='dashed')
+    plt.text(0.2,0.8, 'SP HEIGHT {} px'.format(sp_height), transform=plt.gca().transAxes)
+    plt.legend()
+    plt.grid()
+    plt.tight_layout()
+    plt.show()

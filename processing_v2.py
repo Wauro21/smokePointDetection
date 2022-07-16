@@ -5,7 +5,7 @@ import csv
 import math
 from processing_options import argsHandler
 import os
-from utils import verbosePrint, getConnectedComponents, heightBox
+from utils import verbosePrint, getConnectedComponents, heightBox, resultPlotting
 from matplotlib import pyplot as plt
 
 # Default Values
@@ -88,7 +88,6 @@ def smokepoint(args):
 		# Check if frame is not valid
 		if(centroid_diff > MAX_CENTROID_TOLERANCE):
 			invalid_frame_counter +=1
-			verbosePrint(args.Verbose, "Invalid Frame {}".format(invalid_frame_counter))
 			continue
 		# If valid, get height data
 		h.append(contour_height)
@@ -148,75 +147,14 @@ def smokepoint(args):
 		'tip_height':H,				# Tip height values
 		'tenth_poly':tenth_poly,	# 10th poly coef
 		'tenth_der':der_poly,		# Derivativa of 10th poly
+		'linear_poly':linear_poly,	# Linear region poly
 		'linear_region_start':linear_region_start,
 		'linear_region_end':linear_region_end,
 		'sp_height':sp_height,		# flame height at sp
 		'sp_Height':sp_Height,		# tip height at sp
+		'n_invalid_frames':invalid_frame_counter
 	}
-
-	# Remove after debugging
-	debug_plot = plt.figure()
-	plt.subplot(3,1,1)
-	# Plot raw data
-	plt.scatter(h,H,color='b', label='Raw height data')
-	# Plot poly
-	low_bound = math.floor(min(h))
-	upp_bound = math.ceil(max(h))
-	samples = len(h)
-	show_heights = np.linspace(low_bound, upp_bound, samples)
-	show_poly_val = np.polyval(tenth_poly, show_heights)
-	plt.plot(show_heights, show_poly_val,'r',label='Tenth order poly')
-	# Plot raw linear data
-	plt.scatter(list(linear_region_points.keys()), list(linear_region_points.values()),color='g',label='Raw linear points')
-	# Plot linear poly
-	linear_h = list(linear_region_points.keys())
-	show_linear_poly = np.polyval(linear_poly, linear_h)
-	plt.plot(linear_h, show_linear_poly, color='c', label='Linear Fit')
-	plt.xlabel('Flame height px')
-	plt.ylabel('Flame Tip height px')
-	plt.grid()
-	plt.title('Analysis of RAW Data')
-	plt.legend()
-
-	plt.subplot(3,1,2)
-
-	h_sorted = h
-	h_sorted.sort()
-	show_der_val = np.polyval(der_poly, h_sorted)
-	# plot raw der
-	plt.scatter(h, show_der_val, color='b', label='Derivative raw data')
-	# Plot derivative
-	plt.plot(h_sorted, show_der_val,color='b',label='Derivative of 10th poly')
-	# Lineal region
-	plt.axvspan(h[linear_region_start], h[linear_region_end], color='r', alpha=0.3, label='Lineal Region')
-	# Interest region
-	plt.axhline(y=DER_LOW_BOUND, color='k', linestyle='dashed')
-	plt.axhline(y=-DER_LOW_BOUND, color='k', linestyle='dashed')
-	plt.title('Derivative Analysis')
-	plt.xlabel('Flame height px')
-	plt.ylabel('Flame Tip height px')
-	plt.grid()
-	plt.legend()
-
-	plt.subplot(3,1,3)
-	# Poly for reference
-	plt.plot(show_heights, show_poly_val,'r',label='Tenth order poly')
-	# Linear region for reference
-	show_linear_poly = np.polyval(linear_poly,h)
-	plt.plot(h_sorted, show_linear_poly, color='c', label='Linear Fit')
-	# Plot SP
-	plt.scatter(sp_height, sp_Height, s=50, color='m', label='Smoke Point')
-	plt.legend()
-	# Plot dashed lines for SP
-	plt.axhline(y=sp_Height, color='k', linestyle='dashed')
-	plt.axvline(x=sp_height, color='k', linestyle='dashed')
-	plt.text(0.2,0.8, 'SP HEIGHT {} px'.format(sp_height), transform=plt.gca().transAxes)
-	plt.grid()
-
-	plt.tight_layout()
-	plt.show()
-
-
+	return ret_dict
 
 
 
@@ -224,4 +162,5 @@ def smokepoint(args):
 
 if __name__ == '__main__':
 	args = argsHandler()
-	smokepoint(args)
+	sp_vals = smokepoint(args)
+	resultPlotting(sp_vals)
