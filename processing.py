@@ -18,7 +18,7 @@ SP_THRESHOLD = 1 #px, converted from the 0,1mm by authors
 CENTROID_RADIUS = 10
 
 
-def smokepoint(args):
+def smokepoint(args, signalObject=None):
 	# Load the data (video or folder)
 	media = cv2.VideoCapture(args.Input)
 	n_frames = int(media.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -97,7 +97,6 @@ def smokepoint(args):
 			cv2.imshow('input', frame)
 			if cv2.waitKey(1) == ord('q'):
 				break
-
 	 # End of media reading
 
 	if(bar):
