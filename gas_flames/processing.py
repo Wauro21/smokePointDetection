@@ -18,7 +18,7 @@ def borderEnhance(frame):
 
     # AVG
 
-    n = 3
+    n = 1
     p = n -1
     factor = 1/n
     avg = np.zeros_like(gray_frame)
@@ -52,11 +52,13 @@ def borderEnhance(frame):
     abs_grad_x = cv2.convertScaleAbs(sobel_x)
     abs_grad_y = cv2.convertScaleAbs(sobel_y)
 
-    grad = cv2.addWeighted(abs_grad_x, 0.0, abs_grad_y, 1.0,0)
+    grad = cv2.addWeighted(abs_grad_x, 0.2, abs_grad_y, 0.8,0)
+    test = cv2.addWeighted(grad, 1.0, gray_frame, -0.9, 0)
 
     sharped = cv2.filter2D(grad, ddepth=-1, kernel=sharp_k)
+    # cv2.imwrite('ricardo_afilado.png',sharped)
 
-    ret, thresh = cv2.threshold(sharped, 100, 255, cv2.THRESH_BINARY)
+    ret, thresh = cv2.threshold(test, 100, 255, cv2.THRESH_BINARY)
     
     morph_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
 
@@ -69,7 +71,7 @@ def borderEnhance(frame):
     fig, axs = plt.subplots(1,4)
     fig.suptitle('Gas flame')
 
-    axs[0].imshow(gray_frame, cmap='gray')
+    axs[0].imshow(test, cmap='gray')
     axs[0].set_title('Gray input image')
 
     axs[1].imshow(cc_mask, cmap='gray')
@@ -134,7 +136,7 @@ def borderEnhance(frame):
 image = True
 #path = '/mnt/shared/SP_18_08_22/sp_test_30fps_1/Basler_acA2040-55uc__23734412__20220818_183353703_%04d.tiff'
 path = '/mnt/shared/SP_18_08_22/sp_test_30fps_1/Basler_acA2040-55uc__23734412__20220818_183353703_{:04d}.tiff'
-index = 11000
+index = 2000#11000
 path = path.format(index)
 print(path) 
 if (image):
