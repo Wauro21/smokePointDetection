@@ -138,9 +138,11 @@ def dataLoader(arg_string):
     # Check if is folder with images
     elif(os.path.isdir(arg_string)):
         files = os.listdir(arg_string)
-        n_file = len(files)
+        #n_file = len(files)
+        files.sort()
         file_ = files[0]
         prefix = file_.replace('0000', '%04d')
+        print(prefix)
         return os.path.join(arg_string, prefix)
     
     # Not a valid input exit
