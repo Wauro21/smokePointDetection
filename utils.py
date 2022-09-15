@@ -2,6 +2,7 @@ import cv2
 from matplotlib import pyplot as plt
 import math
 import numpy as np
+import os
 
 # Colors for height boxes
 box_colors = {
@@ -128,3 +129,20 @@ def resultPlotting(sp_results):
     plt.grid()
     plt.tight_layout()
     plt.show()
+
+def dataLoader(arg_string):
+    # Check if arg is file
+    if(os.path.isfile(arg_string)):
+        return arg_string
+
+    # Check if is folder with images
+    elif(os.path.isdir(arg_string)):
+        files = os.listdir(arg_string)
+        n_file = len(files)
+        file_ = files[0]
+        prefix = file_.replace('0000', '%04d')
+        return os.path.join(arg_string, prefix)
+    
+    # Not a valid input exit
+    print('Not a valid input!')
+    exit(1)

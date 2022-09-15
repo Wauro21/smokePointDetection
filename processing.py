@@ -5,22 +5,24 @@ import csv
 import math
 from processing_options import argsHandler
 import os
-from utils import verbosePrint, getConnectedComponents, heightBox, resultPlotting
+from utils import verbosePrint, getConnectedComponents, heightBox, resultPlotting, dataLoader
 from matplotlib import pyplot as plt
-
+import matplotlib
+matplotlib.use('tkAgg')
 # Default Values
 MAX_PIXEL_VALUE = 255
 MAX_CENTROID_TOLERANCE = 10 #px, converted from the 1mm by authors
-DER_LOW_BOUND = 2e-5
+#DER_LOW_BOUND = 2e-5
 SP_THRESHOLD = 1 #px, converted from the 0,1mm by authors
 
 # Drawing values
 CENTROID_RADIUS = 10
 
 
-def smokepoint(args, signalObject=None):
+def smokepoint(args):
 	# Load the data (video or folder)
-	media = cv2.VideoCapture(args.Input)
+	parsed = dataLoader(args.Input)
+	media = cv2.VideoCapture(parsed,0)
 	n_frames = int(media.get(cv2.CAP_PROP_FRAME_COUNT))
 	# Set threshold for core and countour
 	core_threshold_value = round(MAX_PIXEL_VALUE*args.ThresholdCore/100)
@@ -116,7 +118,7 @@ def smokepoint(args, signalObject=None):
 
 	for flame_pos, flame_height in enumerate(h):
 		eval = abs(np.polyval(der_poly, flame_height))
-		if(eval <= DER_LOW_BOUND):
+		if(eval <= args.DerivativeThreshold):
 			linear_region_points[flame_height] = np.polyval(tenth_poly, flame_height)
 			if linear_interval_flag:
 				linear_region_start = flame_pos
@@ -139,7 +141,7 @@ def smokepoint(args, signalObject=None):
 			sp_Height = poly_H_val
 			break
 
-	verbosePrint(args.Verbose, 'SP height found {}'.format(sp_height))
+	verbosePrint(args.Verbose, 'SP height found {} at frame {}'.format(sp_height, flame_pos))
 
 	ret_dict = {
 		'height':h,					# flame height values
@@ -153,6 +155,12 @@ def smokepoint(args, signalObject=None):
 		'sp_Height':sp_Height,		# tip height at sp
 		'n_invalid_frames':invalid_frame_counter
 	}
+
+	if(args.SaveValues):
+		np.savetxt(args.SaveValues+'_flame_height.csv', ret_dict['height'],delimiter=',')
+		np.savetxt(args.SaveValues+'_tip_height.csv', ret_dict['tip_height'],delimiter=',')
+
+
 	return ret_dict
 
 
@@ -162,4 +170,5 @@ def smokepoint(args, signalObject=None):
 if __name__ == '__main__':
 	args = argsHandler()
 	sp_vals = smokepoint(args)
+	print('Invalid Frames : {}'.format(sp_vals['n_invalid_frames']))
 	resultPlotting(sp_vals)
