@@ -26,6 +26,7 @@ def argsHandler():
         parser.add_argument("-bb","--Boxes", help="Shows bounding boxes for the regions", action='store_true')
         parser.add_argument("-sv","--SaveValues", help="Generates a file, saving the estimated height values, the coefficientes of the polynoms and the resulting plots")
         parser.add_argument("-mm", help= "Uses the px to mm convertion for thes calculations", action='store_true')
+        parser.add_argument("-cut", help="Cut the frames columnwise from center axis", type=int)
         parser.add_argument("--Verbose", action='store_true', help='If passed enables information prints through terminal.')
         args = parser.parse_args()
         return args

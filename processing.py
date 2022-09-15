@@ -24,6 +24,8 @@ def smokepoint(args):
 	parsed = dataLoader(args.Input)
 	media = cv2.VideoCapture(parsed,0)
 	n_frames = int(media.get(cv2.CAP_PROP_FRAME_COUNT))
+	width = int(media.get(cv2.CAP_PROP_FRAME_WIDTH))
+	height = int(media.get(cv2.CAP_PROP_FRAME_HEIGHT))
 	# Set threshold for core and countour
 	core_threshold_value = round(MAX_PIXEL_VALUE*args.ThresholdCore/100)
 	contour_threshold_value = round(MAX_PIXEL_VALUE*args.ThresholdContour/100)
@@ -53,6 +55,11 @@ def smokepoint(args):
 
 		if(bar):
 			bar.next()
+		# -> Check if cutting the frame is needed
+		if(args.cut):
+			cut = args.cut//2
+			center_line = width//2
+			frame = frame[:,center_line-cut:center_line+cut]
 
 		# -> Convert to grayscale
 		gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
