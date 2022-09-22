@@ -18,8 +18,23 @@ SP_THRESHOLD = 1 #px, converted from the 0,1mm by authors
 # Drawing values
 CENTROID_RADIUS = 10
 
+# Fig save padding
+FIG_PADDING = 200 #px
+
 
 def smokepoint(args):
+	# Check folder for output data
+	out_path = args.runName
+	if not(os.path.isdir(out_path)):
+		os.mkdir(out_path)
+
+
+	out_frame_folder = os.path.join(out_path,'frames')
+	if not(os.path.isdir(out_frame_folder)):
+		os.mkdir(out_frame_folder)
+
+
+
 	# Load the data (video or folder)
 	parsed = dataLoader(args.Input)
 	media = cv2.VideoCapture(parsed,0)
@@ -29,6 +44,8 @@ def smokepoint(args):
 	# Set threshold for core and countour
 	core_threshold_value = round(MAX_PIXEL_VALUE*args.ThresholdCore/100)
 	contour_threshold_value = round(MAX_PIXEL_VALUE*args.ThresholdContour/100)
+
+	save_cut = height//2 + 100
 
 	verbosePrint(args.Verbose,"[INFO] The threshold values are:\n\tCore: {}\n\tContour: {}".format(core_threshold_value,contour_threshold_value))
 
@@ -46,12 +63,14 @@ def smokepoint(args):
 	reference_centroid_x = -float('inf')
 	reference_centroid_y = -float('inf')
 	invalid_frame_counter = 0
+	frame_counter = 0
 	# Perform frame by frame processing
 	while media.isOpened():
 		ret, frame = media.read()
 		if not ret:
 			verbosePrint(args.Verbose, "[INFO] End of stream, processing is done")
 			break
+		frame_counter += 1
 
 		if(bar):
 			bar.next()
@@ -77,20 +96,31 @@ def smokepoint(args):
 		# Consider that (0,0) is top left corner
 		tip_height = core_components['y'] - contour_components['y']
 
-		if(args.Boxes):
-			heightBox(frame, core_components,'r')
-			heightBox(frame, contour_components,'g')
-
-
 		if(first_frame_flag):
 			reference_centroid_x = contour_components['cX']
 			reference_centroid_y = contour_components['cY']
 			first_frame_flag = False
+			# Manually add the values of h and H, before continuing
+			h.append(contour_height)
+			H.append(tip_height)
 			continue
 
+
+		if(args.saveFig and (args.saveFig == frame_counter)):
+			cv2.imwrite(os.path.join(out_frame_folder,'original_{}.png'.format(args.saveFig)),frame[save_cut-FIG_PADDING:save_cut+FIG_PADDING,:])
+			cv2.imwrite(os.path.join(out_frame_folder,'gray_{}.png'.format(args.saveFig)),gray_frame[save_cut-FIG_PADDING:save_cut+FIG_PADDING,:])
+			cv2.imwrite(os.path.join(out_frame_folder,'core_thresh_{}.png'.format(args.saveFig)),core_thresh[save_cut-FIG_PADDING:save_cut+FIG_PADDING,:])
+			cv2.imwrite(os.path.join(out_frame_folder,'contour_thresh_{}.png'.format(args.saveFig)),contour_thresh[save_cut-FIG_PADDING:save_cut+FIG_PADDING,:])
+
+		if(args.Boxes):
+			heightBox(frame, core_components,'r')
+			heightBox(frame, contour_components,'g')
 		# Draw reference centroid and frame centroid [TO-DO:ARGUMENT?]
 		cv2.circle(frame, (int(reference_centroid_x), int(reference_centroid_y)), CENTROID_RADIUS, (255,0,255),-1)
 		cv2.circle(frame, (int(contour_components['cX']),int(contour_components['cY'])), CENTROID_RADIUS, (255,0,0),-1)
+
+		if(args.saveFig and (args.saveFig == frame_counter)):
+			cv2.imwrite(os.path.join(out_frame_folder,'original_with_data_{}.png'.format(args.saveFig)),frame[save_cut-FIG_PADDING:save_cut+FIG_PADDING,:])
 
 		centroid_diff = abs(contour_components['cX']-reference_centroid_x)
 
@@ -121,6 +151,7 @@ def smokepoint(args):
 	# -> Get linear region
 	linear_interval_flag = True
 	linear_region_start = -float('inf')
+	linear_region_end = float('inf')
 	linear_region_points = {}
 
 	for flame_pos, flame_height in enumerate(h):
@@ -131,24 +162,32 @@ def smokepoint(args):
 				linear_region_start = flame_pos
 				linear_interval_flag = False
 			linear_region_end = flame_pos
+
+	# Check if linear region does in fact was found
+	if(len(linear_region_points) <= 2):
+		print("No enough points ({}) were found to set the linear region with derivative threshold of {}".format(len(linear_region_points),args.DerivativeThreshold))
+		linear_poly = None
+		sp_height = None
+		sp_Height = None
+	else:
 	# Linear regresion for points of region
-	linear_poly = np.polyfit(list(linear_region_points.keys()),list( linear_region_points.values()),1)
+		linear_poly = np.polyfit(list(linear_region_points.keys()),list( linear_region_points.values()),1)
 
-	# -> Get first value over the linear region
-	# Save coordinates of the point
-	sp_height = -float('inf')
-	sp_Height = -float('inf')
-	for flame_pos in range(linear_region_start, len(h)):
-		flame_height = h[flame_pos]
-		poly_H_val = np.polyval(tenth_poly, flame_height)
-		poly_linear_val = np.polyval(linear_poly, flame_height)
-		distance = poly_H_val - poly_linear_val
-		if(distance > SP_THRESHOLD):
-			sp_height = flame_height
-			sp_Height = poly_H_val
-			break
+		# -> Get first value over the linear region
+		# Save coordinates of the point
+		sp_height = -float('inf')
+		sp_Height = -float('inf')
+		for flame_pos in range(linear_region_start, len(h)):
+			flame_height = h[flame_pos]
+			poly_H_val = np.polyval(tenth_poly, flame_height)
+			poly_linear_val = np.polyval(linear_poly, flame_height)
+			distance = poly_H_val - poly_linear_val
+			if(distance > SP_THRESHOLD):
+				sp_height = flame_height
+				sp_Height = poly_H_val
+				break
 
-	verbosePrint(args.Verbose, 'SP height found {} at frame {}'.format(sp_height, flame_pos))
+		verbosePrint(args.Verbose, 'SP height found {} at frame {}'.format(sp_height, flame_pos))
 
 	ret_dict = {
 		'height':h,					# flame height values
@@ -163,9 +202,10 @@ def smokepoint(args):
 		'n_invalid_frames':invalid_frame_counter
 	}
 
-	if(args.SaveValues):
-		np.savetxt(args.SaveValues+'_flame_height.csv', ret_dict['height'],delimiter=',')
-		np.savetxt(args.SaveValues+'_tip_height.csv', ret_dict['tip_height'],delimiter=',')
+	if(args.saveFig):
+		np.savetxt(os.path.join(out_path,'flame_height.csv'), ret_dict['height'],delimiter=',')
+		np.savetxt(os.path.join(out_path,'tip_height.csv'), ret_dict['tip_height'],delimiter=',')
+		np.savetxt(os.path.join(out_path,'n_invalid_frames.csv'), ret_dict['n_invalid_frames'])
 
 
 	return ret_dict
@@ -178,4 +218,4 @@ if __name__ == '__main__':
 	args = argsHandler()
 	sp_vals = smokepoint(args)
 	print('Invalid Frames : {}'.format(sp_vals['n_invalid_frames']))
-	resultPlotting(sp_vals)
+	resultPlotting(sp_vals,args.Display)

@@ -67,7 +67,7 @@ def heightBox(frame, cc, color):
     cv2.rectangle(frame, (cc['x'],cc['y']), (cc['x']+cc['w'], cc['y']+cc['h']), box_colors[color],3)
 
 
-def resultPlotting(sp_results):
+def resultPlotting(sp_results,display):
     fig = plt.figure()
     # Unpack data
     h = sp_results['height']
@@ -128,7 +128,12 @@ def resultPlotting(sp_results):
     plt.legend()
     plt.grid()
     plt.tight_layout()
-    plt.show()
+
+    if(display):
+        plt.show()
+
+    plt.savefig('demo.pdf')
+    
 
 def dataLoader(arg_string):
     # Check if arg is file
