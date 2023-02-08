@@ -11,6 +11,8 @@ class CentralWidget(QWidget):
     def __init__(self, parent=None):
 
         super().__init__(parent)
+
+        self.prefix = None
         
         # Objects 
 
@@ -20,6 +22,7 @@ class CentralWidget(QWidget):
         # Init routines
 
         # Signals and Slots
+        self.LoadWidget.prefix_signal.connect(self.setPrefix)
 
         # Layout
         # -> Demo layout
@@ -27,6 +30,9 @@ class CentralWidget(QWidget):
         layout.addWidget(self.LoadWidget)
 
         self.setLayout(layout)
+
+    def setPrefix(self, prefix):
+        self.prefix = prefix
 
 
 
