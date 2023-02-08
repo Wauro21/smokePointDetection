@@ -4,7 +4,7 @@ import os
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
 from LoadWidget import LoadWidget
 from VideoPlayer import FrameHolder
-
+from PlotWidget import PlotWidget
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 
@@ -20,6 +20,7 @@ class CentralWidget(QWidget):
         # Widgets
         self.LoadWidget = LoadWidget(self)
         self.VideoWidget = FrameHolder(self)
+        self.PlotWidget = PlotWidget(self)
         self.prueba = QPushButton('demo', self)
 
         # Init routines
@@ -36,6 +37,7 @@ class CentralWidget(QWidget):
         layout.addWidget(self.LoadWidget)
         layout.addWidget(self.VideoWidget)
         layout.addWidget(self.prueba)
+        layout.addWidget(self.PlotWidget)
 
         self.setLayout(layout)
 
@@ -44,7 +46,7 @@ class CentralWidget(QWidget):
         self.prueba.setEnabled(True)
 
     def requestPlayback(self):
-        self.VideoWidget.startPlayback(self.video_path)
+        self.VideoWidget.startPlayback(self.video_path, self.PlotWidget.update)
 
 
 

@@ -26,6 +26,7 @@ class LoadWidget(QWidget):
         self.field_description = QLabel('File:')
         self.display_path = QLineEdit(LOAD_WIDGET_FILE_DEFAULT_MESSAGE, self)
         self.open_button = QPushButton('Open')
+        self.preprocess_button = QPushButton('Preprocess')
 
         #  Init routine
         # -> Bold texts for labels
@@ -49,6 +50,7 @@ class LoadWidget(QWidget):
         layout.addWidget(self.field_description)
         layout.addWidget(self.display_path)
         layout.addWidget(self.open_button)
+        layout.addWidget(self.preprocess_button)
 
         self.setLayout(layout)
 
