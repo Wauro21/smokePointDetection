@@ -13,7 +13,7 @@ __author__ = 'maurio.aravena@sansano.usm.cl'
 class LoadWidget(QWidget):
 
     # Custom signals
-    prefix_signal = QtCore.pyqtSignal(str)
+    path_signal = QtCore.pyqtSignal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -92,7 +92,8 @@ class LoadWidget(QWidget):
             warning.exec_()
             return False
 
-        self.prefix_signal.emit(prefix)        
+        frames_path = os.path.join(folder, prefix)
+        self.path_signal.emit(frames_path)        
         return True
 
 if __name__ == '__main__':
