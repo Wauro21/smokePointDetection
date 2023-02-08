@@ -62,7 +62,6 @@ class LoadWidget(QWidget):
 
             if fileDialog.exec_():
                 folder = fileDialog.selectedFiles()[0]
-                print(folder)
                 # Validate folder
                 valid = self.checkFolder(folder)
 
