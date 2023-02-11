@@ -4,7 +4,7 @@ import os
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QLineEdit, QPushButton, QFileDialog
 
-from Constants import LOAD_WIDGET_FILE_DEFAULT_MESSAGE, LOAD_WIDGET_FILE_DIALOG_HEADER_TITLE
+from GUI_CONSTANTS import LOAD_WIDGET_FILE_DEFAULT_MESSAGE, LOAD_WIDGET_FILE_DIALOG_HEADER_TITLE
 from MessageBox import WarningBox
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'

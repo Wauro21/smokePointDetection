@@ -4,7 +4,7 @@ from PyQt5.QtGui import QPixmap, QColor, QImage
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread, Qt
 import sys
 import numpy as np
-from Constants import VIDEO_PLAYER_BG_COLOR
+from GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR
 from MessageBox import WarningBox
 import random
 from utils import getConnectedComponents
