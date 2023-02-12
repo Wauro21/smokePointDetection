@@ -1,10 +1,11 @@
 import sys
 import os
 
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout
 from LoadWidget import LoadWidget
 from VideoPlayer import FrameHolder
 from PlotWidget import PlotWidget
+from GUI_CONSTANTS import FrameTypes
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 
@@ -17,11 +18,27 @@ class CentralWidget(QWidget):
         
         # Objects 
 
+        # -> Control dictionary 
+        self.process_controls = {
+            'core_%': 0,
+            'contour_%': 0,
+            'cut': None,
+            'bboxes': False,
+            'centroids': False, 
+            'h': None,
+            'H': None,
+            'display': FrameTypes.FRAME,
+
+        }
+
+
         # Widgets
         self.LoadWidget = LoadWidget(self)
-        self.VideoWidget = FrameHolder(self)
+        self.VideoWidget = FrameHolder(self.process_controls, self)
         self.PlotWidget = PlotWidget(self)
         self.prueba = QPushButton('demo', self)
+        self.original = QPushButton('Original', self)
+        self.gray = QPushButton('Gray', self)
 
         # Init routines
         self.prueba.setEnabled(False)
@@ -29,6 +46,8 @@ class CentralWidget(QWidget):
         # Signals and Slots
         self.LoadWidget.path_signal.connect(self.setPrefix)
         self.prueba.clicked.connect(self.requestPlayback)
+        self.original.clicked.connect(lambda: self.demo(FrameTypes.FRAME))
+        self.gray.clicked.connect(lambda: self.demo(FrameTypes.GRAY))
 
 
         # Layout
@@ -38,6 +57,13 @@ class CentralWidget(QWidget):
         layout.addWidget(self.VideoWidget)
         layout.addWidget(self.prueba)
         layout.addWidget(self.PlotWidget)
+        # Demo buttons
+        test = QHBoxLayout()
+        test.addWidget(self.original)
+        test.addWidget(self.gray)
+
+        layout.addLayout(test)
+        
 
         self.setLayout(layout)
 
@@ -48,6 +74,8 @@ class CentralWidget(QWidget):
     def requestPlayback(self):
         self.VideoWidget.startPlayback(self.video_path, self.PlotWidget.update)
 
+    def demo(self, value):
+        self.process_controls['display'] = value
 
 
 if __name__ == '__main__':

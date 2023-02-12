@@ -6,7 +6,7 @@ import csv
 import math
 from processing_options import argsHandler
 import os
-from utils import checkGenerateFolder, plotCentroid, verbosePrint, getConnectedComponents, heightBox, resultPlotting, dataLoader
+from utils import checkGenerateFolder, getThreshvalues, plotCentroid, verbosePrint, getConnectedComponents, heightBox, resultPlotting, dataLoader
 from matplotlib import pyplot as plt
 import matplotlib
 matplotlib.use('tkAgg')
@@ -95,6 +95,7 @@ def frameProcess(frame, cut, core_threshold_value, contour_threshold_value):
     contour_components = getConnectedComponents(contour_thresh, NUMBER_OF_CONNECTED_COMPONENTS)
 
     ret_dict = {
+        'frame': frame, 
         'gray': gray_frame,
         'core': core_thresh,
         'contour': contour_thresh, 
@@ -124,8 +125,8 @@ def smokepoint(args):
     height = int(media.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     # Set threshold for core and countour
-    core_threshold_value = round(MAX_PIXEL_VALUE*args.ThresholdCore/100)
-    contour_threshold_value = round(MAX_PIXEL_VALUE*args.ThresholdContour/100)
+    core_threshold_value = getThreshvalues(args.TresholdCore)
+    contour_threshold_value = getThreshvalues(args.TresholdContour)
     verbosePrint(args.Verbose, THRESHOLD_VALUES_MESSAGE.format(core_threshold_value,contour_threshold_value))
 
     # Set the progress bar for verbose
@@ -209,11 +210,14 @@ def smokepoint(args):
              
         
         # Calculate the centroid difference to check if is a valid frame
-
+        invalid_frame_h = []
+        invalid_frame_H = []
         centroid_diff = abs(frame_results['contour_cc']['cX'] - reference_centroid_x)
 
         if(centroid_diff > MAX_CENTROID_TOLERANCE):
             invalid_frame_counter += 1
+            invalid_frame_h.append(contour_height)
+            invalid_frame_H.append(tip_height)
             continue
         
         # If the data is valid, append it
@@ -232,6 +236,10 @@ def smokepoint(args):
 
     polynomial_results = processHeights(h, H, args.DerivativeThreshold, invalid_frame_counter)
 
+    # Add the invalid frames values
+    polynomial_results['invalid_frames_h'] = invalid_frame_h
+    polynomial_results['invalid_frames_H'] = invalid_frame_H
+
     if(args.saveFig):
         np.savetxt(os.path.join(out_path,'flame_height.csv'), polynomial_results['height'],delimiter=',')
         np.savetxt(os.path.join(out_path,'tip_height.csv'), polynomial_results['tip_height'],delimiter=',')
@@ -247,4 +255,4 @@ if __name__ == '__main__':
     args = argsHandler()
     sp_vals = smokepoint(args)
     print('Invalid Frames : {}'.format(sp_vals['n_invalid_frames']))
-    resultPlotting(sp_vals,args.Display)
+    resultPlotting(sp_vals,True)

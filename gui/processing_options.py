@@ -24,6 +24,7 @@ def argsHandler():
         parser.add_argument("-tcontour", "--ThresholdContour", default=DEFAULT_CONTOUR_THRESHOLD, type=float, help="Percentage of the max value to use as threshold for the contour region. Default is {}".format(DEFAULT_CONTOUR_THRESHOLD))
         parser.add_argument("-dt", "--DerivativeThreshold", help='Lower bound for finding linear region. By default is {}'.format(DEFAULT_DERIVATIVE_THRESHOLD), type=float, default=DEFAULT_DERIVATIVE_THRESHOLD)
         parser.add_argument("-bb","--Boxes", help="Shows bounding boxes for the regions", action='store_true')
+        parser.add_argument("-c","--Centroids", help="Shows reference and frame centroid", action='store_true')
         parser.add_argument("-sv","--SaveValues", help="Generates a file, saving the estimated height values, the coefficientes of the polynoms and the resulting plots")
         parser.add_argument("-mm", help= "Uses the px to mm convertion for thes calculations", action='store_true')
         parser.add_argument("-cut", help="Cut the frames columnwise from center axis", type=int)

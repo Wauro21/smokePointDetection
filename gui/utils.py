@@ -1,3 +1,4 @@
+from CONSTANTS import CENTROID_RADIUS, MAX_PIXEL_VALUE
 import cv2
 from matplotlib import pyplot as plt
 import math
@@ -67,6 +68,9 @@ def heightBox(frame, cc, color):
     cv2.rectangle(frame, (cc['x'],cc['y']), (cc['x']+cc['w'], cc['y']+cc['h']), box_colors[color],3)
 
 
+def plotCentroid(frame, rcX, rcY, color):
+    cv2.circle(frame, (int(rcX), int(rcY)), CENTROID_RADIUS, color,-1)
+
 def resultPlotting(sp_results,display):
     fig = plt.figure()
     # Unpack data
@@ -79,16 +83,11 @@ def resultPlotting(sp_results,display):
     linear_region_end = sp_results['linear_region_end']
     sp_height = sp_results['sp_height']
     sp_Height = sp_results['sp_Height']
-    inv_x = sp_results['invalid_x']
-    inv_y = sp_results['invalid_y']
-
-    print("LINEAR REGION")
-    print(linear_region_start)
-    print(linear_region_end)
+    inv_x = sp_results['invalid_frames_h']
+    inv_y = sp_results['invalid_frames_H']
 
     # Analysis of raw data
     fig = plt.figure()
-
 
     # -> Raw height data
     plt.scatter(h,H, color='b', label='Tip Height')
@@ -171,3 +170,11 @@ def dataLoader(arg_string):
     # Not a valid input exit
     print('Not a valid input!')
     exit(1)
+
+def checkGenerateFolder(path):
+    if not(os.path.isdir(path)):
+        os.mkdir(path)    
+    return path
+
+def getThreshvalues(percentage):
+    return round(MAX_PIXEL_VALUE*percentage/100)

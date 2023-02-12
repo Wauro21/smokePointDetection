@@ -6,65 +6,22 @@ import sys
 import numpy as np
 from GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR
 from MessageBox import WarningBox
-import random
-from utils import getConnectedComponents
-
-class VideoReader(QThread):
-
-    update_frame_signal = pyqtSignal(np.ndarray)
-    values_signal = pyqtSignal(list)
-    
-    def __init__(self, video_path):
-        super().__init__()
-        self.video_path = video_path
-        
-    def run(self):
-        count = 0
-        media = cv2.VideoCapture(self.video_path, 0)
-        
-        while media.isOpened():
-            ret, frame = media.read()
-            if(not ret):
-                break
-
-            H, h = self.processFrame(frame, 10, 5)
-            self.update_frame_signal.emit(frame)
-            self.values_signal.emit([count, h])
-            count += 1
-
-
-    def processFrame(self, frame, tcore, tcontour):
-
-        # -> To grayscale
-        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-        # -> Apply core and contour thresholds
-        ret, core_thresh = cv2.threshold(gray_frame, tcore, 255, cv2.THRESH_BINARY)
-        ret, contour_thresh = cv2.threshold(gray_frame, tcontour, 255, cv2.THRESH_BINARY)
-
-        # -> From connected components, get stats
-        core_components = getConnectedComponents(core_thresh,4)
-        contour_components = getConnectedComponents(contour_thresh,4)
-
-        contour_height = contour_components['h']
-        tip_height = core_components['y'] - contour_components['y']
-
-        return contour_height, tip_height
+from Thread import VideoReader
 
 
 class FrameHolder(QWidget):
     
-    def __init__(self, parent=None):
+    def __init__(self, process_controls, parent=None):
         super().__init__(parent)
 
         self.thread = None
-
+        self.process_controls = process_controls
         # Widgets 
         self.frame_label = QLabel(self)
 
         # Init routines
         
-        gray_fill = QPixmap(480, 640)
+        gray_fill = QPixmap(640, 480)
         gray_fill.fill(QColor(VIDEO_PLAYER_BG_COLOR))
         self.frame_label.setPixmap(gray_fill)
 
@@ -82,7 +39,7 @@ class FrameHolder(QWidget):
             return False
 
 
-        self.thread = VideoReader(video_path)
+        self.thread = VideoReader(video_path, self.process_controls)
         self.thread.update_frame_signal.connect(self.updateLabel)
         self.thread.finished.connect(self.cleanThread)
         self.thread.values_signal.connect(update_function)
@@ -104,7 +61,7 @@ class FrameHolder(QWidget):
         h, w, ch = rgb_img.shape
         bytes_per_line = ch*w
         converted = QImage(rgb_img, w, h, bytes_per_line, QImage.Format_RGB888)
-        converted = converted.scaled(680,480,Qt.KeepAspectRatio)
+        converted = converted.scaled(480, 680,Qt.KeepAspectRatio)
         return QPixmap.fromImage(converted)
 
 if __name__ == '__main__':
