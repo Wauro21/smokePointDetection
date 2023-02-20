@@ -24,3 +24,8 @@ class FrameTypes(Enum):
 # Mouse event offset 
 # -> To feel more natural when selecting the area of interest offset 
 MOUSE_EVENT_PIXEL_OFFSET = 32
+
+
+# Preprocessing
+PREPROCESSING_MINIMUM_WIDTH = 100#
+PREPROCESSING_SCROLL_WIDTH_STEP = 10
