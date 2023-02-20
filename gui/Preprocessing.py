@@ -2,7 +2,7 @@ import math
 import sys
 import os
 import cv2
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QFormLayout, QSpinBox
 from PyQt5.QtGui import QPixmap, QColor, QImage
 from GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, VIDEO_PLAYER_BG_COLOR
 from utils import convert2QT
@@ -19,6 +19,7 @@ class PreprocessingWidget(QWidget):
             'scaled': None,
         }
         # Widgets
+        self.ButtonsWidget = PreprocessingButtonsWidget(self)
         self.frame_label = QLabel(self)
 
         # Init routines
@@ -29,6 +30,7 @@ class PreprocessingWidget(QWidget):
         #Layout
         layout = QHBoxLayout()
         layout.addWidget(self.frame_label)
+        layout.addWidget(self.ButtonsWidget)
 
         self.setLayout(layout)
 
@@ -53,6 +55,10 @@ class PreprocessingWidget(QWidget):
         # Set the frame 
         self.frame_label.setPixmap(qt_frame)
 
+        # Init spinboxes with info from frame
+        w_original =  self.resize_dict['original'][1]
+        self.ButtonsWidget.initSpinsBoxes(0, w_original)
+
     def updateFrame(self, frame=None):
         if (frame is None):
             frame = self.frame
@@ -68,19 +74,64 @@ class PreprocessingWidget(QWidget):
         return math.floor(value*self.resize_dict['original'][0] / self.resize_dict['scaled'][0])-MOUSE_EVENT_PIXEL_OFFSET
 
 
-
-    def mouseMoveEvent(self, event):
-
+    def drawLine(self, x_cord):
         # Copy the frame to show
         draw_frame = self.frame.copy()
 
         # Get coordinates for center line
-        x_center = self.unScaleCord(event.x())
-
-        cv2.line(draw_frame, (x_center, -10), (x_center, 1000), (0, 255, 0), thickness=2)
- 
+        height = self.resize_dict['original'][0]
+        cv2.line(draw_frame, (x_cord, 0), (x_cord, height), (0, 255, 0), thickness=2)
         self.updateFrame(draw_frame)
+    
+    
+    def mouseMoveEvent(self, event):
+        x_cord = self.unScaleCord(event.x())
+        # Draw the center line on the frame
+        self.drawLine(x_cord)
 
+        # Update Spinbox to value
+        self.ButtonsWidget.updateCenterlinePos(x_cord)
+
+    def getSizeDict(self):
+        return self.resize_dict
+
+
+
+        
+
+class PreprocessingButtonsWidget(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        # Objects
+
+        #Widgets
+        self.center_line = QSpinBox(self)
+        self.width = QSpinBox(self)
+
+        # Init routines
+
+
+        # Signals and Slots
+
+        # Layout
+        layout = QFormLayout()
+        layout.addRow('Center Line (x coordinate):', self.center_line)
+        layout.addRow('Width of Area of Interest:', self.width)
+
+
+        self.setLayout(layout)
+
+    def initSpinsBoxes(self, min, max):
+        self.initSpinBox(min, max, self.center_line)
+
+    def initSpinBox(self, min, max, box):
+        box.setMinimum(min)
+        box.setMaximum(max)
+        
+
+    def updateCenterlinePos(self, value):
+        self.center_line.setValue(value)
 
 if __name__ == '__main__':
     app = QApplication([])
