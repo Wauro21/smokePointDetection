@@ -19,3 +19,8 @@ class FrameTypes(Enum):
     CONTOUR = 3
     CORE_CC = 4
     CONTOUR_CC = 5
+
+
+# Mouse event offset 
+# -> To feel more natural when selecting the area of interest offset 
+MOUSE_EVENT_PIXEL_OFFSET = 32

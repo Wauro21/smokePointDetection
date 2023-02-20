@@ -7,6 +7,7 @@ import numpy as np
 from GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR
 from MessageBox import WarningBox
 from Thread import VideoReader
+from utils import convert2QT
 
 
 class FrameHolder(QWidget):
@@ -53,16 +54,9 @@ class FrameHolder(QWidget):
 
     @pyqtSlot(np.ndarray)
     def updateLabel(self, frame):
-        qt_img = self.convert2QT(frame)
+        qt_img = convert2QT(frame)
         self.frame_label.setPixmap(qt_img)
 
-    def convert2QT(self, cv_img):
-        rgb_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
-        h, w, ch = rgb_img.shape
-        bytes_per_line = ch*w
-        converted = QImage(rgb_img, w, h, bytes_per_line, QImage.Format_RGB888)
-        converted = converted.scaled(480, 680,Qt.KeepAspectRatio)
-        return QPixmap.fromImage(converted)
 
 if __name__ == '__main__':
     app = QApplication([])

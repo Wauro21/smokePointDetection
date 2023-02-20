@@ -1,6 +1,5 @@
 import sys
 import os
-
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout
 from LoadWidget import LoadWidget
 from VideoPlayer import FrameHolder
@@ -14,9 +13,9 @@ class CentralWidget(QWidget):
 
         super().__init__(parent)
 
+        # Objects 
         self.video_path = None
         
-        # Objects 
 
         # -> Control dictionary 
         self.process_controls = {
@@ -36,6 +35,8 @@ class CentralWidget(QWidget):
         self.LoadWidget = LoadWidget(self)
         self.VideoWidget = FrameHolder(self.process_controls, self)
         self.PlotWidget = PlotWidget(self)
+        
+        # -> Temporal
         self.prueba = QPushButton('demo', self)
         self.original = QPushButton('Original', self)
         self.gray = QPushButton('Gray', self)

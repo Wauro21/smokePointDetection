@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QLineEdi
 
 from GUI_CONSTANTS import LOAD_WIDGET_FILE_DEFAULT_MESSAGE, LOAD_WIDGET_FILE_DIALOG_HEADER_TITLE
 from MessageBox import WarningBox
+from Preprocessing import PreprocessingWidget
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 
@@ -19,7 +20,6 @@ class LoadWidget(QWidget):
         super().__init__(parent)
         
         # Objects 
-        
 
         # Widgets 
 
@@ -27,6 +27,7 @@ class LoadWidget(QWidget):
         self.display_path = QLineEdit(LOAD_WIDGET_FILE_DEFAULT_MESSAGE, self)
         self.open_button = QPushButton('Open')
         self.preprocess_button = QPushButton('Preprocess')
+        self.PreprocessWidget = PreprocessingWidget() # No parent to be displayed as new window
 
         #  Init routine
         # -> Bold texts for labels
@@ -44,6 +45,7 @@ class LoadWidget(QWidget):
 
         # Signals and slots
         self.open_button.clicked.connect(self.getFiles)
+        self.preprocess_button.clicked.connect(self.showPreprocess)
 
         # Layout
         layout = QHBoxLayout()
@@ -53,6 +55,9 @@ class LoadWidget(QWidget):
         layout.addWidget(self.preprocess_button)
 
         self.setLayout(layout)
+
+    def showPreprocess(self):
+        self.PreprocessWidget.show()
 
     def getFiles(self):
         valid = False
@@ -93,6 +98,10 @@ class LoadWidget(QWidget):
             warning = WarningBox('Frames inside the folder are not numerated in order starting from 0000.')
             warning.exec_()
             return False
+        
+        # Save first frame location for preprocessing
+        first_frame_path = os.path.join(folder, files[0])
+        self.PreprocessWidget.setFrame(first_frame_path)
 
         frames_path = os.path.join(folder, prefix)
         self.path_signal.emit(frames_path)        

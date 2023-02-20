@@ -4,6 +4,8 @@ from matplotlib import pyplot as plt
 import math
 import numpy as np
 import os
+from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtCore import Qt
 
 # Colors for height boxes
 box_colors = {
@@ -178,3 +180,11 @@ def checkGenerateFolder(path):
 
 def getThreshvalues(percentage):
     return round(MAX_PIXEL_VALUE*percentage/100)
+
+def convert2QT(cv_img):
+        rgb_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+        h, w, ch = rgb_img.shape
+        bytes_per_line = ch*w
+        converted = QImage(rgb_img, w, h, bytes_per_line, QImage.Format_RGB888)
+        converted = converted.scaled(680, 480,Qt.KeepAspectRatio)
+        return QPixmap.fromImage(converted)
