@@ -36,3 +36,8 @@ PREPROCESSING_DESC_MESSAGE = 'Left click on the approximate of the center of the
 # -> For saving/loading jsons
 PREPROCESSING_SAVE_CUT = 'Save the current cut profile onto a file'
 PREPROCESSING_LOAD_CUT = 'Load cut profile from file'
+
+# -> Color for lines
+PREPROESSING_CENTER_LINE_COLOR = (255,153,51) # '#ff9933'
+PREPROCESSING_WIDTH_LINE_COLOR = (51, 153, 255) # '#3399ff'
+PREPROCESSING_LINES_WIDTH = 2

@@ -31,6 +31,8 @@ class LoadWidget(QWidget):
         self.PreprocessWidget = PreprocessingWidget() # No parent to be displayed as new window
 
         #  Init routine
+        self.preprocess_button.setEnabled(False)
+
         # -> Bold texts for labels
         self.field_description.setStyleSheet(
             "font-weight: bold;"
@@ -79,6 +81,9 @@ class LoadWidget(QWidget):
 
 
                 self.setDisplayLabel(folder)
+                
+                # Enable preprocessing 
+                self.preprocess_button.setEnabled(True)
             else:
                 # User pressed cancel
                 break

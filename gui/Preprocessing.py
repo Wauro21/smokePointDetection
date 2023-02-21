@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QFormLayout, QSpinBox, QPushButton
 from PyQt5.QtGui import QPixmap, QColor, QImage
-from GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_DESC_MESSAGE, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SCROLL_WIDTH_STEP, PREPROCESSING_TITLE_MESSAGE, PREPROCESSING_WINDOW_TITLE, VIDEO_PLAYER_BG_COLOR
+from GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_DESC_MESSAGE, PREPROCESSING_LINES_WIDTH, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SCROLL_WIDTH_STEP, PREPROCESSING_TITLE_MESSAGE, PREPROCESSING_WIDTH_LINE_COLOR, PREPROCESSING_WINDOW_TITLE, PREPROESSING_CENTER_LINE_COLOR, VIDEO_PLAYER_BG_COLOR
 from PreprocessingButtons import PreprocessingButtonsWidget
 from utils import convert2QT
 from PyQt5.QtCore import pyqtSignal
@@ -104,9 +104,12 @@ class PreprocessingWidget(QWidget):
         w = width // 2
 
         # Draw lines on frame
-        cv2.line(draw_frame, (x_cord, 0), (x_cord, height), (0, 255, 0), thickness=2)
-        cv2.line(draw_frame, (x_cord-w, 0), (x_cord-w, height), (0, 0, 255), thickness=2)
-        cv2.line(draw_frame, (x_cord+w, 0), (x_cord+w, height), (0, 0, 255), thickness=2)
+        # -> Center line
+        cv2.line(draw_frame, (x_cord, 0), (x_cord, height), PREPROESSING_CENTER_LINE_COLOR, thickness=PREPROCESSING_LINES_WIDTH)
+        
+        # -> Width lines
+        cv2.line(draw_frame, (x_cord-w, 0), (x_cord-w, height), PREPROCESSING_WIDTH_LINE_COLOR, thickness=PREPROCESSING_LINES_WIDTH)
+        cv2.line(draw_frame, (x_cord+w, 0), (x_cord+w, height), PREPROCESSING_WIDTH_LINE_COLOR, thickness=PREPROCESSING_LINES_WIDTH)
         self.updateFrame(draw_frame)
     
     
