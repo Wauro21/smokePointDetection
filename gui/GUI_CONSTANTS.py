@@ -29,3 +29,10 @@ MOUSE_EVENT_PIXEL_OFFSET = 32
 # Preprocessing
 PREPROCESSING_MINIMUM_WIDTH = 100#
 PREPROCESSING_SCROLL_WIDTH_STEP = 10
+PREPROCESSING_WINDOW_TITLE = 'Preprocessing'
+PREPROCESSING_TITLE_MESSAGE= 'Select the region of interest to cut the frames and save processing time'
+PREPROCESSING_DESC_MESSAGE = 'Left click on the approximate of the center of the flame and adjust the width of the region, scrolling the wheel. You can use the controls to fine tune the area. You can also save/load this presets for future use.'
+
+# -> For saving/loading jsons
+PREPROCESSING_SAVE_CUT = 'Save the current cut profile onto a file'
+PREPROCESSING_LOAD_CUT = 'Load cut profile from file'

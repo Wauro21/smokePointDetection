@@ -5,13 +5,16 @@ import cv2
 import numpy as np
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QFormLayout, QSpinBox, QPushButton
 from PyQt5.QtGui import QPixmap, QColor, QImage
-from GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SCROLL_WIDTH_STEP, VIDEO_PLAYER_BG_COLOR
+from GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_DESC_MESSAGE, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SCROLL_WIDTH_STEP, PREPROCESSING_TITLE_MESSAGE, PREPROCESSING_WINDOW_TITLE, VIDEO_PLAYER_BG_COLOR
+from PreprocessingButtons import PreprocessingButtonsWidget
 from utils import convert2QT
 from PyQt5.QtCore import pyqtSignal
 
 class PreprocessingWidget(QWidget):
+    
+    preprocess_done = pyqtSignal()
+
     def __init__(self, parent=None):
-        
         super().__init__(parent)
 
         # Objects
@@ -26,9 +29,11 @@ class PreprocessingWidget(QWidget):
 
         # Init routines
         self.defaultFrame()
+        self.setWindowTitle(PREPROCESSING_WINDOW_TITLE)
 
         # Signals and Slots
         self.ButtonsWidget.update_frame.connect(self.updateAreaofInterest)
+        self.ButtonsWidget.cut_signal.connect(self.preprocessingDone)
 
         #Layout
         layout = QHBoxLayout()
@@ -37,6 +42,12 @@ class PreprocessingWidget(QWidget):
 
         self.setLayout(layout)
 
+    def preprocessingDone(self):
+        self.preprocess_done.emit()
+        self.close()
+
+    def getCutInfo(self):
+        return self.ButtonsWidget.getCutDict()
 
     def defaultFrame(self):
         gray_fill = QPixmap(640, 480)
@@ -53,7 +64,6 @@ class PreprocessingWidget(QWidget):
         qt_frame = convert2QT(self.frame)
         # Get size of the scaled frame
         self.resize_dict['scaled'] = (qt_frame.size().height(), qt_frame.size().width())
-        print(self.resize_dict)
 
         # Set the frame 
         self.frame_label.setPixmap(qt_frame)
@@ -113,97 +123,6 @@ class PreprocessingWidget(QWidget):
         return self.resize_dict
 
 
-
-        
-
-class PreprocessingButtonsWidget(QWidget):
-    update_frame = pyqtSignal()
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        # Status 
-        self.center_line_status = True
-        self.width_status = True
-
-        # Objects
-
-        #Widgets
-        self.center_line = QSpinBox(self)
-        self.width = QSpinBox(self)
-        self.lock_center_line = QPushButton('Lock')
-        self.lock_width = QPushButton('Lock')
-
-        # Init routines
-
-
-        # Signals and Slots
-        self.center_line.valueChanged.connect(lambda: self.update_frame.emit())
-        self.width.valueChanged.connect(lambda: self.update_frame.emit())
-        self.lock_center_line.clicked.connect(self.handleCenterLineControls)
-        self.lock_width.clicked.connect(self.handleWidthControls)
-        # Layout
-        layout = QFormLayout()
-
-        # -> Center line controls
-        c_line_layout = QHBoxLayout()
-        c_line_layout.addWidget(self.center_line)
-        c_line_layout.addWidget(self.lock_center_line)
-
-        # -> Width controsl
-        width_layout = QHBoxLayout()
-        width_layout.addWidget(self.width)
-        width_layout.addWidget(self.lock_width)
-
-        layout.addRow('Center Line (x coordinate):', c_line_layout)
-        layout.addRow('Width of Area of Interest:', width_layout)
-
-
-        self.setLayout(layout)
-
-    def handleCenterLineControls(self):
-        self.center_line_status = not self.center_line_status
-        self.center_line.setEnabled(self.center_line_status)
-
-    def handleWidthControls(self):
-        self.width_status = not self.width_status
-        self.width.setEnabled(self.width_status)
-
-    def getCenterlinePos(self):
-        return self.center_line.value()
-
-    def getAreaWidth(self):
-        return self.width.value()
-
-    def initSpinsBoxes(self, min, max):
-        self.initSpinBox(min, max, self.center_line)
-        self.initSpinBox(PREPROCESSING_MINIMUM_WIDTH, max, self.width)
-
-    def initSpinBox(self, min, max, box):
-        box.setMinimum(min)
-        box.setMaximum(max)
-        
-
-    def updateCenterlinePos(self, value):
-        if(self.center_line.isEnabled()):
-            self.center_line.setValue(value)
-
-    def mouseIncrementWidth(self, step):
-        if(self.width.isEnabled()):
-            # get actual value from box
-            a_width = self.width.value()
-            # get max and min
-            s_max = self.width.maximum()
-            s_min = self.width.minimum()
-
-            temp = a_width + step
-            if(temp >= s_max):
-                self.width.setValue(s_max)
-
-            elif(temp <= s_min):
-                self.width.setValue(s_min)
-
-            else:
-                self.width.setValue(temp)
 
 if __name__ == '__main__':
     app = QApplication([])

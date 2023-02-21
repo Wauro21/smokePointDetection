@@ -46,10 +46,10 @@ class CentralWidget(QWidget):
 
         # Signals and Slots
         self.LoadWidget.path_signal.connect(self.setPrefix)
+        self.LoadWidget.cut_info.connect(self.updateCutInfo)
         self.prueba.clicked.connect(self.requestPlayback)
         self.original.clicked.connect(lambda: self.demo(FrameTypes.FRAME))
         self.gray.clicked.connect(lambda: self.demo(FrameTypes.GRAY))
-
 
         # Layout
         # -> Demo layout
@@ -67,6 +67,9 @@ class CentralWidget(QWidget):
         
 
         self.setLayout(layout)
+
+    def updateCutInfo(self):
+        self.process_controls['cut'] = self.LoadWidget.getCutInfo()
 
     def setPrefix(self, video_path):
         self.video_path = video_path

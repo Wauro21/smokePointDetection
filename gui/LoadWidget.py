@@ -15,6 +15,7 @@ class LoadWidget(QWidget):
 
     # Custom signals
     path_signal = QtCore.pyqtSignal(str)
+    cut_info = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -46,6 +47,7 @@ class LoadWidget(QWidget):
         # Signals and slots
         self.open_button.clicked.connect(self.getFiles)
         self.preprocess_button.clicked.connect(self.showPreprocess)
+        self.PreprocessWidget.preprocess_done.connect(lambda: self.cut_info.emit())
 
         # Layout
         layout = QHBoxLayout()
@@ -55,6 +57,9 @@ class LoadWidget(QWidget):
         layout.addWidget(self.preprocess_button)
 
         self.setLayout(layout)
+
+    def getCutInfo(self):
+        return self.PreprocessWidget.getCutInfo()
 
     def showPreprocess(self):
         self.PreprocessWidget.show()
