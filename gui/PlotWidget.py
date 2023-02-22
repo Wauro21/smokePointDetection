@@ -14,8 +14,9 @@ class PlotWidget(QWidget):
 
         super().__init__(parent)
         
-        self.xdata = []
-        self.ydata = []
+        self.frames = []
+        self.h = []
+        self.H = []
         
         # Widgets
         self.pltCanvas = FigureCanvas()
@@ -34,15 +35,17 @@ class PlotWidget(QWidget):
         self.setLayout(layout)
 
     def update(self, values):
-        x, y = values
+        frame, h, H = values
         # Clean axis
-        self.xdata.append(x)
-        self.ydata.append(y)
+        self.frames.append(frame)
+        self.h.append(h)
+        self.H.append(H)
 
 
-    def update_plot(self,i):
+    def update_plot(self, i):
         self.axs.cla()
-        self.axs.plot(self.xdata, self.ydata)
+        self.axs.plot(self.frames, self.h)
+        self.axs.plot(self.frames, self.H)
 
 
 if __name__ == '__main__':

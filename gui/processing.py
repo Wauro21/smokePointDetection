@@ -1,6 +1,7 @@
 from CONSTANTS import CONTOUR_BOUNDING_BOX_COLOR, CORE_BOUNDING_BOX_COLOR, CUT_ARGS_ERROR_MESSAGE, DERIVATIVE_ORDER, FRAME_CENTROID_COLOR, LINEAR_POLY_ORDER, LINEAR_REGION_ERROR_MESSAGE, MAX_CENTROID_TOLERANCE, MAX_PIXEL_VALUE, NUMBER_OF_CONNECTED_COMPONENTS, POLYNOMIAL_ORDER, REFERENCE_CENTROID_COLOR, SP_FOUND_MESSAGE, SP_THRESHOLD, SUCESSFULL_PROCESSING_MESSAGE, THRESHOLD_VALUES_MESSAGE
 import cv2
 import numpy as np
+from GUI_CONSTANTS import FrameTypes
 from progress.bar import Bar
 import csv
 import math
@@ -95,12 +96,12 @@ def frameProcess(frame, cut, core_threshold_value, contour_threshold_value):
     contour_components = getConnectedComponents(contour_thresh, NUMBER_OF_CONNECTED_COMPONENTS)
 
     ret_dict = {
-        'frame': frame, 
-        'gray': gray_frame,
-        'core': core_thresh,
-        'contour': contour_thresh, 
-        'core_cc': core_components,
-        'contour_cc': contour_components
+        FrameTypes.FRAME: frame, 
+        FrameTypes.GRAY: gray_frame,
+        FrameTypes.CORE: core_thresh,
+        FrameTypes.CONTOUR: contour_thresh, 
+        FrameTypes.CORE_CC: core_components,
+        FrameTypes.CONTOUR_CC: contour_components
     }
 
     return ret_dict
@@ -181,13 +182,13 @@ def smokepoint(args):
         frame_results = frameProcess(frame, cut_info, core_threshold_value, contour_threshold_value)
     
         # Get contour and tip height
-        contour_height = frame_results['contour_cc']['h']
+        contour_height = frame_results[FrameTypes.CONTOUR_CC]['h']
         # -> Consider that (0,0) is top left corner
-        tip_height = frame_results['core_cc']['y'] - frame_results['contour_cc']['y']
+        tip_height = frame_results[FrameTypes.CORE_CC]['y'] - frame_results[FrameTypes.CONTOUR_CC]['y']
 
         if(first_frame_flag):
-            reference_centroid_x = frame_results['contour_cc']['cX']
-            reference_centroid_y = frame_results['contour_cc']['cY']
+            reference_centroid_x = frame_results[FrameTypes.CONTOUR_CC]['cX']
+            reference_centroid_y = frame_results[FrameTypes.CONTOUR_CC]['cY']
             first_frame_flag = False
 
             # First frame heights are considerated valid
@@ -200,19 +201,19 @@ def smokepoint(args):
 
         # -> Generate height boxes to display
         if(args.Boxes): 
-            heightBox(frame, frame_results['core_cc'], CORE_BOUNDING_BOX_COLOR)
-            heightBox(frame, frame_results['contour_cc'], CONTOUR_BOUNDING_BOX_COLOR)
+            heightBox(frame, frame_results[FrameTypes.CORE_CC], CORE_BOUNDING_BOX_COLOR)
+            heightBox(frame, frame_results[FrameTypes.CONTOUR_CC], CONTOUR_BOUNDING_BOX_COLOR)
 
         # -> Draw the reference centroids and the actual centroid
         if(args.Centroids):
             plotCentroid(frame, reference_centroid_x, reference_centroid_y, REFERENCE_CENTROID_COLOR)
-            plotCentroid(frame, frame_results['contour_cc']['cX'], frame_results['contour_cc']['cY'], FRAME_CENTROID_COLOR)
+            plotCentroid(frame, frame_results[FrameTypes.CONTOUR_CC]['cX'], frame_results[FrameTypes.CONTOUR_CC]['cY'], FRAME_CENTROID_COLOR)
              
         
         # Calculate the centroid difference to check if is a valid frame
         invalid_frame_h = []
         invalid_frame_H = []
-        centroid_diff = abs(frame_results['contour_cc']['cX'] - reference_centroid_x)
+        centroid_diff = abs(frame_results[FrameTypes.CONTOUR_CC]['cX'] - reference_centroid_x)
 
         if(centroid_diff > MAX_CENTROID_TOLERANCE):
             invalid_frame_counter += 1

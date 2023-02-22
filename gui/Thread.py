@@ -1,4 +1,4 @@
-from CONSTANTS import CONTOUR_BOUNDING_BOX_COLOR, CORE_BOUNDING_BOX_COLOR, MAX_CENTROID_TOLERANCE, REFERENCE_CENTROID_COLOR
+from CONSTANTS import CONTOUR_BOUNDING_BOX_COLOR, CORE_BOUNDING_BOX_COLOR, FRAME_CENTROID_COLOR, MAX_CENTROID_TOLERANCE, REFERENCE_CENTROID_COLOR
 from GUI_CONSTANTS import FrameTypes
 from utils import getThreshvalues, heightBox, plotCentroid
 from processing import frameProcess
@@ -58,13 +58,13 @@ class VideoReader(QThread):
             frame_processed = frameProcess(frame, cut_info, core_threshold_value, contour_threshold_value)
 
             # Get contour and tip height
-            contour_height = frame_processed['contour_cc']['h']
+            contour_height = frame_processed[FrameTypes.CONTOUR_CC]['h']
             # -> Consider that (0,0) is top left corner
-            tip_height = frame_processed['core_cc']['y'] - frame_processed['contour_cc']['y']
+            tip_height = frame_processed[FrameTypes.CORE_CC]['y'] - frame_processed[FrameTypes.CONTOUR_CC]['y']
 
             if(first_frame_flag):
-                reference_centroid_x = frame_processed['contour_cc']['cX']
-                reference_centroid_y = frame_processed['contour_cc']['cY']
+                reference_centroid_x = frame_processed[FrameTypes.CONTOUR_CC]['cX']
+                reference_centroid_y = frame_processed[FrameTypes.CONTOUR_CC]['cY']
                 first_frame_flag = False
 
                 # First frame heights are considerated valid
@@ -77,19 +77,19 @@ class VideoReader(QThread):
 
             # -> Generate height boxes to display
             if(self.process_controls['bboxes']): 
-                heightBox(frame, frame_processed['core_cc'], CORE_BOUNDING_BOX_COLOR)
-                heightBox(frame, frame_processed['contour_cc'], CONTOUR_BOUNDING_BOX_COLOR)
+                heightBox(frame, frame_processed[FrameTypes.CORE_CC], CORE_BOUNDING_BOX_COLOR)
+                heightBox(frame, frame_processed[FrameTypes.CONTOUR_CC], CONTOUR_BOUNDING_BOX_COLOR)
 
             # -> Draw the reference centroids and the actual centroid
             if(self.process_controls['centroids']):
                 plotCentroid(frame, reference_centroid_x, reference_centroid_y, REFERENCE_CENTROID_COLOR)
-                plotCentroid(frame, frame_processed['contour_cc']['cX'], frame_processed['contour_cc']['cY'], FRAME_CENTROID_COLOR)
+                plotCentroid(frame, frame_processed[FrameTypes.CONTOUR_CC]['cX'], frame_processed[FrameTypes.CONTOUR_CC]['cY'], FRAME_CENTROID_COLOR)
                 
             
             # Calculate the centroid difference to check if is a valid frame
             invalid_frame_h = []
             invalid_frame_H = []
-            centroid_diff = abs(frame_processed['contour_cc']['cX'] - reference_centroid_x)
+            centroid_diff = abs(frame_processed[FrameTypes.CONTOUR_CC]['cX'] - reference_centroid_x)
 
             if(centroid_diff > MAX_CENTROID_TOLERANCE):
                 invalid_frame_counter += 1
@@ -110,26 +110,11 @@ class VideoReader(QThread):
 
 
 # NOT CLEANED
-            self.values_signal.emit([frame_counter, contour_height])
+            self.values_signal.emit([frame_counter, contour_height, tip_height])
 
     def toDisplay(self, requestedFrame, frame_processed):
+        
+        if(requestedFrame is FrameTypes.CORE_CC or requestedFrame is FrameTypes.CONTOUR_CC):
+            return frame_processed[requestedFrame]['cmask']
 
-        if(requestedFrame is FrameTypes.GRAY):
-            return frame_processed['gray']
-
-        if(requestedFrame is FrameTypes.CORE):
-            return frame_processed['core']
-
-        if(requestedFrame is FrameTypes.CORE):
-            return frame_processed['core']
-
-        if(requestedFrame is FrameTypes.CONTOUR):
-            return frame_processed['contour']
-
-        if(requestedFrame is FrameTypes.CORE_CC):
-            return frame_processed['core_cc']
-
-        if (requestedFrame is FrameTypes.CONTOUR_CC):
-            return frame_processed['contour_cc']
-
-        return frame_processed['frame']
+        return frame_processed[requestedFrame]
