@@ -79,6 +79,7 @@ class FrameHolder(QWidget):
             h, w, c = frame.shape
         except:
             h, w = frame.shape
+            c = None
         # Calculate aspect ratio
         ar = w/h
         # Target dimensions
@@ -87,8 +88,10 @@ class FrameHolder(QWidget):
         # -> Fix height
         nH = H
         # -> From aspect ratio get new width
-        nW = ar*nH
+        nW = round(ar*nH)
         # -> Apply resizing to the possible dimensions that keep the aspect ratio
+        print(nH)
+        print(nW)
         resized_frame = cv2.resize(frame, (nW, nH))
 
         # Generate the final target size frame add color to bg
