@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QApplication
 from PyQt5.QtGui import QPixmap, QColor, QImage
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread, Qt
 import sys
+from GUI_CONSTANTS import VIDEO_PLAYER_HEIGHT_DEFAULT, VIDEO_PLAYER_WIDTH_DEFAULT, VIDEO_PLAYER_BG_COLOR_BGR, VIDEO_PLAYER_BG_COLOR_GRAY
 import numpy as np
 from GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR, FrameTypes
 from MessageBox import WarningBox
@@ -67,32 +68,45 @@ class FrameHolder(QWidget):
 
     @pyqtSlot(np.ndarray)
     def updateLabel(self, frame):
-        # CLEAN CLEAN CLEANCLEAN CLEAN CLEANCLEAN CLEAN CLEANCLEAN CLEAN CLEANCLEAN CLEAN CLEAN
-        #testing resize
+        # Resize to fit inside defined dimensions of player
+        r_frame = self.resizeFrame(frame)
+        qt_img = convert2QT(r_frame, False)
+        self.frame_label.setPixmap(qt_img)
 
-        try:
+    def resizeFrame(self, frame, target=[VIDEO_PLAYER_HEIGHT_DEFAULT, VIDEO_PLAYER_WIDTH_DEFAULT]):
+        # Unpack frame info
+        try: 
             h, w, c = frame.shape
         except:
             h, w = frame.shape
-            c = None
+        # Calculate aspect ratio
         ar = w/h
-        nH = 480
-        nW = round(ar*480)
-        
-        n_frame = cv2.resize(frame, (nW, nH))
+        # Target dimensions
+        H, W = target      
+        #Calculate the possible dimensions
+        # -> Fix height
+        nH = H
+        # -> From aspect ratio get new width
+        nW = ar*nH
+        # -> Apply resizing to the possible dimensions that keep the aspect ratio
+        resized_frame = cv2.resize(frame, (nW, nH))
+
+        # Generate the final target size frame add color to bg
         if(c):
-            f_frame = np.ones((480, 200, c), np.uint8)
-            f_frame[:,:,0] =  f_frame[:,:,0] *255
+            f_frame = np.ones((H, W, c), np.uint8)
+            for i in range(c):
+                f_frame[:,:,i] =  f_frame[:,:,i] *VIDEO_PLAYER_BG_COLOR_BGR[i]
         else:
-            f_frame = np.ones((480, 200), np.uint8)
-            f_frame[:,:] =  f_frame[:,:] *255
+            f_frame = np.ones((H, W), np.uint8)
+            f_frame[:,:] =  f_frame[:,:] *VIDEO_PLAYER_BG_COLOR_GRAY
 
-        aH, aW = 0, (200 - nW)//2
+        # Position resized frame inside final frame
+        # -> Calculate the left-most edge of the resized frame inside de final frame
+        aH, aW = (H-nH)//2, (W - nW)//2
+        # -> Position the frame 
+        f_frame[aH:aH+nH, aW:aW+nW] = resized_frame
 
-        f_frame[aH:aH+nH, aW:aW+nW] = n_frame
-
-        qt_img = convert2QT(f_frame, False)
-        self.frame_label.setPixmap(qt_img)
+        return f_frame
 
 
 if __name__ == '__main__':

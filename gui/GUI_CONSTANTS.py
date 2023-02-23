@@ -10,6 +10,10 @@ LOAD_WIDGET_FILE_DIALOG_HEADER_TITLE = 'Select a folder to process'
 # VideoPlayer
 
 VIDEO_PLAYER_BG_COLOR = '#303539'
+VIDEO_PLAYER_BG_COLOR_BGR = (22, 21, 19)
+VIDEO_PLAYER_BG_COLOR_GRAY = 255 # To define
+VIDEO_PLAYER_HEIGHT_DEFAULT = 480
+VIDEO_PLAYER_WIDTH_DEFAULT = 200
 
 # Type of frames to display
 class FrameTypes(Enum):
