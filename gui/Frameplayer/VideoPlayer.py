@@ -8,7 +8,7 @@ import numpy as np
 from GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR, FrameTypes
 from MessageBox import WarningBox
 from Thread import VideoReader
-from VideoButtons import VideoButtons
+from .VideoButtons import VideoButtons
 from utils import convert2QT
 from PIL import Image
 

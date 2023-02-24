@@ -2,10 +2,10 @@ import sys
 import os
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout
 from LoadWidget import LoadWidget
-from VideoPlayer import FrameHolder
-from PlotWidget import PlotWidget
+from Frameplayer.VideoPlayer import FrameHolder
+from Plot.PlotWidget import PlotWidget
 from GUI_CONSTANTS import FrameTypes
-from PlotHolder import PlotHolder
+from Plot.PlotHolder import PlotHolder
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 

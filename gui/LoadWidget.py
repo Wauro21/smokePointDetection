@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QLineEdi
 
 from GUI_CONSTANTS import LOAD_WIDGET_FILE_DEFAULT_MESSAGE, LOAD_WIDGET_FILE_DIALOG_HEADER_TITLE
 from MessageBox import WarningBox
-from Preprocessing import PreprocessingWidget
+from Preprocessing.Preprocessing import PreprocessingWidget
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 

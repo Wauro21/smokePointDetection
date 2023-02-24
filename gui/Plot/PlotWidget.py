@@ -73,8 +73,8 @@ class PlotWidget(QWidget):
         y = self.axs.plot(self.x, self.y, label=self.labels[0], color=self.colors[0])
         z = self.axs.plot(self.x, self.z, label=self.labels[1], color=self.colors[1])
 
-        handles, labels = self.axs.get_legend_handles_labels()
-        self.pltCanvas.figure.legend(handles, labels, loc=1)
+        #handles, labels = self.axs.get_legend_handles_labels()
+        #self.pltCanvas.figure.legend(handles, labels, loc=1)
 
 
 if __name__ == '__main__':
