@@ -10,6 +10,7 @@ class VideoReader(QThread):
 
     update_frame_signal = pyqtSignal(np.ndarray)
     values_signal = pyqtSignal(list)
+    centroid_signal = pyqtSignal(list)
     
     def __init__(self, video_path, process_controls):
         super().__init__()
@@ -71,6 +72,8 @@ class VideoReader(QThread):
                 h.append(contour_height)
                 H.append(tip_height)
 
+                self.centroid_signal.emit([frame_counter, reference_centroid_x])
+
                 continue
 
             # For the rest of the frames
@@ -89,17 +92,19 @@ class VideoReader(QThread):
             # Calculate the centroid difference to check if is a valid frame
             invalid_frame_h = []
             invalid_frame_H = []
-            centroid_diff = abs(frame_processed[FrameTypes.CONTOUR_CC]['cX'] - reference_centroid_x)
-
+            frame_centroid = frame_processed[FrameTypes.CONTOUR_CC]['cX']
+            centroid_diff = abs(frame_centroid - reference_centroid_x)
             if(centroid_diff > MAX_CENTROID_TOLERANCE):
                 invalid_frame_counter += 1
                 invalid_frame_h.append(contour_height)
                 invalid_frame_H.append(tip_height)
+                self.centroid_signal.emit([frame_counter, frame_centroid, False])
                 continue
             
             # If the data is valid, append it
             h.append(contour_height)
             H.append(tip_height)
+            self.centroid_signal.emit([frame_counter, frame_centroid, True])
 
             # End of media reading
 
@@ -109,7 +114,6 @@ class VideoReader(QThread):
             self.update_frame_signal.emit(to_display)
 
 
-# NOT CLEANED
             self.values_signal.emit([frame_counter, contour_height, tip_height])
 
     def toDisplay(self, requestedFrame, frame_processed):

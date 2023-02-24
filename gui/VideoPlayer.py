@@ -1,5 +1,5 @@
 import cv2
-from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QApplication
+from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QApplication, QFrame
 from PyQt5.QtGui import QPixmap, QColor, QImage
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread, Qt
 import sys
@@ -35,7 +35,7 @@ class FrameHolder(QWidget):
         layout.addWidget(self.controls)
         layout.addWidget(self.frame_label)
 
-        self.setLayout(layout)       
+        self.setLayout(layout)
     
     @pyqtSlot(FrameTypes)
     def selectFrame(self, frame_code):

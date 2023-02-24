@@ -5,6 +5,7 @@ from LoadWidget import LoadWidget
 from VideoPlayer import FrameHolder
 from PlotWidget import PlotWidget
 from GUI_CONSTANTS import FrameTypes
+from PlotHolder import PlotHolder
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 
@@ -34,12 +35,14 @@ class CentralWidget(QWidget):
         # Widgets
         self.LoadWidget = LoadWidget(self)
         self.VideoWidget = FrameHolder(self.process_controls, self)
-        self.PlotWidget = PlotWidget(self)
+        # -> Plots 
+        self.HeightPlot = PlotWidget('Height Analysis', 'Frames [-]', 'Height [px]', ['Flame Height', 'Tip Height'], self)
+        self.CentroidPlot = PlotWidget('TBI','', '', [] , self)
+        self.Plotholder = PlotHolder([self.HeightPlot, self.CentroidPlot],self)
+
         
         # -> Temporal
         self.prueba = QPushButton('demo', self)
-        self.original = QPushButton('Original', self)
-        self.gray = QPushButton('Gray', self)
 
         # Init routines
         self.prueba.setEnabled(False)
@@ -48,24 +51,20 @@ class CentralWidget(QWidget):
         self.LoadWidget.path_signal.connect(self.setPrefix)
         self.LoadWidget.cut_info.connect(self.updateCutInfo)
         self.prueba.clicked.connect(self.requestPlayback)
-        self.original.clicked.connect(lambda: self.demo(FrameTypes.FRAME))
-        self.gray.clicked.connect(lambda: self.demo(FrameTypes.GRAY))
 
         # Layout
         # -> Demo layout
         layout = QVBoxLayout()
         layout.addWidget(self.LoadWidget)
-        layout.addWidget(self.VideoWidget)
-        layout.addWidget(self.prueba)
-        layout.addWidget(self.PlotWidget)
-        # Demo buttons
-        test = QHBoxLayout()
-        test.addWidget(self.original)
-        test.addWidget(self.gray)
 
-        layout.addLayout(test)
+        # -> Video and plot area
+        video_plot_layout = QHBoxLayout()
+        video_plot_layout.addWidget(self.VideoWidget)
+        video_plot_layout.addWidget(self.Plotholder)
+        layout.addLayout(video_plot_layout)
         
-
+        layout.addWidget(self.prueba)
+        
         self.setLayout(layout)
 
     def updateCutInfo(self):
@@ -76,7 +75,7 @@ class CentralWidget(QWidget):
         self.prueba.setEnabled(True)
 
     def requestPlayback(self):
-        self.VideoWidget.startPlayback(self.video_path, self.PlotWidget.update)
+        self.VideoWidget.startPlayback(self.video_path, self.HeightPlot.update)
 
     def demo(self, value):
         self.process_controls['display'] = value

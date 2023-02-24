@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QApplication, QRadioButton
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread, Qt
-from GUI_CONSTANTS import FrameTypes
+from GUI_CONSTANTS import VIDEO_BUTTONS_WIDGET_HEIGHT, VIDEO_BUTTONS_WIDGET_WIDTH, FrameTypes
 
 class VideoButtons(QWidget):
     frame_selection = pyqtSignal(FrameTypes)
@@ -13,7 +13,6 @@ class VideoButtons(QWidget):
 
         # Widgets
         self.title = QLabel('Frame Controls:')
-        
         self.original = FrameSelector('Default', FrameTypes.FRAME, self)
         self.gray = FrameSelector('Gray', FrameTypes.GRAY, self)
         self.core = FrameSelector('Core', FrameTypes.CORE, self)
@@ -22,6 +21,8 @@ class VideoButtons(QWidget):
         self.contour_mask = FrameSelector('Contour Mask', FrameTypes.CONTOUR_CC, self)
 
         # Init routines
+        self.setFixedWidth(VIDEO_BUTTONS_WIDGET_WIDTH)
+        self.setStyleSheet('background-color:red') # REMOVE AFTER DEBUG
         self.title.setStyleSheet('font-weight:bold')
         self.original.toggle()
         self.controls = [self.original, self.gray, self.core, self.contour, self.core_mask, self.contour_mask]
@@ -36,6 +37,7 @@ class VideoButtons(QWidget):
         for ctrl in self.controls:
             layout.addWidget(ctrl)
 
+        layout.addStretch()
         self.setLayout(layout)
 
     def frameSelection(self):
