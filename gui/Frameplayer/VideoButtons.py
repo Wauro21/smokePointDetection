@@ -22,7 +22,6 @@ class VideoButtons(QWidget):
 
         # Init routines
         self.setFixedWidth(VIDEO_BUTTONS_WIDGET_WIDTH)
-        self.setStyleSheet('background-color:red') # REMOVE AFTER DEBUG
         self.title.setStyleSheet('font-weight:bold')
         self.original.toggle()
         self.controls = [self.original, self.gray, self.core, self.contour, self.core_mask, self.contour_mask]
