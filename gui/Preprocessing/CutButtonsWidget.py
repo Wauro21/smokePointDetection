@@ -12,7 +12,7 @@ from PyQt5.QtCore import pyqtSignal
 import datetime
 import json
 
-class PreprocessingButtonsWidget(QWidget):
+class CutButtonsWidget(QWidget):
     cut_signal = pyqtSignal()
     update_frame = pyqtSignal()
     def __init__(self, parent=None):

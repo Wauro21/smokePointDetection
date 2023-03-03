@@ -6,11 +6,11 @@ import numpy as np
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QFormLayout, QSpinBox, QPushButton
 from PyQt5.QtGui import QPixmap, QColor, QImage
 from GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_DESC_MESSAGE, PREPROCESSING_LINES_WIDTH, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SCROLL_WIDTH_STEP, PREPROCESSING_TITLE_MESSAGE, PREPROCESSING_WIDTH_LINE_COLOR, PREPROCESSING_WINDOW_TITLE, PREPROESSING_CENTER_LINE_COLOR, VIDEO_PLAYER_BG_COLOR
-from .PreprocessingButtons import PreprocessingButtonsWidget
+from .CutButtonsWidget import CutButtonsWidget
 from utils import convert2QT
 from PyQt5.QtCore import pyqtSignal
 
-class PreprocessingWidget(QWidget):
+class CutWidget(QWidget):
     
     preprocess_done = pyqtSignal()
 
@@ -24,7 +24,7 @@ class PreprocessingWidget(QWidget):
             'scaled': None,
         }
         # Widgets
-        self.ButtonsWidget = PreprocessingButtonsWidget(self)
+        self.ButtonsWidget = CutButtonsWidget(self)
         self.frame_label = QLabel(self)
 
         # Init routines
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     app = QApplication([])
     if os.name == 'nt':
         app.setStyle('Fusion')
-    widget = PreprocessingWidget()
+    widget = CutWidget()
     widget.setFrame('/media/mauricio/SSD_Mauricio/sp_lamp/sp_lamp_mix_tolueno_isooctano_1/1__23105690__20220909_120322743_0000.tiff')
     widget.show()
     sys.exit(app.exec_())

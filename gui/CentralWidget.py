@@ -33,7 +33,7 @@ class CentralWidget(QWidget):
 
 
         # Widgets
-        self.LoadWidget = LoadWidget(self)
+        self.LoadWidget = LoadWidget(self.process_controls, self)
         self.VideoWidget = FrameHolder(self.process_controls, self)
         # -> Plots 
         self.HeightPlot = PlotWidget('Height Analysis', 'Frames [-]', 'Height [px]', ['Flame Height', 'Tip Height'], self)

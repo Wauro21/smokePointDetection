@@ -6,7 +6,9 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QLineEdi
 
 from GUI_CONSTANTS import LOAD_WIDGET_FILE_DEFAULT_MESSAGE, LOAD_WIDGET_FILE_DIALOG_HEADER_TITLE
 from MessageBox import WarningBox
-from Preprocessing.CutWidget import PreprocessingWidget
+from Preprocessing.CutWidget import CutWidget
+from Preprocessing.Preprocessing import PreprocessingWidget
+from Preprocessing.ThresholdWidget import ThresholdWidget
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 
@@ -17,20 +19,29 @@ class LoadWidget(QWidget):
     path_signal = QtCore.pyqtSignal(str)
     cut_info = QtCore.pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(self, process_controls,  parent=None):
         super().__init__(parent)
         
         # Objects 
+        self.processControls = process_controls
 
         # Widgets 
 
         self.field_description = QLabel('File:')
         self.display_path = QLineEdit(LOAD_WIDGET_FILE_DEFAULT_MESSAGE, self)
         self.open_button = QPushButton('Open')
-        self.preprocess_button = QPushButton('Preprocess')
-        self.PreprocessWidget = PreprocessingWidget() # No parent to be displayed as new window
 
+        # -> Preprocess controls
+        self.preprocess_button = QPushButton('Preprocess')
+        self.PreprocessTabs = PreprocessingWidget()
+        self.CutWidget = CutWidget(self.PreprocessTabs) # No parent to be displayed as new window
+        self.ThresholdWidget = ThresholdWidget(self.processControls, self.PreprocessTabs)
         #  Init routine
+
+        self.PreprocessTabs.addTab(self.CutWidget, 'Cut frame')
+        self.PreprocessTabs.addTab(self.ThresholdWidget, 'Threshold')
+
+
         self.preprocess_button.setEnabled(False)
 
         # -> Bold texts for labels
@@ -49,7 +60,7 @@ class LoadWidget(QWidget):
         # Signals and slots
         self.open_button.clicked.connect(self.getFiles)
         self.preprocess_button.clicked.connect(self.showPreprocess)
-        self.PreprocessWidget.preprocess_done.connect(lambda: self.cut_info.emit())
+        self.CutWidget.preprocess_done.connect(lambda: self.cut_info.emit())
 
         # Layout
         layout = QHBoxLayout()
@@ -61,10 +72,10 @@ class LoadWidget(QWidget):
         self.setLayout(layout)
 
     def getCutInfo(self):
-        return self.PreprocessWidget.getCutInfo()
+        return self.CutWidget.getCutInfo()
 
     def showPreprocess(self):
-        self.PreprocessWidget.show()
+        self.PreprocessTabs.show()
 
     def getFiles(self):
         valid = False
@@ -111,7 +122,7 @@ class LoadWidget(QWidget):
         
         # Save first frame location for preprocessing
         first_frame_path = os.path.join(folder, files[0])
-        self.PreprocessWidget.setFrame(first_frame_path)
+        self.CutWidget.setFrame(first_frame_path)
 
         frames_path = os.path.join(folder, prefix)
         self.path_signal.emit(frames_path)        

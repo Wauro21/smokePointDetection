@@ -9,7 +9,7 @@ from GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR, FrameTypes
 from MessageBox import WarningBox
 from Thread import VideoReader
 from .VideoButtons import VideoButtons
-from utils import convert2QT
+from utils import convert2QT, resizeFrame
 from PIL import Image
 
 
@@ -74,45 +74,9 @@ class FrameHolder(QWidget):
     @pyqtSlot(np.ndarray)
     def updateLabel(self, frame):
         # Resize to fit inside defined dimensions of player
-        r_frame = self.resizeFrame(frame)
+        r_frame = resizeFrame(frame)
         qt_img = convert2QT(r_frame, False)
         self.frame_label.setPixmap(qt_img)
-
-    def resizeFrame(self, frame, target=[VIDEO_PLAYER_HEIGHT_DEFAULT, VIDEO_PLAYER_WIDTH_DEFAULT]):
-        # Unpack frame info
-        try: 
-            h, w, c = frame.shape
-        except:
-            h, w = frame.shape
-            c = None
-        # Calculate aspect ratio
-        ar = w/h
-        # Target dimensions
-        H, W = target      
-        #Calculate the possible dimensions
-        # -> Fix height
-        nH = H
-        # -> From aspect ratio get new width
-        nW = round(ar*nH)
-        # -> Apply resizing to the possible dimensions that keep the aspect ratio
-        resized_frame = cv2.resize(frame, (nW, nH))
-
-        # Generate the final target size frame add color to bg
-        if(c):
-            f_frame = np.ones((H, W, c), np.uint8)
-            for i in range(c):
-                f_frame[:,:,i] =  f_frame[:,:,i] *VIDEO_PLAYER_BG_COLOR_BGR[i]
-        else:
-            f_frame = np.ones((H, W), np.uint8)
-            f_frame[:,:] =  f_frame[:,:] *VIDEO_PLAYER_BG_COLOR_GRAY
-
-        # Position resized frame inside final frame
-        # -> Calculate the left-most edge of the resized frame inside de final frame
-        aH, aW = (H-nH)//2, (W - nW)//2
-        # -> Position the frame 
-        f_frame[aH:aH+nH, aW:aW+nW] = resized_frame
-
-        return f_frame
 
 
 if __name__ == '__main__':
