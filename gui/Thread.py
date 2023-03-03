@@ -80,13 +80,13 @@ class VideoReader(QThread):
 
             # -> Generate height boxes to display
             if(self.process_controls['bboxes']): 
-                heightBox(frame, frame_processed[FrameTypes.CORE_CC], CORE_BOUNDING_BOX_COLOR)
-                heightBox(frame, frame_processed[FrameTypes.CONTOUR_CC], CONTOUR_BOUNDING_BOX_COLOR)
+                heightBox(frame_processed[FrameTypes.FRAME], frame_processed[FrameTypes.CORE_CC], CORE_BOUNDING_BOX_COLOR)
+                heightBox(frame_processed[FrameTypes.FRAME], frame_processed[FrameTypes.CONTOUR_CC], CONTOUR_BOUNDING_BOX_COLOR)
 
             # -> Draw the reference centroids and the actual centroid
             if(self.process_controls['centroids']):
-                plotCentroid(frame, reference_centroid_x, reference_centroid_y, REFERENCE_CENTROID_COLOR)
-                plotCentroid(frame, frame_processed[FrameTypes.CONTOUR_CC]['cX'], frame_processed[FrameTypes.CONTOUR_CC]['cY'], FRAME_CENTROID_COLOR)
+                plotCentroid(frame_processed[FrameTypes.FRAME], reference_centroid_x, reference_centroid_y, REFERENCE_CENTROID_COLOR)
+                plotCentroid(frame_processed[FrameTypes.FRAME], frame_processed[FrameTypes.CONTOUR_CC]['cX'], frame_processed[FrameTypes.CONTOUR_CC]['cY'], FRAME_CENTROID_COLOR)
                 
             
             # Calculate the centroid difference to check if is a valid frame

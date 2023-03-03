@@ -80,8 +80,17 @@ class VideoButtons(QWidget):
             if btn.isChecked():
                 selection = btn.getFrame()
                 break
+        # Enable extra controls for FRAME
+        self.extraHandler(selection)
         self.frame_selection.emit(selection)
         
+
+    def extraHandler(self, frame):
+        for extra in self.extra_controls:
+            if(frame is FrameTypes.FRAME):
+                extra.setEnabled(True)
+            else: extra.setEnabled(False)        
+
         
 
 class FrameSelector(QRadioButton):
