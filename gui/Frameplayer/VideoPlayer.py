@@ -29,6 +29,7 @@ class FrameHolder(QWidget):
 
         # Signals and Slots
         self.controls.frame_selection.connect(self.selectFrame)
+        self.controls.frame_controls.connect(self.controlFrame)
 
         # Layout
         layout = QHBoxLayout()
@@ -65,6 +66,10 @@ class FrameHolder(QWidget):
     def cleanThread(self):
         self.thread = None
 
+    @pyqtSlot(dict)
+    def controlFrame(self, values):
+        self.process_controls['bboxes'] = values['bboxes']
+        self.process_controls['centroids'] = values['centroids']
 
     @pyqtSlot(np.ndarray)
     def updateLabel(self, frame):
