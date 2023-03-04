@@ -7,6 +7,8 @@ import os
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtCore import Qt
 
+from GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR_BGR, VIDEO_PLAYER_BG_COLOR_GRAY, VIDEO_PLAYER_HEIGHT_DEFAULT, VIDEO_PLAYER_WIDTH_DEFAULT
+
 # Colors for height boxes
 box_colors = {
     'r':(0,0,255),
@@ -189,3 +191,40 @@ def convert2QT(cv_img, resize=True):
         if(resize):
             converted = converted.scaled(680, 480,Qt.KeepAspectRatio)
         return QPixmap.fromImage(converted)
+
+
+def resizeFrame(frame, target=[VIDEO_PLAYER_HEIGHT_DEFAULT, VIDEO_PLAYER_WIDTH_DEFAULT]):
+        # Unpack frame info
+        try: 
+            h, w, c = frame.shape
+        except:
+            h, w = frame.shape
+            c = None
+        # Calculate aspect ratio
+        ar = w/h
+        # Target dimensions
+        H, W = target      
+        #Calculate the possible dimensions
+        # -> Fix height
+        nH = H
+        # -> From aspect ratio get new width
+        nW = round(ar*nH)
+        # -> Apply resizing to the possible dimensions that keep the aspect ratio
+        resized_frame = cv2.resize(frame, (nW, nH))
+
+        # Generate the final target size frame add color to bg
+        if(c):
+            f_frame = np.ones((H, W, c), np.uint8)
+            for i in range(c):
+                f_frame[:,:,i] =  f_frame[:,:,i] *VIDEO_PLAYER_BG_COLOR_BGR[i]
+        else:
+            f_frame = np.ones((H, W), np.uint8)
+            f_frame[:,:] =  f_frame[:,:] *VIDEO_PLAYER_BG_COLOR_GRAY
+
+        # Position resized frame inside final frame
+        # -> Calculate the left-most edge of the resized frame inside de final frame
+        aH, aW = (H-nH)//2, (W - nW)//2
+        # -> Position the frame 
+        f_frame[aH:aH+nH, aW:aW+nW] = resized_frame
+
+        return f_frame

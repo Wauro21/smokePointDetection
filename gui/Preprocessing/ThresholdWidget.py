@@ -6,7 +6,7 @@ from PyQt5.QtGui import QPixmap, QColor, QImage
 
 from GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR
 from CONSTANTS import MAX_PIXEL_VALUE
-from utils import convert2QT, resizeFrame
+from utils import convert2QT, getThreshvalues, resizeFrame
 
 
 class ThresholdWidget(QWidget):
@@ -56,10 +56,12 @@ class ThresholdWidget(QWidget):
             self.frame = self.frame[:, cut_info['left']: cut_info['right']]
 
         # -> Core frame
-        _, self.core = cv2.threshold(self.frame, 10, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
+        core_value = getThreshvalues(self.processControls['core_%'])
+        _, self.core = cv2.threshold(self.frame, core_value, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
         self.core = resizeFrame(self.core)
         # -> Contour 
-        _, self.contour = cv2.threshold(self.frame, 5, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
+        contour_value = getThreshvalues(self.processControls['contour_%'])
+        _, self.contour = cv2.threshold(self.frame, contour_value, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
         self.contour = resizeFrame(self.contour)
 
         # Conver 2QT

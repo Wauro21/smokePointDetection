@@ -16,7 +16,7 @@ __author__ = 'maurio.aravena@sansano.usm.cl'
 class LoadWidget(QWidget):
 
     # Custom signals
-    path_signal = QtCore.pyqtSignal(str)
+    path_signal = QtCore.pyqtSignal(list)
     cut_info = QtCore.pyqtSignal()
 
     def __init__(self, process_controls,  parent=None):
@@ -31,18 +31,11 @@ class LoadWidget(QWidget):
         self.display_path = QLineEdit(LOAD_WIDGET_FILE_DEFAULT_MESSAGE, self)
         self.open_button = QPushButton('Open')
 
-        # -> Preprocess controls
-        self.preprocess_button = QPushButton('Preprocess')
-        self.PreprocessTabs = PreprocessingWidget()
-        self.CutWidget = CutWidget(self.PreprocessTabs) # No parent to be displayed as new window
-        self.ThresholdWidget = ThresholdWidget(self.processControls, self.PreprocessTabs)
+        # -> Configure run button
+        self.configure_button = QPushButton('Configure run')
+        
         #  Init routine
-
-        self.PreprocessTabs.addTab(self.CutWidget, 'Cut frame')
-        self.PreprocessTabs.addTab(self.ThresholdWidget, 'Threshold')
-
-
-        self.preprocess_button.setEnabled(False)
+        self.configure_button.setEnabled(False)
 
         # -> Bold texts for labels
         self.field_description.setStyleSheet(
@@ -59,23 +52,21 @@ class LoadWidget(QWidget):
 
         # Signals and slots
         self.open_button.clicked.connect(self.getFiles)
-        self.preprocess_button.clicked.connect(self.showPreprocess)
-        self.CutWidget.preprocess_done.connect(lambda: self.cut_info.emit())
 
         # Layout
         layout = QHBoxLayout()
         layout.addWidget(self.field_description)
         layout.addWidget(self.display_path)
         layout.addWidget(self.open_button)
-        layout.addWidget(self.preprocess_button)
+        layout.addWidget(self.configure_button)
 
         self.setLayout(layout)
 
-    def getCutInfo(self):
-        return self.CutWidget.getCutInfo()
+    def getDemoFrame(self):
+        return self.demo_frame
 
-    def showPreprocess(self):
-        self.PreprocessTabs.show()
+    def configureHandler(self, function):
+        self.configure_button.clicked.connect(function)
 
     def getFiles(self):
         valid = False
@@ -94,7 +85,7 @@ class LoadWidget(QWidget):
                 self.setDisplayLabel(folder)
                 
                 # Enable preprocessing 
-                self.preprocess_button.setEnabled(True)
+                self.configure_button.setEnabled(True)
             else:
                 # User pressed cancel
                 break
@@ -121,11 +112,10 @@ class LoadWidget(QWidget):
             return False
         
         # Save first frame location for preprocessing
-        first_frame_path = os.path.join(folder, files[0])
-        self.CutWidget.setFrame(first_frame_path)
+        demo_frame = os.path.join(folder, files[0])
 
         frames_path = os.path.join(folder, prefix)
-        self.path_signal.emit(frames_path)        
+        self.path_signal.emit([frames_path, demo_frame])        
         return True
 
 if __name__ == '__main__':

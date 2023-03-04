@@ -14,10 +14,11 @@ class CutWidget(QWidget):
     
     preprocess_done = pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(self, process_controls, parent=None):
         super().__init__(parent)
 
         # Objects
+        self.process_controls = process_controls
         self.frame = None
         self.resize_dict = {
             'original': None,
@@ -43,8 +44,8 @@ class CutWidget(QWidget):
         self.setLayout(layout)
 
     def preprocessingDone(self):
+        self.process_controls['cut'] = self.getCutInfo()
         self.preprocess_done.emit()
-        self.close()
 
     def getCutInfo(self):
         return self.ButtonsWidget.getCutDict()

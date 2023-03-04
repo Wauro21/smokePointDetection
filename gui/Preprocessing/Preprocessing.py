@@ -15,7 +15,6 @@ class PreprocessingWidget(QWidget):
 
         # Init routines
 
-
         # Signals and Slots
 
 
@@ -25,5 +24,12 @@ class PreprocessingWidget(QWidget):
         layout.addWidget(self.tabs)
         self.setLayout(layout)
 
-    def addTab(self, widget, label):
-        self.tabs.addTab(widget, label)
+    def addTab(self, widget, label, enabled):
+        index = self.tabs.addTab(widget, label)
+        self.tabs.setTabEnabled(index, enabled)
+
+    def setTabEnabled(self, index, value):
+        self.tabs.setTabEnabled(index, value)
+
+    def setCurrentIndex(self, index):
+        self.tabs.setCurrentIndex(index)
