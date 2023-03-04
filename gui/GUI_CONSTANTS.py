@@ -1,5 +1,8 @@
 from enum import Enum
 
+# Colors
+GUI_RED_ERROR_BG = '#f86e6c'
+
 # LoadWdiget
 
 # -> Display message for QLineEdit used for file selection
@@ -31,15 +34,25 @@ MOUSE_EVENT_PIXEL_OFFSET = 32
 
 
 # Preprocessing
+PREPROCESSING_MAIN_DESCRIPTION = 'Narrow the area of interest to remove redundant frame information. Then select the threshold values for the areas of interest to start the process.'
 PREPROCESSING_MINIMUM_WIDTH = 100#
 PREPROCESSING_SCROLL_WIDTH_STEP = 10
 PREPROCESSING_WINDOW_TITLE = 'Preprocessing'
 PREPROCESSING_TITLE_MESSAGE= 'Select the region of interest to cut the frames and save processing time'
-PREPROCESSING_DESC_MESSAGE = 'Left click on the approximate of the center of the flame and adjust the width of the region, scrolling the wheel. You can use the controls to fine tune the area. You can also save/load this presets for future use.'
+PREPROCESSING_DESC_MESSAGE = 'Left click on the approximate center of the flame and adjust the width of the region, scrolling the mouse wheel. You can use the controls to fine tune the area. You can also save/load this presets for future use.'
 
 # -> For saving/loading jsons
 PREPROCESSING_SAVE_CUT = 'Save the current cut profile onto a file'
 PREPROCESSING_LOAD_CUT = 'Load cut profile from file'
+
+# -> For thresholding 
+PREPROCESSING_THRESHOLD_FRAME_TITLE = '{} analysis'
+PREPROCESSING_THRESHOLD_PERCENTAGE = '{} value: '
+PREPROCESSING_KEY_DICT = '{}_%'
+PREPROCESSSING_ERROR_THRESHOLD_IMAGE = 'The selected threshold results in a null area, please use a lower one.'
+PREPROCESSING_AREA_THRESHOLD_INFO = '{} px*px'
+PREPROCESSING_HEIGHT_THRESHOLD_INFO = '{} px'
+PREPROCESSING_START_ERROR = 'Contour threshold cannot be lower than core threshold!'
 
 # -> Color for lines
 PREPROESSING_CENTER_LINE_COLOR = (255,153,51) # '#ff9933'

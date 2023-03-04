@@ -9,7 +9,6 @@ class PreprocessingWidget(QWidget):
 
 
         # Widgets
-        self.description = QLabel('probando', self)
         self.tabs = QTabWidget(self)
 
 
@@ -20,9 +19,11 @@ class PreprocessingWidget(QWidget):
 
         # Layout
         layout = QVBoxLayout()
-        layout.addWidget(self.description)
         layout.addWidget(self.tabs)
         self.setLayout(layout)
+
+    def requestClose(self):
+        self.close()
 
     def addTab(self, widget, label, enabled):
         index = self.tabs.addTab(widget, label)

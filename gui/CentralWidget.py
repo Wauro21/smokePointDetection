@@ -58,6 +58,7 @@ class CentralWidget(QWidget):
         self.LoadWidget.path_signal.connect(self.setPrefix)
         self.LoadWidget.configureHandler(self.requestCutting)
         self.CutWindow.preprocess_done.connect(self.requestThreshold)
+        self.ThresholdWindow.start_signal.connect(self.requestStart)
 
         # Layout
         layout = QVBoxLayout()
@@ -70,6 +71,10 @@ class CentralWidget(QWidget):
         layout.addLayout(video_plot_layout)
         
         self.setLayout(layout)
+
+    def requestStart(self):
+        self.PreprocessingTabs.requestClose()
+        self.requestPlayback()
 
     def requestThreshold(self):
         # Set the frame
