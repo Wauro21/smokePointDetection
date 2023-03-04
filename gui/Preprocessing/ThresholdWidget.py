@@ -57,16 +57,16 @@ class ThresholdWidget(QWidget):
 
         # -> Core frame
         core_value = getThreshvalues(self.processControls['core_%'])
-        _, self.core = cv2.threshold(self.frame, core_value, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
-        self.core = resizeFrame(self.core)
+        _, core = cv2.threshold(self.frame, core_value, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
+        core = resizeFrame(core)
         # -> Contour 
         contour_value = getThreshvalues(self.processControls['contour_%'])
-        _, self.contour = cv2.threshold(self.frame, contour_value, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
-        self.contour = resizeFrame(self.contour)
+        _, contour = cv2.threshold(self.frame, contour_value, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
+        contour = resizeFrame(contour)
 
         # Conver 2QT
-        qt_core = convert2QT(self.core)
-        qt_contour = convert2QT(self.contour)
+        qt_core = convert2QT(core)
+        qt_contour = convert2QT(contour)
        
         # Set the frame 
         self.core_label.setPixmap(qt_core)
