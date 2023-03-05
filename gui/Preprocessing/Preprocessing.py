@@ -16,7 +16,6 @@ class PreprocessingWidget(QWidget):
 
         # Signals and Slots
 
-
         # Layout
         layout = QVBoxLayout()
         layout.addWidget(self.tabs)

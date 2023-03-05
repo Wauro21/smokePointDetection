@@ -42,6 +42,7 @@ class CentralWidget(QWidget):
         # -> Preprocess : No parent so can be displayed as new window
         self.PreprocessingTabs = PreprocessingWidget()
         self.CutWindow = CutWidget(self.process_controls, self.PreprocessingTabs)
+        #self.ThresholdWindow = ThresholdWidget(self.process_controls, self.PreprocessingTabs)
         self.ThresholdWindow = ThresholdWidget(self.process_controls, self.PreprocessingTabs)
 
         # -> Plots 

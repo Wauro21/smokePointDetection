@@ -46,13 +46,15 @@ PREPROCESSING_SAVE_CUT = 'Save the current cut profile onto a file'
 PREPROCESSING_LOAD_CUT = 'Load cut profile from file'
 
 # -> For thresholding 
-PREPROCESSING_THRESHOLD_FRAME_TITLE = '{} analysis'
-PREPROCESSING_THRESHOLD_PERCENTAGE = '{} value: '
-PREPROCESSING_KEY_DICT = '{}_%'
+PREPROCESSING_THRESHOLD_FRAME_TITLE = '{} preview'
+PREPROCESSING_THESHOLD_CONTROLS_TITLE = '{} controls'
+PREPROCESSING_THRESHOLD_PERCENTAGE = '{} threshold value: '
+PREPROCESSING_THRESHOLD_INFORMATION = 'ROI Statistics'
 PREPROCESSSING_ERROR_THRESHOLD_IMAGE = 'The selected threshold results in a null area, please use a lower one.'
-PREPROCESSING_AREA_THRESHOLD_INFO = '{} px*px'
-PREPROCESSING_HEIGHT_THRESHOLD_INFO = '{} px'
-PREPROCESSING_START_ERROR = 'Contour threshold cannot be lower than core threshold!'
+PREPROCESSING_START_ERROR = 'Contour threshold cannot be higher than core threshold!'
+PREPROCESSING_THRESHOLD_SUFFIX = ' %'
+PREPROCESSING_HEIGHT_INFORMATION_PARSER = '{} px'
+PREPROCESSING_AREA_INFORMATION_PARSER = '{} px\u00b2'
 
 # -> Color for lines
 PREPROESSING_CENTER_LINE_COLOR = (255,153,51) # '#ff9933'
