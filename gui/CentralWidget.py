@@ -24,8 +24,8 @@ class CentralWidget(QWidget):
 
         # -> Control dictionary 
         self.process_controls = {
-            'core_%': 2,
-            'contour_%': 1,
+            'core_%': 0,
+            'contour_%': 0,
             'cut': None,
             'bboxes': False,
             'centroids': False, 

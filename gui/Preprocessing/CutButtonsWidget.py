@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QFormLay
 from PyQt5.QtGui import QPixmap, QColor, QImage
 from GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_DESC_MESSAGE, PREPROCESSING_LOAD_CUT, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SAVE_CUT, PREPROCESSING_SCROLL_WIDTH_STEP, PREPROCESSING_TITLE_MESSAGE, PREPROCESSING_WINDOW_TITLE, VIDEO_PLAYER_BG_COLOR
 from MessageBox import ErrorBox, InformationBox
+from Preprocessing.CommonButtons import LowerButtons
 from utils import convert2QT
 from PyQt5.QtCore import pyqtSignal
 import datetime
@@ -43,6 +44,7 @@ class CutButtonsWidget(QWidget):
         self.desc_label.setWordWrap(True)
         self.title_label.setStyleSheet('font-weight: bold')
         self.desc_label.setStyleSheet('margin-bottom: 25px')
+        self.bottom_actions.setStyleSheet('margin-bottom: 100px')
 
         # Signals and Slots
         self.center_line.valueChanged.connect(lambda: self.update_frame.emit())
@@ -198,35 +200,3 @@ class CutButtonsWidget(QWidget):
         self.setCutDict()
 
 
-class LowerButtons(QWidget):
-    apply = pyqtSignal()
-    save = pyqtSignal()
-    load = pyqtSignal()
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        # Objects
-
-        # Widgets
-        self.apply_button = QPushButton('Apply')
-        self.save_button = QPushButton('Save')
-        self.load_button = QPushButton('Load')
-
-        # init routines
-        self.setStyleSheet('margin-top: 100px')
-
-        # Signals and Slots
-        self.apply_button.clicked.connect(lambda: self.apply.emit())
-        self.save_button.clicked.connect(lambda: self.save.emit())
-        self.load_button.clicked.connect(lambda: self.load.emit())
-
-        # Layout
-
-        layout = QHBoxLayout()
-
-        layout.addWidget(self.apply_button)
-        layout.addWidget(self.save_button)
-        layout.addWidget(self.load_button)
-
-        self.setLayout(layout)

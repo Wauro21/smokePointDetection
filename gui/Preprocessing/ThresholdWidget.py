@@ -1,12 +1,15 @@
 import os
 import sys
 import cv2
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFormLayout, QSpinBox, QPushButton, QTableWidget, QTableWidgetItem, QAbstractItemView
+import json
+import datetime
+from PyQt5.QtWidgets import QHeaderView, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFormLayout, QSpinBox, QTableWidget, QTableWidgetItem, QAbstractItemView, QFileDialog
 from PyQt5.QtGui import QPixmap, QColor, QImage
 from PyQt5 import QtCore
-from GUI_CONSTANTS import PREPROCESSING_AREA_INFORMATION_PARSER, PREPROCESSING_HEIGHT_INFORMATION_PARSER, PREPROCESSING_THESHOLD_CONTROLS_TITLE, PREPROCESSING_THRESHOLD_FRAME_TITLE, PREPROCESSING_THRESHOLD_INFORMATION, PREPROCESSING_THRESHOLD_PERCENTAGE, PREPROCESSING_THRESHOLD_SUFFIX, PREPROCESSSING_ERROR_THRESHOLD_IMAGE, VIDEO_PLAYER_BG_COLOR
+from GUI_CONSTANTS import PREPROCESSING_AREA_INFORMATION_PARSER, PREPROCESSING_HEIGHT_INFORMATION_PARSER, PREPROCESSING_INFORMATION_TABLE_COLUMN_HEIGHT, PREPROCESSING_INFORMATION_TABLE_WIDTH, PREPROCESSING_TABLE_PADDING, PREPROCESSING_THESHOLD_CONTROLS_TITLE, PREPROCESSING_THRESHOLD_DESC, PREPROCESSING_THRESHOLD_FRAME_TITLE, PREPROCESSING_THRESHOLD_INFORMATION, PREPROCESSING_THRESHOLD_LOAD, PREPROCESSING_THRESHOLD_PERCENTAGE, PREPROCESSING_THRESHOLD_SAVE, PREPROCESSING_THRESHOLD_SPIN_WIDTH, PREPROCESSING_THRESHOLD_SUFFIX, PREPROCESSSING_ERROR_THRESHOLD_IMAGE, VIDEO_PLAYER_BG_COLOR
 from CONSTANTS import MAX_PIXEL_VALUE, NUMBER_OF_CONNECTED_COMPONENTS
-from MessageBox import ErrorBox
+from MessageBox import ErrorBox, InformationBox
+from Preprocessing.CommonButtons import LowerButtons
 from utils import convert2QT, getConnectedComponents, getThreshvalues, resizeFrame
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread, Qt
 
@@ -21,14 +24,20 @@ class ThresholdWidget(QWidget):
         self.process_controls = process_controls
 
         # Widgets 
+        self.desc = QLabel(PREPROCESSING_THRESHOLD_DESC, self)
         self.core_frame = ThresholdFrame(self.process_controls, 'Core', 'core_%', self)
         self.core_controls = ThresholdControls('Core', 'core_%', self.process_controls, self)
         self.contour_frame = ThresholdFrame(self.process_controls, 'Contour', 'contour_%', self)
         self.contour_controls = ThresholdControls('Contour', 'contour_%', self.process_controls, self)
+        self.lower_buttons = LowerButtons(self)
 
 
         # Init routines
-        
+        self.desc.setWordWrap(True)
+        self.desc.setStyleSheet(
+            'margin-top: 50px; font-weight: bold'
+        )
+
 
         # Signals and Slots
         # -> Invalid area update signals
@@ -42,6 +51,11 @@ class ThresholdWidget(QWidget):
         self.core_frame.info_update.connect(self.core_controls.updateInfo)
         self.contour_frame.info_update.connect(self.contour_controls.updateInfo)
 
+        # -> lower buttons actions
+        self.lower_buttons.apply.connect(lambda: print('apply'))
+        self.lower_buttons.save.connect(self.save2JSON)
+        self.lower_buttons.load.connect(self.loadJSON)
+
         # Layout
         layout = QHBoxLayout()
 
@@ -52,6 +66,8 @@ class ThresholdWidget(QWidget):
         controls = QVBoxLayout()
         controls.addWidget(self.core_controls)
         controls.addWidget(self.contour_controls)
+        controls.addWidget(self.desc)
+        controls.addWidget(self.lower_buttons)
 
         layout.addLayout(controls)
 
@@ -62,6 +78,61 @@ class ThresholdWidget(QWidget):
         self.core_frame.setFrame(self.frame)
         self.contour_frame.setFrame(self.frame)
 
+    def save2JSON(self):
+
+        # Generate threshold dict
+        save_dict = {
+            'core_%': self.process_controls['core_%'],
+            'contour_%': self.process_controls['contour_%']
+        }
+
+        # Save file dialog
+        date = datetime.datetime.now()
+        date = date.strftime('%d-%m-%Y_%H-%M-%S')
+
+        fileDialog = QFileDialog(self, windowTitle=PREPROCESSING_THRESHOLD_SAVE)
+        save_file = fileDialog.getSaveFileName(
+            self,
+            PREPROCESSING_THRESHOLD_SAVE, 
+            directory='threshold_values_{}.json'.format(date),
+            filter='*.json',
+        )
+
+        if(save_file[0]):
+            # Save the actual file
+            with open(save_file[0], 'w') as file:
+                json.dump(save_dict, file)
+
+    def loadJSON(self):
+        fileDialog = QFileDialog(self, windowTitle=PREPROCESSING_THRESHOLD_LOAD)
+        fileDialog.setFileMode(QFileDialog.ExistingFile)
+        fileDialog.setNameFilter('*.json')
+
+        if fileDialog.exec_():
+            file = fileDialog.selectedFiles()
+            
+            # Check if json is valid
+            try:
+                with open(file[0], 'r') as json_file:
+                    json_dict = json.load(json_file)
+
+                    try:
+                        core = json_dict['core_%']
+                        contour = json_dict['contour_%']
+
+                    except:
+                        message = ErrorBox('The provided JSON file is not in the correct format! Try with another file.')
+                        message.exec_()
+            except:
+                message = ErrorBox('Not a valid JSON file.')
+                message.exec_()
+
+            self.core_controls.loadValues(core)
+            self.contour_controls.loadValues(contour)
+
+            # Inform user
+            message = InformationBox('Presets loaded!')
+            message.exec_()
 
 class ThresholdControls(QWidget):
     update_frame = pyqtSignal()
@@ -85,6 +156,13 @@ class ThresholdControls(QWidget):
             'font-weight: bold; font-size: 15px'
         )
 
+        self.info_title.setAlignment(QtCore.Qt.AlignCenter)
+        self.info_title.setStyleSheet(
+            'font-weight: bold;'
+        )
+
+        self.threshold.setFixedWidth(PREPROCESSING_THRESHOLD_SPIN_WIDTH)
+
 
         # -> Table init
         self.info_table.setRowCount(2)
@@ -95,6 +173,23 @@ class ThresholdControls(QWidget):
         self.info_table.setItem(0,0, QTableWidgetItem(PREPROCESSING_HEIGHT_INFORMATION_PARSER.format('-')))
         self.info_table.setItem(1,0, QTableWidgetItem(PREPROCESSING_AREA_INFORMATION_PARSER.format('-')))
         self.info_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
+        # -> Adjust table dimentions: Width
+        table_header = self.info_table.verticalHeader()
+        table_header.setStyleSheet(
+            'font-weight: bold;'
+        )
+        table_header.setSectionResizeMode(QHeaderView.Fixed)
+        table_header.setFixedWidth(PREPROCESSING_INFORMATION_TABLE_WIDTH//2)
+
+
+        # -> Adjust table dimentions: Height
+        n_rows = self.info_table.rowCount()
+        for row in range(n_rows):
+            self.info_table.setRowHeight(row, PREPROCESSING_INFORMATION_TABLE_COLUMN_HEIGHT)
+
+        self.info_table.setFixedSize(PREPROCESSING_INFORMATION_TABLE_WIDTH, n_rows*PREPROCESSING_INFORMATION_TABLE_COLUMN_HEIGHT+ PREPROCESSING_TABLE_PADDING)
+        
 
         # Signals and Slots
         self.threshold.valueChanged.connect(self.updateValue)
@@ -107,10 +202,16 @@ class ThresholdControls(QWidget):
         main_controls = QFormLayout()
         main_controls.addRow(PREPROCESSING_THRESHOLD_PERCENTAGE.format(title), self.threshold)
 
+        # -> table center
+        table_layout = QHBoxLayout()
+        table_layout.addStretch(1)
+        table_layout.addWidget(self.info_table)
+        table_layout.addStretch(1)
+
         layout.addWidget(self.title)
         layout.addLayout(main_controls)
         layout.addWidget(self.info_title)
-        layout.addWidget(self.info_table)
+        layout.addLayout(table_layout)
 
         self.setLayout(layout)
     
@@ -124,6 +225,9 @@ class ThresholdControls(QWidget):
     def updateValue(self):
         self.process_controls[self.key] = self.threshold.value()
         self.update_frame.emit()
+
+    def loadValues(self, value):
+        self.threshold.setValue(value)
 
     @pyqtSlot(int)
     def invalidValue(self, old_valid):

@@ -46,6 +46,7 @@ PREPROCESSING_SAVE_CUT = 'Save the current cut profile onto a file'
 PREPROCESSING_LOAD_CUT = 'Load cut profile from file'
 
 # -> For thresholding 
+PREPROCESSING_THRESHOLD_DESC = 'Adjust the threshold controls to define the core and contour regions. The selected values will be used for the Smoke Point estimation. You can watch the effect of the selected threshols on the previes on the left. You can also save/load this presets for future use.'
 PREPROCESSING_THRESHOLD_FRAME_TITLE = '{} preview'
 PREPROCESSING_THESHOLD_CONTROLS_TITLE = '{} controls'
 PREPROCESSING_THRESHOLD_PERCENTAGE = '{} threshold value: '
@@ -55,6 +56,12 @@ PREPROCESSING_START_ERROR = 'Contour threshold cannot be higher than core thresh
 PREPROCESSING_THRESHOLD_SUFFIX = ' %'
 PREPROCESSING_HEIGHT_INFORMATION_PARSER = '{} px'
 PREPROCESSING_AREA_INFORMATION_PARSER = '{} px\u00b2'
+PREPROCESSING_INFORMATION_TABLE_WIDTH = 200
+PREPROCESSING_INFORMATION_TABLE_COLUMN_HEIGHT = 25
+PREPROCESSING_TABLE_PADDING = 2 # 1 px per line division
+PREPROCESSING_THRESHOLD_SPIN_WIDTH = 75
+PREPROCESSING_THRESHOLD_SAVE = 'Save the current threshold values onto a file'
+PREPROCESSING_THRESHOLD_LOAD = 'Load threshold values from file'
 
 # -> Color for lines
 PREPROESSING_CENTER_LINE_COLOR = (255,153,51) # '#ff9933'
