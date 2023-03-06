@@ -1,5 +1,5 @@
 from CONSTANTS import CONTOUR_BOUNDING_BOX_COLOR, CORE_BOUNDING_BOX_COLOR, FRAME_CENTROID_COLOR, MAX_CENTROID_TOLERANCE, REFERENCE_CENTROID_COLOR
-from GUI_CONSTANTS import FrameTypes
+from GUI_CONSTANTS import CentroidTypes, FrameTypes
 from utils import getThreshvalues, heightBox, plotCentroid
 from processing import frameProcess
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread, Qt
@@ -10,7 +10,7 @@ class VideoReader(QThread):
 
     update_frame_signal = pyqtSignal(np.ndarray)
     values_signal = pyqtSignal(list)
-    centroid_signal = pyqtSignal(list)
+    centroid_signal = pyqtSignal(dict)
     
     def __init__(self, video_path, process_controls):
         super().__init__()
@@ -72,7 +72,13 @@ class VideoReader(QThread):
                 h.append(contour_height)
                 H.append(tip_height)
 
-                self.centroid_signal.emit([frame_counter, reference_centroid_x])
+                # Centroid reference emit
+
+                centroid_message = {
+                    CentroidTypes.REFERENCE: reference_centroid_x
+                    }
+
+                self.centroid_signal.emit(centroid_message)
 
                 continue
 
@@ -98,13 +104,22 @@ class VideoReader(QThread):
                 invalid_frame_counter += 1
                 invalid_frame_h.append(contour_height)
                 invalid_frame_H.append(tip_height)
-                self.centroid_signal.emit([frame_counter, frame_centroid, False])
+                # Set the message 
+                centroid_message = {
+                    CentroidTypes.INVALID: [frame_counter, frame_centroid]
+                }
+                self.centroid_signal.emit(centroid_message)
                 continue
             
             # If the data is valid, append it
             h.append(contour_height)
             H.append(tip_height)
-            self.centroid_signal.emit([frame_counter, frame_centroid, True])
+
+            # Set the message
+            centroid_message = {
+                CentroidTypes.VALID: [frame_counter, frame_centroid]
+            }
+            self.centroid_signal.emit(centroid_message)
 
             # End of media reading
 
@@ -115,6 +130,9 @@ class VideoReader(QThread):
 
 
             self.values_signal.emit([frame_counter, contour_height, tip_height])
+
+        # When processing is done 
+        
 
     def toDisplay(self, requestedFrame, frame_processed):
         

@@ -13,8 +13,8 @@ LINEAR_POLY_ORDER = 1
 # -> Plotting constants
 # Drawing values
 CENTROID_RADIUS = 10
-REFERENCE_CENTROID_COLOR = (255,0,255)
-FRAME_CENTROID_COLOR = (255,0,0)
+REFERENCE_CENTROID_COLOR = (48,166,255)
+FRAME_CENTROID_COLOR = (77,0,7)
 
 # Fig save padding
 FIG_PADDING = 200 #px
@@ -28,5 +28,5 @@ LINEAR_REGION_ERROR_MESSAGE = "No enough points ({}) were found to set the linea
 SP_FOUND_MESSAGE = 'SP height found {} at frame {}'
 
 # -> Bounding Boxes for regions
-CORE_BOUNDING_BOX_COLOR = 'r'
-CONTOUR_BOUNDING_BOX_COLOR = 'g'
+CORE_BOUNDING_BOX_COLOR = (120, 114, 25)
+CONTOUR_BOUNDING_BOX_COLOR = (237, 190, 108)

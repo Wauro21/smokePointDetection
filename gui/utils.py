@@ -6,18 +6,7 @@ import numpy as np
 import os
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtCore import Qt
-
 from GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR_BGR, VIDEO_PLAYER_BG_COLOR_GRAY, VIDEO_PLAYER_HEIGHT_DEFAULT, VIDEO_PLAYER_WIDTH_DEFAULT
-
-# Colors for height boxes
-box_colors = {
-    'r':(0,0,255),
-    'g':(0,255,0),
-    'b':(255,0,0),
-    'y':(0,255,255),
-    'p':(255,0,255)
-}
-
 
 # Prints the message only if verbose mode is active
 def verbosePrint(control, text):
@@ -69,7 +58,7 @@ def px2mm(value):
     return (M_PX_CM*value)+C_PX_CM
 
 def heightBox(frame, cc, color):
-    cv2.rectangle(frame, (cc['x'],cc['y']), (cc['x']+cc['w'], cc['y']+cc['h']), box_colors[color],3)
+    cv2.rectangle(frame, (cc['x'],cc['y']), (cc['x']+cc['w'], cc['y']+cc['h']), color,3)
 
 
 def plotCentroid(frame, rcX, rcY, color):

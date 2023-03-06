@@ -48,7 +48,7 @@ class FrameHolder(QWidget):
         self.frame_label.setPixmap(gray_fill)
         
 
-    def startPlayback(self, video_path, update_function):
+    def startPlayback(self, video_path, process_update_function, centroid_update_function):
         if(self.thread != None):
             warning = WarningBox('Playback thread is already busy playing other media. Close the program.')
             warning.exec_()
@@ -58,7 +58,8 @@ class FrameHolder(QWidget):
         self.thread = VideoReader(video_path, self.process_controls)
         self.thread.update_frame_signal.connect(self.updateLabel)
         self.thread.finished.connect(self.cleanThread)
-        self.thread.values_signal.connect(update_function)
+        self.thread.values_signal.connect(process_update_function)
+        self.thread.centroid_signal.connect(centroid_update_function)
         self.thread.start()
 
         return True

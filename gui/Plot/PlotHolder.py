@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout,QTab
 import matplotlib.pyplot as plt
 import os
 import sys
-from .PlotWidget import PlotWidget
 
 
 class PlotHolder(QWidget):

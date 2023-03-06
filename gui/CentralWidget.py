@@ -1,9 +1,10 @@
 import sys
 import os
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout
+from Plot.CentroidPlot import CentroidPlotWidget
 from LoadWidget import LoadWidget
 from Frameplayer.VideoPlayer import FrameHolder
-from Plot.PlotWidget import PlotWidget
+from Plot.ProcessPlot import ProcessPlotWidget
 from GUI_CONSTANTS import FrameTypes
 from Plot.PlotHolder import PlotHolder
 from Preprocessing.CutWidget import CutWidget
@@ -47,8 +48,8 @@ class CentralWidget(QWidget):
         self.DisplayWindow = DisplaySettings(self.process_controls, self.PreprocessingTabs)
 
         # -> Plots 
-        self.HeightPlot = PlotWidget('Height Analysis', 'Frames [-]', 'Height [px]', ['Flame Height', 'Tip Height'], self)
-        self.CentroidPlot = PlotWidget('TBI','', '', [] , self)
+        self.HeightPlot = ProcessPlotWidget('Height Analysis', 'Frames [-]', 'Height [px]', ['Flame Height', 'Core Height', 'Tip Height'], self)
+        self.CentroidPlot = CentroidPlotWidget('Centroid Analysis', 'Frames [-]', 'X coordinate [px]')
         self.Plotholder = PlotHolder([self.HeightPlot, self.CentroidPlot],self)
 
 
@@ -112,7 +113,7 @@ class CentralWidget(QWidget):
         self.video_path, self.demo_frame_path = values
 
     def requestPlayback(self):
-        self.VideoWidget.startPlayback(self.video_path, self.HeightPlot.update)
+        self.VideoWidget.startPlayback(self.video_path, self.HeightPlot.update, self.CentroidPlot.update)
 
     def demo(self, value):
         self.process_controls['display'] = value
