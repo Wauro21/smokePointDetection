@@ -56,7 +56,8 @@ class CentralWidget(QWidget):
         self.PreprocessingTabs.addTab(self.CutWindow, 'Cut frame', True)
         self.PreprocessingTabs.addTab(self.ThresholdWindow, 'Threshold controls', False)
         self.PreprocessingTabs.addTab(self.DisplayWindow, 'Run settings', False)
-        self.DisplayWindow.applyHandler(self.requestStart)
+        self.DisplayWindow.applyHandler(self.enableStart)
+        self.LoadWidget.startHandler(self.requestPlayback)
 
         # Signals and Slots
         self.LoadWidget.path_signal.connect(self.setPrefix)
@@ -76,6 +77,10 @@ class CentralWidget(QWidget):
         
         self.setLayout(layout)
 
+    def enableStart(self):
+        self.PreprocessingTabs.requestClose()
+        self.LoadWidget.startEnable()
+
     def requestDisplay(self):
         # Update run settings display
         self.DisplayWindow.updateInfo()
@@ -83,7 +88,6 @@ class CentralWidget(QWidget):
         self.PreprocessingTabs.setCurrentIndex(2)
 
     def requestStart(self):
-        self.PreprocessingTabs.requestClose()
         self.requestPlayback()
 
     def requestThreshold(self):

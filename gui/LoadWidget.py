@@ -101,9 +101,19 @@ class LoadWidget(QWidget):
                 self.processControls['contour_%'] = contour
                 self.processControls['cut'] = cut
 
+                self.start_button.setEnabled(True)
+                
+
                 # Inform user
                 message = LoadBox('Presets loaded!', self.processControls)
                 message.exec_()
+
+    def startHandler(self, function):
+        self.start_button.clicked.connect(function)
+
+    def startEnable(self):
+        self.start_button.setEnabled(True)
+
     def getDemoFrame(self):
         return self.demo_frame
 
