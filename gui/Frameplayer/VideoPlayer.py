@@ -14,7 +14,7 @@ from PIL import Image
 
 
 class FrameHolder(QWidget):
-    
+    frame_process_done = pyqtSignal()
     def __init__(self, process_controls, parent=None):
         super().__init__(parent)
 
@@ -66,6 +66,7 @@ class FrameHolder(QWidget):
 
     def cleanThread(self):
         self.thread = None
+        self.frame_process_done.emit()
 
     @pyqtSlot(dict)
     def controlFrame(self, values):

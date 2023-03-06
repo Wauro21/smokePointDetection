@@ -158,6 +158,9 @@ class LoadWidget(QWidget):
         files.sort()
         prefix = files[0].replace('0000', '%04d')
 
+        # Save number of frames
+        self.processControls['n_frames'] = len(files)
+
         if(files[0] == prefix):
             # Something didn't work on the prefix, probably some weird files
             warning = WarningBox('Frames inside the folder are not numerated in order starting from 0000.')

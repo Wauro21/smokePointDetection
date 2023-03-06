@@ -82,10 +82,6 @@ class CentroidPlotWidget(QWidget):
         self.axs.scatter(invalid_frames, invalid_centroids, color=PLOT_CENTROID_INVALID_COLOR, marker=PLOT_CENTROID_INVALID_MARKER, label='Invalid')
 
         self.axs.legend(bbox_to_anchor=(0, 1.02, 1,0.2), loc='lower left', ncol=4)
-        
-        
-
-
 
 
     def getTitle(self):

@@ -5,12 +5,13 @@ from Plot.CentroidPlot import CentroidPlotWidget
 from LoadWidget import LoadWidget
 from Frameplayer.VideoPlayer import FrameHolder
 from Plot.ProcessPlot import ProcessPlotWidget
-from GUI_CONSTANTS import FrameTypes
+from GUI_CONSTANTS import FrameTypes, InformationStatus
 from Plot.PlotHolder import PlotHolder
 from Preprocessing.CutWidget import CutWidget
 from Preprocessing.Preprocessing import PreprocessingWidget
 from Preprocessing.ThresholdWidget import ThresholdWidget
 from Preprocessing.InfoWidget import DisplaySettings
+from RunInformation import InformationBar, InformationTab
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 
@@ -26,6 +27,7 @@ class CentralWidget(QWidget):
 
         # -> Control dictionary 
         self.process_controls = {
+            'n_frames': 0,
             'core_%': 0,
             'contour_%': 0,
             'cut': None,
@@ -52,19 +54,22 @@ class CentralWidget(QWidget):
         self.CentroidPlot = CentroidPlotWidget('Centroid Analysis', 'Frames [-]', 'X coordinate [px]')
         self.Plotholder = PlotHolder([self.HeightPlot, self.CentroidPlot],self)
 
+        # -> Information bar
+        self.infoBar = InformationBar(self)
 
         # Init routines
         self.PreprocessingTabs.addTab(self.CutWindow, 'Cut frame', True)
         self.PreprocessingTabs.addTab(self.ThresholdWindow, 'Threshold controls', False)
         self.PreprocessingTabs.addTab(self.DisplayWindow, 'Run settings', False)
         self.DisplayWindow.applyHandler(self.enableStart)
-        self.LoadWidget.startHandler(self.requestPlayback)
+        self.LoadWidget.startHandler(self.requestStart)
 
         # Signals and Slots
         self.LoadWidget.path_signal.connect(self.setPrefix)
         self.LoadWidget.configureHandler(self.requestCutting)
         self.CutWindow.preprocess_done.connect(self.requestThreshold)
         self.ThresholdWindow.done_signal.connect(self.requestDisplay)
+        self.VideoWidget.frame_process_done.connect(self.frameProcessDone)
 
         # Layout
         layout = QVBoxLayout()
@@ -75,8 +80,19 @@ class CentralWidget(QWidget):
         video_plot_layout.addWidget(self.VideoWidget)
         video_plot_layout.addWidget(self.Plotholder)
         layout.addLayout(video_plot_layout)
+
+        layout.addWidget(self.infoBar)
         
         self.setLayout(layout)
+
+    def frameProcessDone(self):
+        self.infoBar.setStatus(InformationStatus.FRAMES_DONE)
+
+    def centroidSignalHandler(self, message):
+        # Update centroid plot
+        self.CentroidPlot.update(message)
+        self.infoBar.stepBar(self.process_controls['n_frames'])
+        
 
     def enableStart(self):
         self.PreprocessingTabs.requestClose()
@@ -89,6 +105,7 @@ class CentralWidget(QWidget):
         self.PreprocessingTabs.setCurrentIndex(2)
 
     def requestStart(self):
+        self.infoBar.setStatus(InformationStatus.FRAMES)
         self.requestPlayback()
 
     def requestThreshold(self):
@@ -113,7 +130,7 @@ class CentralWidget(QWidget):
         self.video_path, self.demo_frame_path = values
 
     def requestPlayback(self):
-        self.VideoWidget.startPlayback(self.video_path, self.HeightPlot.update, self.CentroidPlot.update)
+        self.VideoWidget.startPlayback(self.video_path, self.HeightPlot.update, self.centroidSignalHandler)
 
     def demo(self, value):
         self.process_controls['display'] = value
