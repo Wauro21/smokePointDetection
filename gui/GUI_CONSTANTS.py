@@ -8,6 +8,7 @@ GUI_RED_ERROR_BG = '#f86e6c'
 # -> Display message for QLineEdit used for file selection
 LOAD_WIDGET_FILE_DEFAULT_MESSAGE = 'Select a frame folder to process'
 LOAD_WIDGET_FILE_DIALOG_HEADER_TITLE = 'Select a folder to process'
+LOAD_WIDGET_LOAD_JSON = 'Load settings from file'
 
 
 # VideoPlayer
@@ -62,6 +63,17 @@ PREPROCESSING_TABLE_PADDING = 2 # 1 px per line division
 PREPROCESSING_THRESHOLD_SPIN_WIDTH = 75
 PREPROCESSING_THRESHOLD_SAVE = 'Save the current threshold values onto a file'
 PREPROCESSING_THRESHOLD_LOAD = 'Load threshold values from file'
+
+# -> For display information
+PREPROCESSING_DISPLAY_TITLE = 'Run summary'
+PREPROCESSING_DISPLAY_DESC = 'This are the settings that will be applied to the Smoke Point run. You can change them going back to the corresponding tabs. You can also save this general settings for future use.'
+PREPROCESSING_DISPLAY_CUT = 'Cut - {} coordinate'
+PREPROCESSING_DISPLAY_CUT_WIDTH = 'Cut width'
+PREPROCESSING_DISPLAY_THRESHOLD = '{} threshold value'
+PREPROCESSING_DISPLAY_WIDTH_VALUE = '{} px'
+PREPROCESSING_DISPLAY_THRESHOLD_VALUE = '{} %'
+PREPROCESSING_DISPLAY_INFO_WIDTH = 300
+PREPROCESSING_DISPLAY_INFO_HEIGHT = 125
 
 # -> Color for lines
 PREPROESSING_CENTER_LINE_COLOR = (255,153,51) # '#ff9933'

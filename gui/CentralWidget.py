@@ -9,6 +9,7 @@ from Plot.PlotHolder import PlotHolder
 from Preprocessing.CutWidget import CutWidget
 from Preprocessing.Preprocessing import PreprocessingWidget
 from Preprocessing.ThresholdWidget import ThresholdWidget
+from Preprocessing.InfoWidget import DisplaySettings
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 
@@ -42,8 +43,8 @@ class CentralWidget(QWidget):
         # -> Preprocess : No parent so can be displayed as new window
         self.PreprocessingTabs = PreprocessingWidget()
         self.CutWindow = CutWidget(self.process_controls, self.PreprocessingTabs)
-        #self.ThresholdWindow = ThresholdWidget(self.process_controls, self.PreprocessingTabs)
         self.ThresholdWindow = ThresholdWidget(self.process_controls, self.PreprocessingTabs)
+        self.DisplayWindow = DisplaySettings(self.process_controls, self.PreprocessingTabs)
 
         # -> Plots 
         self.HeightPlot = PlotWidget('Height Analysis', 'Frames [-]', 'Height [px]', ['Flame Height', 'Tip Height'], self)
@@ -54,12 +55,14 @@ class CentralWidget(QWidget):
         # Init routines
         self.PreprocessingTabs.addTab(self.CutWindow, 'Cut frame', True)
         self.PreprocessingTabs.addTab(self.ThresholdWindow, 'Threshold controls', False)
+        self.PreprocessingTabs.addTab(self.DisplayWindow, 'Run settings', False)
+        self.DisplayWindow.applyHandler(self.requestStart)
 
         # Signals and Slots
         self.LoadWidget.path_signal.connect(self.setPrefix)
         self.LoadWidget.configureHandler(self.requestCutting)
         self.CutWindow.preprocess_done.connect(self.requestThreshold)
-        self.ThresholdWindow.start_signal.connect(self.requestStart)
+        self.ThresholdWindow.done_signal.connect(self.requestDisplay)
 
         # Layout
         layout = QVBoxLayout()
@@ -73,11 +76,20 @@ class CentralWidget(QWidget):
         
         self.setLayout(layout)
 
+    def requestDisplay(self):
+        # Update run settings display
+        self.DisplayWindow.updateInfo()
+        self.PreprocessingTabs.setTabEnabled(2, True)
+        self.PreprocessingTabs.setCurrentIndex(2)
+
     def requestStart(self):
         self.PreprocessingTabs.requestClose()
         self.requestPlayback()
 
     def requestThreshold(self):
+        # Update run settings display
+        self.DisplayWindow.updateInfo()
+        
         # Set the frame
         self.ThresholdWindow.setFrame(self.demo_frame_path)
         self.PreprocessingTabs.setTabEnabled(1, True)

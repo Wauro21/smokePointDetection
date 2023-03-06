@@ -6,15 +6,15 @@ import datetime
 from PyQt5.QtWidgets import QHeaderView, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFormLayout, QSpinBox, QTableWidget, QTableWidgetItem, QAbstractItemView, QFileDialog
 from PyQt5.QtGui import QPixmap, QColor, QImage
 from PyQt5 import QtCore
-from GUI_CONSTANTS import PREPROCESSING_AREA_INFORMATION_PARSER, PREPROCESSING_HEIGHT_INFORMATION_PARSER, PREPROCESSING_INFORMATION_TABLE_COLUMN_HEIGHT, PREPROCESSING_INFORMATION_TABLE_WIDTH, PREPROCESSING_TABLE_PADDING, PREPROCESSING_THESHOLD_CONTROLS_TITLE, PREPROCESSING_THRESHOLD_DESC, PREPROCESSING_THRESHOLD_FRAME_TITLE, PREPROCESSING_THRESHOLD_INFORMATION, PREPROCESSING_THRESHOLD_LOAD, PREPROCESSING_THRESHOLD_PERCENTAGE, PREPROCESSING_THRESHOLD_SAVE, PREPROCESSING_THRESHOLD_SPIN_WIDTH, PREPROCESSING_THRESHOLD_SUFFIX, PREPROCESSSING_ERROR_THRESHOLD_IMAGE, VIDEO_PLAYER_BG_COLOR
+from GUI_CONSTANTS import PREPROCESSING_AREA_INFORMATION_PARSER, PREPROCESSING_HEIGHT_INFORMATION_PARSER, PREPROCESSING_INFORMATION_TABLE_COLUMN_HEIGHT, PREPROCESSING_INFORMATION_TABLE_WIDTH, PREPROCESSING_START_ERROR, PREPROCESSING_TABLE_PADDING, PREPROCESSING_THESHOLD_CONTROLS_TITLE, PREPROCESSING_THRESHOLD_DESC, PREPROCESSING_THRESHOLD_FRAME_TITLE, PREPROCESSING_THRESHOLD_INFORMATION, PREPROCESSING_THRESHOLD_LOAD, PREPROCESSING_THRESHOLD_PERCENTAGE, PREPROCESSING_THRESHOLD_SAVE, PREPROCESSING_THRESHOLD_SPIN_WIDTH, PREPROCESSING_THRESHOLD_SUFFIX, PREPROCESSSING_ERROR_THRESHOLD_IMAGE, VIDEO_PLAYER_BG_COLOR
 from CONSTANTS import MAX_PIXEL_VALUE, NUMBER_OF_CONNECTED_COMPONENTS
 from MessageBox import ErrorBox, InformationBox
 from Preprocessing.CommonButtons import LowerButtons
 from utils import convert2QT, getConnectedComponents, getThreshvalues, resizeFrame
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread, Qt
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
 class ThresholdWidget(QWidget):
-    start_signal = pyqtSignal()
+    done_signal = pyqtSignal()
     def __init__(self, process_controls,  parent=None):
         
         super().__init__(parent)
@@ -52,7 +52,7 @@ class ThresholdWidget(QWidget):
         self.contour_frame.info_update.connect(self.contour_controls.updateInfo)
 
         # -> lower buttons actions
-        self.lower_buttons.apply.connect(lambda: print('apply'))
+        self.lower_buttons.apply.connect(self.applyThresh)
         self.lower_buttons.save.connect(self.save2JSON)
         self.lower_buttons.load.connect(self.loadJSON)
 
@@ -72,6 +72,18 @@ class ThresholdWidget(QWidget):
         layout.addLayout(controls)
 
         self.setLayout(layout)
+
+    def applyThresh(self):
+
+        # Check if values are valid
+        if(self.process_controls['core_%'] > self.process_controls['contour_%']):
+            self.done_signal.emit()
+
+        else: 
+            message = ErrorBox(PREPROCESSING_START_ERROR)
+            message.exec_()
+
+
 
     def setFrame(self, path):
         self.frame = path
