@@ -28,5 +28,5 @@ LINEAR_REGION_ERROR_MESSAGE = "No enough points ({}) were found to set the linea
 SP_FOUND_MESSAGE = 'SP height found {} at frame {}'
 
 # -> Bounding Boxes for regions
-CORE_BOUNDING_BOX_COLOR = (120, 114, 25)
-CONTOUR_BOUNDING_BOX_COLOR = (237, 190, 108)
+CORE_BOUNDING_BOX_COLOR = (237, 190, 108)
+CONTOUR_BOUNDING_BOX_COLOR = (120, 114, 25)
