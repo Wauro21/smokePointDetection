@@ -219,7 +219,7 @@ class InformationBar(QWidget):
 
     def stepBar(self, total):
         self.last_steps += 1
-        value = 100*(self.last_steps/total)
+        value = round(100*(self.last_steps/total))
         self.progress.setValue(value)
 
     def getLastTime(self):
