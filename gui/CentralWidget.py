@@ -1,6 +1,7 @@
 import sys
 import os
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout
+from Plot.FixedPlots import FixedPlot, PolyHeightPlot
 from Plot.CentroidPlot import CentroidPlotWidget
 from LoadWidget import LoadWidget
 from Frameplayer.VideoPlayer import FrameHolder
@@ -12,6 +13,8 @@ from Preprocessing.Preprocessing import PreprocessingWidget
 from Preprocessing.ThresholdWidget import ThresholdWidget
 from Preprocessing.InfoWidget import DisplaySettings
 from RunInformation import InformationBar, InformationTab
+from MessageBox import WarningBox
+from Thread import PloyAnalizer
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 
@@ -23,7 +26,7 @@ class CentralWidget(QWidget):
         # Objects 
         self.video_path = None
         self.demo_frame_path = None
-        
+        self.polyThread = None
 
         # -> Control dictionary 
         self.process_controls = {
@@ -38,7 +41,9 @@ class CentralWidget(QWidget):
             'display': FrameTypes.FRAME,
             'n_invalid_frames': 0,
             'centroid_ref_cord': None, 
-            'last_run_time': 0
+            'last_run_time': 0,
+            '10th_poly': None,
+            '10th_der': None, 
         }
 
 
@@ -54,7 +59,8 @@ class CentralWidget(QWidget):
         # -> Plots 
         self.HeightPlot = ProcessPlotWidget('Height Analysis', 'Frames [-]', 'Height [px]', ['Flame Height', 'Core Height', 'Tip Height'], self)
         self.CentroidPlot = CentroidPlotWidget('Centroid Analysis', 'Frames [-]', 'X coordinate [px]')
-        self.Plotholder = PlotHolder([self.HeightPlot, self.CentroidPlot],self)
+        self.PolyHeightPlot = PolyHeightPlot('h v/s H')
+        self.Plotholder = PlotHolder([self.HeightPlot, self.CentroidPlot, self.PolyHeightPlot],self)
 
         # -> Information bar
         self.infoBar = InformationBar(self)
@@ -89,6 +95,20 @@ class CentralWidget(QWidget):
         
         self.setLayout(layout)
 
+    def plotHeightsPoly(self):
+        self.PolyHeightPlot.plot(self.process_controls)
+
+    def requestPolynomialAnalysis(self):
+        if(self.polyThread != None):
+            warning = WarningBox('There is already a thread performing the analysis, wait until it finishes before attempting to perform the analysis again.')
+            warning.exec_()
+            return False
+        
+        self.polyThread = PloyAnalizer(self.process_controls)
+        self.polyThread.heights_plot.connect(self.plotHeightsPoly)
+        self.polyThread.start()
+
+
     def frameProcessDone(self):
         # Change status
         self.infoBar.setStatus(InformationStatus.FRAMES_DONE)
@@ -99,6 +119,9 @@ class CentralWidget(QWidget):
 
         # Set current tab 
         self.Plotholder.setCurrentTab(2)
+
+        # REMOVE LATER ONLY TEMPORAL
+        self.requestPolynomialAnalysis()
 
     def centroidSignalHandler(self, message):
         # Update centroid plot

@@ -1,10 +1,38 @@
-from CONSTANTS import CONTOUR_BOUNDING_BOX_COLOR, CORE_BOUNDING_BOX_COLOR, FRAME_CENTROID_COLOR, MAX_CENTROID_TOLERANCE, REFERENCE_CENTROID_COLOR
+from CONSTANTS import CONTOUR_BOUNDING_BOX_COLOR, CORE_BOUNDING_BOX_COLOR, DERIVATIVE_LOW_BOUND, DERIVATIVE_ORDER, FRAME_CENTROID_COLOR, MAX_CENTROID_TOLERANCE, POLYNOMIAL_ORDER, REFERENCE_CENTROID_COLOR
 from GUI_CONSTANTS import CentroidTypes, FrameTypes
 from utils import getThreshvalues, heightBox, plotCentroid
-from processing import frameProcess
+from processing import frameProcess, processHeights
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread, Qt
 import numpy as np
 import cv2
+
+
+class PloyAnalizer(QThread):
+    heights_plot = pyqtSignal()
+    def __init__(self, process_controls):
+        
+        super().__init__()
+
+        self.process_controls = process_controls
+
+
+    def run(self):
+
+        h = self.process_controls['h']
+        H = self.process_controls['H']
+
+        # -> Fit 10th order poly
+        tenth_poly = np.polyfit(h,H, POLYNOMIAL_ORDER)
+        self.process_controls['10th_poly'] = tenth_poly
+
+        # -> Derivative of the 10th order poly
+        der_poly = np.polyder(tenth_poly, DERIVATIVE_ORDER)
+        self.process_controls['10th_der'] = der_poly
+        
+        # -> Emit h v/s H plot
+        self.heights_plot.emit()
+
+        
 
 class VideoReader(QThread):
 
