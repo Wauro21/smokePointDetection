@@ -5,7 +5,7 @@ from Plot.CentroidPlot import CentroidPlotWidget
 from LoadWidget import LoadWidget
 from Frameplayer.VideoPlayer import FrameHolder
 from Plot.ProcessPlot import ProcessPlotWidget
-from GUI_CONSTANTS import FrameTypes, InformationStatus
+from GUI_CONSTANTS import CentroidTypes, FrameTypes, InformationStatus
 from Plot.PlotHolder import PlotHolder
 from Preprocessing.CutWidget import CutWidget
 from Preprocessing.Preprocessing import PreprocessingWidget
@@ -36,7 +36,9 @@ class CentralWidget(QWidget):
             'h': None,
             'H': None,
             'display': FrameTypes.FRAME,
-
+            'n_invalid_frames': 0,
+            'centroid_ref_cord': None, 
+            'last_run_time': 0
         }
 
 
@@ -56,6 +58,7 @@ class CentralWidget(QWidget):
 
         # -> Information bar
         self.infoBar = InformationBar(self)
+        self.infoTab = InformationTab(self)
 
         # Init routines
         self.PreprocessingTabs.addTab(self.CutWindow, 'Cut frame', True)
@@ -63,6 +66,7 @@ class CentralWidget(QWidget):
         self.PreprocessingTabs.addTab(self.DisplayWindow, 'Run settings', False)
         self.DisplayWindow.applyHandler(self.enableStart)
         self.LoadWidget.startHandler(self.requestStart)
+        self.Plotholder.addTab(self.infoTab)
 
         # Signals and Slots
         self.LoadWidget.path_signal.connect(self.setPrefix)
@@ -86,13 +90,29 @@ class CentralWidget(QWidget):
         self.setLayout(layout)
 
     def frameProcessDone(self):
+        # Change status
         self.infoBar.setStatus(InformationStatus.FRAMES_DONE)
+        # Get last run time
+        self.process_controls['last_run_time'] = self.infoBar.getLastTime()
+        # Update info summary
+        self.infoTab.updateTabs(self.process_controls)
+
+        # Set current tab 
+        self.Plotholder.setCurrentTab(2)
 
     def centroidSignalHandler(self, message):
         # Update centroid plot
         self.CentroidPlot.update(message)
         self.infoBar.stepBar(self.process_controls['n_frames'])
-        
+
+        # If reference set it to the info
+        message_type = list(message.keys())[-1]
+        if(message_type is CentroidTypes.REFERENCE):
+            self.process_controls['centroid_ref_cord'] = message[message_type]
+
+        # Updat invalid counter
+        if(message_type is CentroidTypes.INVALID):
+            self.process_controls['n_invalid_frames'] += 1
 
     def enableStart(self):
         self.PreprocessingTabs.requestClose()

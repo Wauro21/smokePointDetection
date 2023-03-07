@@ -26,6 +26,13 @@ class PlotHolder(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(self.tabWidget)
 
+    def addTab(self, widget):
+        self.tabWidget.addTab(widget, widget.getTitle())
+
+
+    def setCurrentTab(self, index):
+        self.tabWidget.setCurrentIndex(index)
+
 
 if __name__ == '__main__':
     app = QApplication([])

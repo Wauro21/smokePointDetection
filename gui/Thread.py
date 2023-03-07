@@ -132,6 +132,8 @@ class VideoReader(QThread):
             self.values_signal.emit([frame_counter, contour_height, tip_height])
 
         # When processing is done 
+        self.process_controls['h'] = h
+        self.process_controls['H'] = H
         
 
     def toDisplay(self, requestedFrame, frame_processed):
