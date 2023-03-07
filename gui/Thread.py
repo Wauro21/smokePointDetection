@@ -9,6 +9,9 @@ import cv2
 
 class PloyAnalizer(QThread):
     heights_plot = pyqtSignal()
+    linear_plot = pyqtSignal()
+    linear_error = pyqtSignal()
+
     def __init__(self, process_controls):
         
         super().__init__()
@@ -17,7 +20,8 @@ class PloyAnalizer(QThread):
 
 
     def run(self):
-
+        
+        der_threshold = self.process_controls['der_threshold']
         h = self.process_controls['h']
         H = self.process_controls['H']
 
@@ -32,6 +36,35 @@ class PloyAnalizer(QThread):
         # -> Emit h v/s H plot
         self.heights_plot.emit()
 
+        # Find linear region
+        # -> Set default values
+        linear_region_flag = True
+        linear_region_start = -float('inf')
+        linear_region_end = float('inf')
+        linear_region_points = {}
+
+        for flame_pos, flame_height in enumerate(h):
+            poly_eval = abs(np.polyval(der_poly, flame_height))
+            if(poly_eval <= der_threshold):
+                linear_region_points[flame_height] = H[flame_pos]#np.polyval(tenth_poly, flame_height)
+                if(linear_region_flag):
+                    linear_region_start = flame_pos
+                    linear_region_flag = False
+                    continue
+                
+                linear_region_end = flame_pos
+
+        if(len(linear_region_points) <= 2):
+            # Not enough points to process
+            self.linear_error.emit()
+            return False
+        
+        
+        # Save the linear region info
+        self.process_controls['linear_region_start'] = linear_region_start
+        self.process_controls['linear_region_points'] = linear_region_points
+        self.process_controls['linear_region_end'] = linear_region_end
+        self.linear_plot.emit()
         
 
 class VideoReader(QThread):

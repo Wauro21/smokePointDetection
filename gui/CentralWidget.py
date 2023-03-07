@@ -1,7 +1,7 @@
 import sys
 import os
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout
-from Plot.FixedPlots import FixedPlot, PolyHeightPlot
+from Plot.FixedPlots import FixedPlot, LinearRegionPlot, PolyHeightPlot
 from Plot.CentroidPlot import CentroidPlotWidget
 from LoadWidget import LoadWidget
 from Frameplayer.VideoPlayer import FrameHolder
@@ -44,6 +44,10 @@ class CentralWidget(QWidget):
             'last_run_time': 0,
             '10th_poly': None,
             '10th_der': None, 
+            'der_threshold': 2e-2, # Temporal
+            'linear_region_start': None,
+            'linear_region_end': None,
+            'linear_region_points': None,
         }
 
 
@@ -59,8 +63,9 @@ class CentralWidget(QWidget):
         # -> Plots 
         self.HeightPlot = ProcessPlotWidget('Height Analysis', 'Frames [-]', 'Height [px]', ['Flame Height', 'Core Height', 'Tip Height'], self)
         self.CentroidPlot = CentroidPlotWidget('Centroid Analysis', 'Frames [-]', 'X coordinate [px]')
-        self.PolyHeightPlot = PolyHeightPlot('h v/s H')
-        self.Plotholder = PlotHolder([self.HeightPlot, self.CentroidPlot, self.PolyHeightPlot],self)
+        self.PolyHeightPlot = PolyHeightPlot('H vs h')
+        self.LinearPolyPlot = LinearRegionPlot('Linear Region')
+        self.Plotholder = PlotHolder([self.HeightPlot, self.CentroidPlot, self.PolyHeightPlot, self.LinearPolyPlot],self)
 
         # -> Information bar
         self.infoBar = InformationBar(self)
@@ -95,6 +100,9 @@ class CentralWidget(QWidget):
         
         self.setLayout(layout)
 
+    def plotLinearPoly(self):
+        self.LinearPolyPlot.plot(self.process_controls)
+
     def plotHeightsPoly(self):
         self.PolyHeightPlot.plot(self.process_controls)
 
@@ -106,6 +114,8 @@ class CentralWidget(QWidget):
         
         self.polyThread = PloyAnalizer(self.process_controls)
         self.polyThread.heights_plot.connect(self.plotHeightsPoly)
+        self.polyThread.linear_plot.connect(self.plotLinearPoly)
+        self.polyThread.linear_error.connect(lambda: print('ERROR on linear region'))
         self.polyThread.start()
 
 

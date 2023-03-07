@@ -46,6 +46,38 @@ class FixedPlot(QWidget):
         return self.title
 
 
+class LinearRegionPlot(FixedPlot):
+
+    def __init__(self, title, parent=None):
+        
+        super().__init__(title, parent)
+
+
+    def plot(self, process_controls):
+        
+        
+        der_coef = process_controls['10th_der']
+        h = process_controls['h']
+        H = process_controls['H']
+        l_start = process_controls['linear_region_start']
+        l_end = process_controls['linear_region_end']
+                
+        # Derivative show values
+        h_min = math.floor(min(h))
+        h_max = math.ceil(max(h))
+        samples = len(h)
+        h_values = np.linspace(h_min, h_max, samples)
+        
+        der_values = np.polyval(der_coef, h_values)
+
+        # Plot derivative
+        self.axs.plot(h_values, der_values, label='Derivative')
+        # Plot linear region area
+        self.axs.axvspan(h[l_start], h[l_end], color='r', alpha=0.3)
+        self.pltCanvas.draw()
+
+
+
 class PolyHeightPlot(FixedPlot):
 
     def __init__(self, title, parent=None):
