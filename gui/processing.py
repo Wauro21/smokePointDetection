@@ -13,7 +13,7 @@ import matplotlib
 matplotlib.use('tkAgg')
 
 
-def processHeights(h, H, der_threshold, invalid_frame_counter):
+def processHeights(h, H, der_threshold, invalid_frame_counter, show_print=False):
     # -> Fit 10th order poly
     tenth_poly = np.polyfit(h,H, POLYNOMIAL_ORDER)
 
@@ -39,7 +39,7 @@ def processHeights(h, H, der_threshold, invalid_frame_counter):
 
     # Check if the linear region was found
     if(len(linear_region_points) <= 2):
-        print(LINEAR_REGION_ERROR_MESSAGE.format(len(linear_region_points),args.DerivativeThreshold))
+        verbosePrint(show_print, LINEAR_REGION_ERROR_MESSAGE.format(len(linear_region_points),der_threshold))
         linear_poly = None
         sp_height = None
         sp_Height = None
@@ -62,7 +62,7 @@ def processHeights(h, H, der_threshold, invalid_frame_counter):
                 sp_height = flame_height
                 sp_Height = poly_H_val
                 break
-        verbosePrint(args.Verbose, SP_FOUND_MESSAGE.format(sp_height, flame_pos))
+        verbosePrint(show_print, SP_FOUND_MESSAGE.format(sp_height, flame_pos))
 
     ret_dict = {
     'height':h,					# flame height values
@@ -126,8 +126,8 @@ def smokepoint(args):
     height = int(media.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     # Set threshold for core and countour
-    core_threshold_value = getThreshvalues(args.TresholdCore)
-    contour_threshold_value = getThreshvalues(args.TresholdContour)
+    core_threshold_value = getThreshvalues(args.ThresholdCore)
+    contour_threshold_value = getThreshvalues(args.ThresholdContour)
     verbosePrint(args.Verbose, THRESHOLD_VALUES_MESSAGE.format(core_threshold_value,contour_threshold_value))
 
     # Set the progress bar for verbose
@@ -235,7 +235,7 @@ def smokepoint(args):
     media.release()
 
 
-    polynomial_results = processHeights(h, H, args.DerivativeThreshold, invalid_frame_counter)
+    polynomial_results = processHeights(h, H, args.DerivativeThreshold, invalid_frame_counter, args.Verbose)
 
     # Add the invalid frames values
     polynomial_results['invalid_frames_h'] = invalid_frame_h
