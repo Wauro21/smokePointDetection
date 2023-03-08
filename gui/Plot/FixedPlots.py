@@ -10,7 +10,7 @@ from matplotlib.backends.qt_compat import QtWidgets
 from matplotlib.backends.backend_qtagg import (
     FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 
-from GUI_CONSTANTS import PLOT_HEIGHT_POLY_DOTS_COLOR, PLOT_HEIGHT_POLY_DOTS_LABEL, PLOT_HEIGHT_POLY_LINE_COLOR, PLOT_HEIGHT_POLY_LINE_LABEL, PLOT_HEIGHTS_POLY_XLABEL, PLOT_HEIGHTS_POLY_YLABEL, PLOT_WIDGET_HEIGHT, PLOT_WIDGET_WIDTH
+from GUI_CONSTANTS import PLOT_HEIGHT_POLY_DOTS_COLOR, PLOT_HEIGHT_POLY_DOTS_LABEL, PLOT_HEIGHT_POLY_LINE_COLOR, PLOT_HEIGHT_POLY_LINE_LABEL, PLOT_HEIGHTS_POLY_XLABEL, PLOT_HEIGHTS_POLY_YLABEL, PLOT_LINEAR_DER_LABEL, PLOT_LINEAR_REGION_LABEL, PLOT_LINEAR_XLABEL, PLOT_LINEAR_YLABEL, PLOT_SP_LINEAR_POLY_COLOR, PLOT_SP_LINEAR_POLY_LABEL, PLOT_SP_POINT_COLOR, PLOT_SP_POINT_LABEL, PLOT_SP_POLY_COLOR, PLOT_SP_POLY_LABEL, PLOT_SP_XLABEL, PLOT_SP_YLABEL, PLOT_WIDGET_HEIGHT, PLOT_WIDGET_WIDTH
 
 
 class FixedPlot(QWidget):
@@ -52,6 +52,10 @@ class LinearRegionPlot(FixedPlot):
         
         super().__init__(title, parent)
 
+        self.axs.set_xlabel(PLOT_LINEAR_XLABEL)
+        self.axs.set_ylabel(PLOT_LINEAR_YLABEL)
+        self.axs.grid()
+
 
     def plot(self, process_controls):
         
@@ -59,9 +63,9 @@ class LinearRegionPlot(FixedPlot):
         der_coef = process_controls['10th_der']
         h = process_controls['h']
         H = process_controls['H']
-        l_start = process_controls['linear_region_start']
-        l_end = process_controls['linear_region_end']
-                
+        linear_region = process_controls['linear_region']
+        l_h =  list(linear_region.keys())
+        
         # Derivative show values
         h_min = math.floor(min(h))
         h_max = math.ceil(max(h))
@@ -71,12 +75,48 @@ class LinearRegionPlot(FixedPlot):
         der_values = np.polyval(der_coef, h_values)
 
         # Plot derivative
-        self.axs.plot(h_values, der_values, label='Derivative')
+        self.axs.plot(h_values, der_values, label=PLOT_LINEAR_DER_LABEL)
         # Plot linear region area
-        self.axs.axvspan(h[l_start], h[l_end], color='r', alpha=0.3)
+        self.axs.axvspan(l_h[0], l_h[-1], color='r', alpha=0.3, label=PLOT_LINEAR_REGION_LABEL)
+        
+        self.axs.legend(bbox_to_anchor=(0, 1.02, 1,0.2), loc='lower left', ncol=4)
         self.pltCanvas.draw()
 
+class SmokePointPlot(FixedPlot):
+    
+    def __init__(self, title, parent=None):
 
+        super().__init__(title, parent)
+        self.axs.set_xlabel(PLOT_SP_XLABEL)
+        self.axs.set_ylabel(PLOT_SP_YLABEL)
+        self.axs.grid()
+
+    def plot(self, process_controls):
+
+        # Raw data
+        h_min = min(process_controls['h'])
+        h_max = max(process_controls['h'])
+        samples = len(process_controls['h'])
+        h_points = np.linspace(h_min, h_max, samples)
+        sp_h, sp_H = process_controls['sp']
+
+        # Plot fitted poly for H(h)
+        tenth_poly = process_controls['10th_poly']
+        tenth_poly_values = np.polyval(tenth_poly, h_points)
+
+        # Plot linear poly
+        linear_poly = process_controls['linear_poly']
+        linear_poly_values = np.polyval(linear_poly, h_points)
+
+        self.axs.plot(h_points, tenth_poly_values, color=PLOT_SP_POLY_COLOR, label=PLOT_SP_POLY_LABEL)
+        self.axs.plot(h_points, linear_poly_values, color=PLOT_SP_LINEAR_POLY_COLOR, label=PLOT_SP_LINEAR_POLY_LABEL)
+        # Plot sp
+        self.axs.axhline(y=sp_H, color='k', linestyle='dashed')
+        self.axs.axvline(x=sp_h, color='k', linestyle='dashed')
+        self.axs.scatter(sp_h, sp_H, s=50, color=PLOT_SP_POINT_COLOR, label=PLOT_SP_POINT_LABEL.format(sp_h))
+        self.axs.legend(bbox_to_anchor=(0, 1.02, 1,0.2), loc='lower left', ncol=4)
+
+        self.pltCanvas.draw()
 
 class PolyHeightPlot(FixedPlot):
 

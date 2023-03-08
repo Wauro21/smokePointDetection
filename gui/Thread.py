@@ -1,16 +1,18 @@
-from CONSTANTS import CONTOUR_BOUNDING_BOX_COLOR, CORE_BOUNDING_BOX_COLOR, DERIVATIVE_LOW_BOUND, DERIVATIVE_ORDER, FRAME_CENTROID_COLOR, MAX_CENTROID_TOLERANCE, POLYNOMIAL_ORDER, REFERENCE_CENTROID_COLOR
+from CONSTANTS import CONTOUR_BOUNDING_BOX_COLOR, CORE_BOUNDING_BOX_COLOR, DERIVATIVE_LOW_BOUND, DERIVATIVE_ORDER, FRAME_CENTROID_COLOR, LINEAR_POLY_ORDER, MAX_CENTROID_TOLERANCE, POLYNOMIAL_ORDER, REFERENCE_CENTROID_COLOR, SP_THRESHOLD
 from GUI_CONSTANTS import CentroidTypes, FrameTypes
-from utils import getThreshvalues, heightBox, plotCentroid
+from utils import findLinearRegion, getThreshvalues, heightBox, plotCentroid
 from processing import frameProcess, processHeights
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread, Qt
 import numpy as np
 import cv2
 
 
-class PloyAnalizer(QThread):
+class PolyAnalizer(QThread):
     heights_plot = pyqtSignal()
     linear_plot = pyqtSignal()
     linear_error = pyqtSignal()
+    sp_plot = pyqtSignal()
+    sp_error = pyqtSignal()
 
     def __init__(self, process_controls):
         
@@ -37,34 +39,45 @@ class PloyAnalizer(QThread):
         self.heights_plot.emit()
 
         # Find linear region
-        # -> Set default values
-        linear_region_flag = True
-        linear_region_start = -float('inf')
-        linear_region_end = float('inf')
-        linear_region_points = {}
-
-        for flame_pos, flame_height in enumerate(h):
-            poly_eval = abs(np.polyval(der_poly, flame_height))
-            if(poly_eval <= der_threshold):
-                linear_region_points[flame_height] = H[flame_pos]#np.polyval(tenth_poly, flame_height)
-                if(linear_region_flag):
-                    linear_region_start = flame_pos
-                    linear_region_flag = False
-                    continue
-                
-                linear_region_end = flame_pos
-
-        if(len(linear_region_points) <= 2):
+        linear_region = findLinearRegion(h, tenth_poly, der_poly, der_threshold)
+        if(len(linear_region) <= 2):
             # Not enough points to process
             self.linear_error.emit()
             return False
         
-        
         # Save the linear region info
-        self.process_controls['linear_region_start'] = linear_region_start
-        self.process_controls['linear_region_points'] = linear_region_points
-        self.process_controls['linear_region_end'] = linear_region_end
+        self.process_controls['linear_region'] = linear_region
         self.linear_plot.emit()
+
+        # -> Apply linear fit to the region
+        h_linear = list(linear_region.keys())
+        H_linear = list(linear_region.values())
+        linear_poly = np.polyfit(h_linear, H_linear, LINEAR_POLY_ORDER)
+        self.process_controls['linear_poly'] = linear_poly
+
+        # Find the SP value
+        sp_h = None
+        sp_H = None
+        h_points = np.linspace(min(h), max(h), len(h))
+        h_linear_start = h_linear[0]
+        for h_val in h_points:
+            # Only search starting from linear region
+            if(h_val >= h_linear_start):
+                H_val = np.polyval(tenth_poly, h_val)
+                H_poly = np.polyval(linear_poly, h_val)
+                distance = H_val - H_poly
+                if(distance > SP_THRESHOLD):
+                    sp_h = h_val
+                    sp_H = H_val
+                    break
+        if not(sp_H):
+            self.sp_error.emit()
+            return False
+    
+        # Save value and emit signal
+        self.process_controls['sp'] = [sp_h, sp_H]
+        self.sp_plot.emit()
+
         
 
 class VideoReader(QThread):

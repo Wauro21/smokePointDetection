@@ -122,7 +122,20 @@ PLOT_HEIGHTS_POLY_YLABEL = 'Flame Tip height (H) px'
 
 
 # Linear region plot
+PLOT_LINEAR_XLABEL = 'Contour height (h) px'
+PLOT_LINEAR_YLABEL = ''
+PLOT_LINEAR_DER_LABEL = 'Derivative'
+PLOT_LINEAR_REGION_LABEL = 'Linear region'
 
+# SP Plot
+PLOT_SP_XLABEL = 'Contour height (h) px'
+PLOT_SP_YLABEL = 'Tip height (H) px'
+PLOT_SP_POLY_COLOR = PLOT_HEIGHT_POLY_LINE_COLOR
+PLOT_SP_LINEAR_POLY_COLOR = '#00A676'
+PLOT_SP_POLY_LABEL = PLOT_HEIGHT_POLY_LINE_LABEL
+PLOT_SP_LINEAR_POLY_LABEL = 'Linear region fit'
+PLOT_SP_POINT_COLOR = '#4E4187'
+PLOT_SP_POINT_LABEL = 'Smoke Point {} px'
 
 # Information bar
 

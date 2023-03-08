@@ -8,6 +8,47 @@ from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtCore import Qt
 from GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR_BGR, VIDEO_PLAYER_BG_COLOR_GRAY, VIDEO_PLAYER_HEIGHT_DEFAULT, VIDEO_PLAYER_WIDTH_DEFAULT
 
+# Returns the biggest linear region
+def findLinearRegion(h, poly_coef, der_coef, der_threshold):
+
+    h_min = min(h)
+    h_max = max(h)
+    h_points = np.linspace(h_min, h_max, len(h))
+
+    linear_regions = {}
+    region_counter = 0
+    found_region = False
+    for flame_height in h_points:
+        poly_eval = abs(np.polyval(der_coef, flame_height))
+        if(poly_eval <= der_threshold):
+            
+            if not(found_region):
+                # is the first linear point
+                found_region = True
+                # initialize dict 
+                linear_regions[region_counter] = {}
+
+            # In any case add it to the corresponding region
+            linear_regions[region_counter][flame_height] = np.polyval(poly_coef, flame_height)
+            
+        elif(found_region):
+            # The linear region ends
+            found_region = False
+            region_counter += 1
+
+    # Select the biggest region
+    last_region = -1
+    biggest_region = None
+    
+    for region in linear_regions:
+        n_points = len(linear_regions[region])
+        if(n_points > last_region):
+            last_region = n_points
+            biggest_region = linear_regions[region]
+
+    return biggest_region        
+
+
 # Prints the message only if verbose mode is active
 def verbosePrint(control, text):
     if(control):

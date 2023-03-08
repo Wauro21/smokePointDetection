@@ -3,7 +3,7 @@ import sys
 import cv2
 import json
 import datetime
-from PyQt5.QtWidgets import QHeaderView, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFormLayout, QSpinBox, QTableWidget, QTableWidgetItem, QAbstractItemView, QFileDialog
+from PyQt5.QtWidgets import QHeaderView, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFormLayout, QDoubleSpinBox, QTableWidget, QTableWidgetItem, QAbstractItemView, QFileDialog
 from PyQt5.QtGui import QPixmap, QColor, QImage
 from PyQt5 import QtCore
 from GUI_CONSTANTS import PREPROCESSING_AREA_INFORMATION_PARSER, PREPROCESSING_HEIGHT_INFORMATION_PARSER, PREPROCESSING_INFORMATION_TABLE_COLUMN_HEIGHT, PREPROCESSING_INFORMATION_TABLE_WIDTH, PREPROCESSING_START_ERROR, PREPROCESSING_TABLE_PADDING, PREPROCESSING_THESHOLD_CONTROLS_TITLE, PREPROCESSING_THRESHOLD_DESC, PREPROCESSING_THRESHOLD_FRAME_TITLE, PREPROCESSING_THRESHOLD_INFORMATION, PREPROCESSING_THRESHOLD_LOAD, PREPROCESSING_THRESHOLD_PERCENTAGE, PREPROCESSING_THRESHOLD_SAVE, PREPROCESSING_THRESHOLD_SPIN_WIDTH, PREPROCESSING_THRESHOLD_SUFFIX, PREPROCESSSING_ERROR_THRESHOLD_IMAGE, VIDEO_PLAYER_BG_COLOR
@@ -157,7 +157,7 @@ class ThresholdControls(QWidget):
 
         # widgets
         self.title = QLabel(PREPROCESSING_THESHOLD_CONTROLS_TITLE.format(title), self)
-        self.threshold = QSpinBox(self)
+        self.threshold = QDoubleSpinBox(self)
         self.info_title = QLabel(PREPROCESSING_THRESHOLD_INFORMATION ,self)
         self.info_table = QTableWidget(self)
         

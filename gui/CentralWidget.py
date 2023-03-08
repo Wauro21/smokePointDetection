@@ -1,7 +1,7 @@
 import sys
 import os
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout
-from Plot.FixedPlots import FixedPlot, LinearRegionPlot, PolyHeightPlot
+from Plot.FixedPlots import FixedPlot, LinearRegionPlot, PolyHeightPlot, SmokePointPlot
 from Plot.CentroidPlot import CentroidPlotWidget
 from LoadWidget import LoadWidget
 from Frameplayer.VideoPlayer import FrameHolder
@@ -14,7 +14,7 @@ from Preprocessing.ThresholdWidget import ThresholdWidget
 from Preprocessing.InfoWidget import DisplaySettings
 from RunInformation import InformationBar, InformationTab
 from MessageBox import WarningBox
-from Thread import PloyAnalizer
+from Thread import PolyAnalizer
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 
@@ -44,10 +44,10 @@ class CentralWidget(QWidget):
             'last_run_time': 0,
             '10th_poly': None,
             '10th_der': None, 
-            'der_threshold': 2e-2, # Temporal
-            'linear_region_start': None,
-            'linear_region_end': None,
-            'linear_region_points': None,
+            'der_threshold': 1e-2, # Temporal
+            'linear_region': None,
+            'linear_poly': None,
+            'sp': None,
         }
 
 
@@ -65,7 +65,8 @@ class CentralWidget(QWidget):
         self.CentroidPlot = CentroidPlotWidget('Centroid Analysis', 'Frames [-]', 'X coordinate [px]')
         self.PolyHeightPlot = PolyHeightPlot('H vs h')
         self.LinearPolyPlot = LinearRegionPlot('Linear Region')
-        self.Plotholder = PlotHolder([self.HeightPlot, self.CentroidPlot, self.PolyHeightPlot, self.LinearPolyPlot],self)
+        self.SmokePointPlot = SmokePointPlot('Smoke Point Analysis')
+        self.Plotholder = PlotHolder([self.HeightPlot, self.CentroidPlot, self.PolyHeightPlot, self.LinearPolyPlot, self.SmokePointPlot],self)
 
         # -> Information bar
         self.infoBar = InformationBar(self)
@@ -100,6 +101,9 @@ class CentralWidget(QWidget):
         
         self.setLayout(layout)
 
+    def plotSmokePoint(self):
+        self.SmokePointPlot.plot(self.process_controls)
+
     def plotLinearPoly(self):
         self.LinearPolyPlot.plot(self.process_controls)
 
@@ -112,10 +116,11 @@ class CentralWidget(QWidget):
             warning.exec_()
             return False
         
-        self.polyThread = PloyAnalizer(self.process_controls)
+        self.polyThread = PolyAnalizer(self.process_controls)
         self.polyThread.heights_plot.connect(self.plotHeightsPoly)
         self.polyThread.linear_plot.connect(self.plotLinearPoly)
         self.polyThread.linear_error.connect(lambda: print('ERROR on linear region'))
+        self.polyThread.sp_plot.connect(self.plotSmokePoint)
         self.polyThread.start()
 
 
