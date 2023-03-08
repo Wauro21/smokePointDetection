@@ -152,7 +152,7 @@ class VideoReader(QThread):
 
             # -> Draw the reference centroids and the actual centroid
             if(self.process_controls['centroids']):
-                plotCentroid(frame_processed[FrameTypes.FRAME], reference_centroid_x, reference_centroid_y, REFERENCE_CENTROID_COLOR)
+                cv2.line(frame_processed[FrameTypes.FRAME], (round(reference_centroid_x), 0), (round(reference_centroid_x), height), REFERENCE_CENTROID_COLOR, thickness=2)
                 plotCentroid(frame_processed[FrameTypes.FRAME], frame_processed[FrameTypes.CONTOUR_CC]['cX'], frame_processed[FrameTypes.CONTOUR_CC]['cY'], FRAME_CENTROID_COLOR)
                 
             

@@ -37,7 +37,7 @@ class CutButtonsWidget(QWidget):
         self.width = QSpinBox(self)
         self.lock_center_line = QPushButton('Lock')
         self.lock_width = QPushButton('Lock')
-        self.auto = QPushButton('AutoCut')
+        self.auto = QPushButton('Auto')
         self.bottom_actions = LowerButtons(self)
 
         # Init routines
