@@ -46,6 +46,10 @@ PREPROCESSING_DESC_MESSAGE = 'Left click on the approximate center of the flame 
 PREPROCESSING_SAVE_CUT = 'Save the current cut profile onto a file'
 PREPROCESSING_LOAD_CUT = 'Load cut profile from file'
 
+# -> For auto cut the frame
+PREPROCESSING_AUTO_CUT_THRESHOLD_PERCENTAGE = 1
+PREPROCESSING_AUTO_CUT_PADDING = 10 # 10 px
+
 # -> For thresholding 
 PREPROCESSING_THRESHOLD_DESC = 'Adjust the threshold controls to define the core and contour regions. The selected values will be used for the Smoke Point estimation. You can watch the effect of the selected threshols on the previes on the left. You can also save/load this presets for future use.'
 PREPROCESSING_THRESHOLD_FRAME_TITLE = '{} preview'
