@@ -5,9 +5,10 @@ import cv2
 import numpy as np
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QFormLayout, QSpinBox, QPushButton
 from PyQt5.QtGui import QPixmap, QColor, QImage
-from GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_DESC_MESSAGE, PREPROCESSING_LINES_WIDTH, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SCROLL_WIDTH_STEP, PREPROCESSING_TITLE_MESSAGE, PREPROCESSING_WIDTH_LINE_COLOR, PREPROCESSING_WINDOW_TITLE, PREPROESSING_CENTER_LINE_COLOR, VIDEO_PLAYER_BG_COLOR
+from GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_AUTO_CUT_PADDING, PREPROCESSING_AUTO_CUT_THRESHOLD_PERCENTAGE, PREPROCESSING_DESC_MESSAGE, PREPROCESSING_LINES_WIDTH, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SCROLL_WIDTH_STEP, PREPROCESSING_TITLE_MESSAGE, PREPROCESSING_WIDTH_LINE_COLOR, PREPROCESSING_WINDOW_TITLE, PREPROESSING_CENTER_LINE_COLOR, VIDEO_PLAYER_BG_COLOR
+from CONSTANTS import MAX_PIXEL_VALUE, NUMBER_OF_CONNECTED_COMPONENTS
 from .CutButtonsWidget import CutButtonsWidget
-from utils import convert2QT
+from utils import convert2QT, getConnectedComponents
 from PyQt5.QtCore import pyqtSignal
 
 class CutWidget(QWidget):
@@ -35,6 +36,7 @@ class CutWidget(QWidget):
         # Signals and Slots
         self.ButtonsWidget.update_frame.connect(self.updateAreaofInterest)
         self.ButtonsWidget.cut_signal.connect(self.preprocessingDone)
+        self.ButtonsWidget.autoHandler(self.autoCut)
 
         #Layout
         layout = QHBoxLayout()
@@ -73,6 +75,8 @@ class CutWidget(QWidget):
         w_original =  self.resize_dict['original'][1]
         self.ButtonsWidget.initSpinsBoxes(0, w_original)
 
+        # Autocut 
+        self.autoCut()
 
     def updateAreaofInterest(self):
         x_cord = self.ButtonsWidget.getCenterlinePos()
@@ -125,8 +129,25 @@ class CutWidget(QWidget):
 
     def getSizeDict(self):
         return self.resize_dict
+    
 
+    def autoCut(self):
 
+        frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
+        
+        ret, thresh = cv2.threshold(frame, PREPROCESSING_AUTO_CUT_THRESHOLD_PERCENTAGE, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
+        # Get cc of the frame
+        cc = getConnectedComponents(thresh, NUMBER_OF_CONNECTED_COMPONENTS)
+
+        # Calculate the middle of the flame
+        x = cc['x']
+        width = cc['w']
+        center = x + width//2
+        self.ButtonsWidget.updateCenterlinePos(center)
+
+        # Calculate the width with padding
+        width += PREPROCESSING_AUTO_CUT_PADDING
+        self.ButtonsWidget.updateWidth(width)
 
 if __name__ == '__main__':
     app = QApplication([])

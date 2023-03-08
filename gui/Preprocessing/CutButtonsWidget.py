@@ -37,6 +37,7 @@ class CutButtonsWidget(QWidget):
         self.width = QSpinBox(self)
         self.lock_center_line = QPushButton('Lock')
         self.lock_width = QPushButton('Lock')
+        self.auto = QPushButton('AutoCut')
         self.bottom_actions = LowerButtons(self)
 
         # Init routines
@@ -72,10 +73,14 @@ class CutButtonsWidget(QWidget):
         layout.addRow(self.desc_label)
         layout.addRow('Center Line (x coordinate):', c_line_layout)
         layout.addRow('Width of Area of Interest:', width_layout)
+        layout.addRow(self.auto)
         layout.addRow(self.bottom_actions)
 
         self.setLayout(layout)
         
+    def autoHandler(self, function):
+        self.auto.clicked.connect(function)
+    
     def save2JSON(self):
         # Save file dialog
         date = datetime.datetime.now()
@@ -198,5 +203,4 @@ class CutButtonsWidget(QWidget):
                 self.width.setValue(temp)
 
         self.setCutDict()
-
 
