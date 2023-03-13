@@ -6,12 +6,14 @@ import sys
 from GUI_CONSTANTS import TABS_WIDGET_HEIGHT, TABS_WIDGET_WIDTH
 
 
-class PlotHolder(QWidget):
+class TabHolder(QWidget):
 
-    def __init__(self, widgets, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
 
         # Objects
+        self.show_idx = None
+        self.invisible = []
 
         # Widgets
         self.tabWidget = QTabWidget(self)        
@@ -20,21 +22,32 @@ class PlotHolder(QWidget):
         self.setFixedHeight(TABS_WIDGET_HEIGHT)
         self.setFixedWidth(TABS_WIDGET_WIDTH)
 
-        # -> Assign each widget 
-        for widget in widgets:
-            self.tabWidget.addTab(widget, widget.getTitle())
-
         # Layout
         layout = QVBoxLayout()
         layout.addWidget(self.tabWidget)
 
-    def addTab(self, widget):
-        self.tabWidget.addTab(widget, widget.getTitle())
+    def addTab(self, widget, visible=True, show_tab = False):
+        idx = self.tabWidget.addTab(widget, widget.getTitle())
+        self.tabWidget.setTabVisible(idx, visible)
 
+        if not(visible):
+            self.invisible.append(idx)
+
+        if(show_tab):
+            self.show_idx = idx
+
+        return idx
 
     def setCurrentTab(self, index):
         self.tabWidget.setCurrentIndex(index)
 
+    def showResultTab(self):
+        self.tabWidget.setCurrentIndex(self.show_idx)
+
+    def toggleInvinsibles(self):
+        for idx in self.invisible:
+            status = self.tabWidget.isTabVisible(idx)
+            self.tabWidget.setTabVisible(idx, not status)
 
 if __name__ == '__main__':
     app = QApplication([])

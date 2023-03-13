@@ -7,7 +7,7 @@ from LoadWidget import LoadWidget
 from Frameplayer.VideoPlayer import FrameHolder
 from Plot.ProcessPlot import ProcessPlotWidget
 from GUI_CONSTANTS import CentroidTypes, FrameTypes, InformationStatus
-from Plot.PlotHolder import PlotHolder
+from TabHolder import TabHolder
 from Preprocessing.CutWidget import CutWidget
 from Preprocessing.Preprocessing import PreprocessingWidget
 from Preprocessing.ThresholdWidget import ThresholdWidget
@@ -59,6 +59,7 @@ class CentralWidget(QWidget):
         self.CutWindow = CutWidget(self.process_controls, self.PreprocessingTabs)
         self.ThresholdWindow = ThresholdWidget(self.process_controls, self.PreprocessingTabs)
         self.DisplayWindow = DisplaySettings(self.process_controls, self.PreprocessingTabs)
+        self.TabHolder = TabHolder(self)
 
         # -> Plots 
         self.HeightPlot = ProcessPlotWidget(self)
@@ -66,7 +67,6 @@ class CentralWidget(QWidget):
         self.PolyHeightPlot = PolyHeightPlot(self)
         self.LinearPolyPlot = LinearRegionPlot(self)
         self.SmokePointPlot = SmokePointPlot(self)
-        self.Plotholder = PlotHolder([self.HeightPlot, self.CentroidPlot, self.PolyHeightPlot, self.LinearPolyPlot, self.SmokePointPlot],self)
 
         # -> Information bar
         self.infoBar = InformationBar(self)
@@ -78,7 +78,14 @@ class CentralWidget(QWidget):
         self.PreprocessingTabs.addTab(self.DisplayWindow, 'Run settings', False)
         self.DisplayWindow.applyHandler(self.enableStart)
         self.LoadWidget.startHandler(self.requestStart)
-        self.Plotholder.addTab(self.infoTab)
+        
+        # -> Add tabs to tab holder 
+        self.TabHolder.addTab(self.HeightPlot)
+        self.TabHolder.addTab(self.CentroidPlot)
+        self.TabHolder.addTab(self.PolyHeightPlot, False)
+        self.TabHolder.addTab(self.LinearPolyPlot, False)
+        self.TabHolder.addTab(self.SmokePointPlot, False, True)
+        self.TabHolder.addTab(self.infoTab)
 
         # Signals and Slots
         self.LoadWidget.path_signal.connect(self.setPrefix)
@@ -94,7 +101,7 @@ class CentralWidget(QWidget):
         # -> Video and plot area
         video_plot_layout = QHBoxLayout()
         video_plot_layout.addWidget(self.VideoWidget)
-        video_plot_layout.addWidget(self.Plotholder)
+        video_plot_layout.addWidget(self.TabHolder)
         layout.addLayout(video_plot_layout)
 
         layout.addWidget(self.infoBar)
@@ -110,6 +117,16 @@ class CentralWidget(QWidget):
     def plotHeightsPoly(self):
         self.PolyHeightPlot.plot(self.process_controls)
 
+    def polynomialAnalysisDone(self):
+
+        print('Ending poly analysis. CHANGE THIS')
+
+        # Clean thread
+        self.polyThread = None
+
+        # Show invisibles plots
+        self.TabHolder.toggleInvinsibles()
+
     def requestPolynomialAnalysis(self):
         if(self.polyThread != None):
             warning = WarningBox('There is already a thread performing the analysis, wait until it finishes before attempting to perform the analysis again.')
@@ -121,6 +138,7 @@ class CentralWidget(QWidget):
         self.polyThread.linear_plot.connect(self.plotLinearPoly)
         self.polyThread.linear_error.connect(lambda: print('ERROR on linear region'))
         self.polyThread.sp_plot.connect(self.plotSmokePoint)
+        self.polyThread.finished.connect(self.polynomialAnalysisDone)
         self.polyThread.start()
 
 
@@ -133,7 +151,7 @@ class CentralWidget(QWidget):
         self.infoTab.updateTabs(self.process_controls)
 
         # Set current tab 
-        self.Plotholder.setCurrentTab(5) # TEMPORAL REMOVE LATER 
+        self.TabHolder.showResultTab() 
 
         # REMOVE LATER ONLY TEMPORAL
         self.requestPolynomialAnalysis()
@@ -189,9 +207,6 @@ class CentralWidget(QWidget):
 
     def requestPlayback(self):
         self.VideoWidget.startPlayback(self.video_path, self.HeightPlot.update, self.centroidSignalHandler)
-
-    def demo(self, value):
-        self.process_controls['display'] = value
 
 
 if __name__ == '__main__':
