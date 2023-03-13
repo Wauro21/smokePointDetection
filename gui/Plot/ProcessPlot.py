@@ -3,16 +3,17 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
 import matplotlib.pyplot as plt
 import os
 import sys
+from matplotlib.figure import Figure
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.qt_compat import QtWidgets
 from matplotlib.backends.backend_qtagg import (
     FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 
-from GUI_CONSTANTS import PLOT_WIDGET_HEIGHT, PLOT_WIDGET_TRACE_CONTOUR, PLOT_WIDGET_TRACE_CORE, PLOT_WIDGET_TRACE_TIP, PLOT_WIDGET_WIDTH
+from GUI_CONSTANTS import PLOT_HEIGHT_LABELS, PLOT_HEIGHT_TAB_TITLE, PLOT_HEIGHT_X_AXIS, PLOT_HEIGHT_Y_AXIS, PLOT_WIDGET_DPI, PLOT_WIDGET_HEIGHT, PLOT_WIDGET_TRACE_CONTOUR, PLOT_WIDGET_TRACE_CORE, PLOT_WIDGET_TRACE_TIP, PLOT_WIDGET_WIDTH
 
 class ProcessPlotWidget(QWidget):
 
-    def __init__(self, title,x_axis, y_axis, legend_labels, parent=None):
+    def __init__(self, parent=None):
 
         super().__init__(parent)
         
@@ -23,13 +24,14 @@ class ProcessPlotWidget(QWidget):
         self.tip = []
         
         # -> Titles
-        self.title = title
-        self.x_axis = x_axis
-        self.y_axis = y_axis
-        self.labels = legend_labels
+        self.title = PLOT_HEIGHT_TAB_TITLE
+        self.x_axis = PLOT_HEIGHT_X_AXIS
+        self.y_axis = PLOT_HEIGHT_Y_AXIS
+        self.labels = PLOT_HEIGHT_LABELS
         
         # Widgets
-        self.pltCanvas = FigureCanvas()
+        self.fig = Figure(figsize=(PLOT_WIDGET_WIDTH/PLOT_WIDGET_DPI, PLOT_WIDGET_HEIGHT/PLOT_WIDGET_DPI), dpi=PLOT_WIDGET_DPI)
+        self.pltCanvas = FigureCanvas(self.fig)
         self.pltToolbar = NavigationToolbar(self.pltCanvas)
         
         # Init routines

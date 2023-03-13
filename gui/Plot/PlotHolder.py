@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import os
 import sys
 
+from GUI_CONSTANTS import TABS_WIDGET_HEIGHT, TABS_WIDGET_WIDTH
+
 
 class PlotHolder(QWidget):
 
@@ -15,8 +17,8 @@ class PlotHolder(QWidget):
         self.tabWidget = QTabWidget(self)        
 
         # Init routines
-        self.setFixedHeight(480)
-        self.setFixedWidth(640)
+        self.setFixedHeight(TABS_WIDGET_HEIGHT)
+        self.setFixedWidth(TABS_WIDGET_WIDTH)
 
         # -> Assign each widget 
         for widget in widgets:

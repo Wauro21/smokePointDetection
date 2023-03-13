@@ -10,7 +10,7 @@ from matplotlib.backends.qt_compat import QtWidgets
 from matplotlib.backends.backend_qtagg import (
     FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 
-from GUI_CONSTANTS import PLOT_HEIGHT_POLY_DOTS_COLOR, PLOT_HEIGHT_POLY_DOTS_LABEL, PLOT_HEIGHT_POLY_LINE_COLOR, PLOT_HEIGHT_POLY_LINE_LABEL, PLOT_HEIGHTS_POLY_XLABEL, PLOT_HEIGHTS_POLY_YLABEL, PLOT_LINEAR_DER_LABEL, PLOT_LINEAR_REGION_LABEL, PLOT_LINEAR_XLABEL, PLOT_LINEAR_YLABEL, PLOT_SP_LINEAR_POLY_COLOR, PLOT_SP_LINEAR_POLY_LABEL, PLOT_SP_POINT_COLOR, PLOT_SP_POINT_LABEL, PLOT_SP_POLY_COLOR, PLOT_SP_POLY_LABEL, PLOT_SP_XLABEL, PLOT_SP_YLABEL, PLOT_WIDGET_HEIGHT, PLOT_WIDGET_WIDTH
+from GUI_CONSTANTS import PLOT_HEIGHT_POLY_DOTS_COLOR, PLOT_HEIGHT_POLY_DOTS_LABEL, PLOT_HEIGHT_POLY_LINE_COLOR, PLOT_HEIGHT_POLY_LINE_LABEL, PLOT_HEIGHT_POLY_TITLE_TAB, PLOT_HEIGHTS_POLY_XLABEL, PLOT_HEIGHTS_POLY_YLABEL, PLOT_LINEAR_DER_LABEL, PLOT_LINEAR_REGION_LABEL, PLOT_LINEAR_TITLE_TAB, PLOT_LINEAR_XLABEL, PLOT_LINEAR_YLABEL, PLOT_SP_LINEAR_POLY_COLOR, PLOT_SP_LINEAR_POLY_LABEL, PLOT_SP_POINT_COLOR, PLOT_SP_POINT_LABEL, PLOT_SP_POLY_COLOR, PLOT_SP_POLY_LABEL, PLOT_SP_TITLE_TAB, PLOT_SP_XLABEL, PLOT_SP_YLABEL, PLOT_WIDGET_DPI, PLOT_WIDGET_HEIGHT, PLOT_WIDGET_WIDTH
 
 
 class FixedPlot(QWidget):
@@ -23,7 +23,7 @@ class FixedPlot(QWidget):
         self.title = title
 
         # Widgets
-        self.fig = Figure()
+        self.fig = Figure(figsize=(PLOT_WIDGET_WIDTH/PLOT_WIDGET_DPI, PLOT_WIDGET_HEIGHT/PLOT_WIDGET_DPI), dpi=PLOT_WIDGET_DPI)
         self.pltCanvas = FigureCanvas(self.fig)
         self.pltToolbar = NavigationToolbar(self.pltCanvas)
 
@@ -48,9 +48,9 @@ class FixedPlot(QWidget):
 
 class LinearRegionPlot(FixedPlot):
 
-    def __init__(self, title, parent=None):
+    def __init__(self, parent=None):
         
-        super().__init__(title, parent)
+        super().__init__(PLOT_LINEAR_TITLE_TAB, parent)
 
         self.axs.set_xlabel(PLOT_LINEAR_XLABEL)
         self.axs.set_ylabel(PLOT_LINEAR_YLABEL)
@@ -58,7 +58,6 @@ class LinearRegionPlot(FixedPlot):
 
 
     def plot(self, process_controls):
-        
         
         der_coef = process_controls['10th_der']
         h = process_controls['h']
@@ -84,9 +83,9 @@ class LinearRegionPlot(FixedPlot):
 
 class SmokePointPlot(FixedPlot):
     
-    def __init__(self, title, parent=None):
+    def __init__(self, parent=None):
 
-        super().__init__(title, parent)
+        super().__init__(PLOT_SP_TITLE_TAB, parent)
         self.axs.set_xlabel(PLOT_SP_XLABEL)
         self.axs.set_ylabel(PLOT_SP_YLABEL)
         self.axs.grid()
@@ -120,9 +119,9 @@ class SmokePointPlot(FixedPlot):
 
 class PolyHeightPlot(FixedPlot):
 
-    def __init__(self, title, parent=None):
+    def __init__(self, parent=None):
 
-        super().__init__(title, parent)
+        super().__init__(PLOT_HEIGHT_POLY_TITLE_TAB, parent)
         # Set labels
         self.axs.set_xlabel(PLOT_HEIGHTS_POLY_XLABEL)
         self.axs.set_ylabel(PLOT_HEIGHTS_POLY_YLABEL)

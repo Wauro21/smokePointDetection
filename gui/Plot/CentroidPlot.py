@@ -9,20 +9,20 @@ from matplotlib.backends.qt_compat import QtWidgets
 from matplotlib.backends.backend_qtagg import (
     FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 from CONSTANTS import MAX_CENTROID_TOLERANCE
-from GUI_CONSTANTS import PLOT_CENTROID_INVALID_COLOR, PLOT_CENTROID_INVALID_MARKER, PLOT_CENTROID_REFERENCE_COLOR, PLOT_CENTROID_REFERENCE_LINE, PLOT_CENTROID_SAFE_AREA_ALPHA, PLOT_CENTROID_SAFE_AREA_COLOR, PLOT_CENTROID_SAFE_AREA_LIMITS_COLOR, PLOT_CENTROID_SAFE_AREA_LIMITS_LINE, PLOT_CENTROID_VALID_COLOR, PLOT_CENTROID_VALID_MARKER, PLOT_WIDGET_HEIGHT, PLOT_WIDGET_WIDTH, CentroidTypes
+from GUI_CONSTANTS import PLOT_CENTROID_INVALID_COLOR, PLOT_CENTROID_INVALID_MARKER, PLOT_CENTROID_REFERENCE_COLOR, PLOT_CENTROID_REFERENCE_LINE, PLOT_CENTROID_SAFE_AREA_ALPHA, PLOT_CENTROID_SAFE_AREA_COLOR, PLOT_CENTROID_SAFE_AREA_LIMITS_COLOR, PLOT_CENTROID_SAFE_AREA_LIMITS_LINE, PLOT_CENTROID_TAB_TITLE, PLOT_CENTROID_VALID_COLOR, PLOT_CENTROID_VALID_MARKER, PLOT_CENTROID_XLABEL, PLOT_CENTROID_YLABEL, PLOT_WIDGET_HEIGHT, PLOT_WIDGET_WIDTH, CentroidTypes
 
 
 class CentroidPlotWidget(QWidget):
 
-    def __init__(self, title, x_axis, y_axis, parent=None):
+    def __init__(self, parent=None):
 
         super().__init__(parent)
 
         # Objects
         self.centroid_data = None
-        self.title = title
-        self.x_axis = x_axis 
-        self.y_axis = y_axis
+        self.title = PLOT_CENTROID_TAB_TITLE
+        self.x_axis = PLOT_CENTROID_XLABEL
+        self.y_axis = PLOT_CENTROID_YLABEL
 
         # Widgets
         self.fig = Figure()

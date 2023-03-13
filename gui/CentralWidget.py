@@ -61,11 +61,11 @@ class CentralWidget(QWidget):
         self.DisplayWindow = DisplaySettings(self.process_controls, self.PreprocessingTabs)
 
         # -> Plots 
-        self.HeightPlot = ProcessPlotWidget('Height Analysis', 'Frames [-]', 'Height [px]', ['Flame Height', 'Core Height', 'Tip Height'], self)
-        self.CentroidPlot = CentroidPlotWidget('Centroid Analysis', 'Frames [-]', 'X coordinate [px]')
-        self.PolyHeightPlot = PolyHeightPlot('H vs h')
-        self.LinearPolyPlot = LinearRegionPlot('Linear Region')
-        self.SmokePointPlot = SmokePointPlot('Smoke Point Analysis')
+        self.HeightPlot = ProcessPlotWidget(self)
+        self.CentroidPlot = CentroidPlotWidget(self)
+        self.PolyHeightPlot = PolyHeightPlot(self)
+        self.LinearPolyPlot = LinearRegionPlot(self)
+        self.SmokePointPlot = SmokePointPlot(self)
         self.Plotholder = PlotHolder([self.HeightPlot, self.CentroidPlot, self.PolyHeightPlot, self.LinearPolyPlot, self.SmokePointPlot],self)
 
         # -> Information bar
@@ -133,7 +133,7 @@ class CentralWidget(QWidget):
         self.infoTab.updateTabs(self.process_controls)
 
         # Set current tab 
-        self.Plotholder.setCurrentTab(2)
+        self.Plotholder.setCurrentTab(5) # TEMPORAL REMOVE LATER 
 
         # REMOVE LATER ONLY TEMPORAL
         self.requestPolynomialAnalysis()
