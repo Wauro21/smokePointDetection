@@ -41,13 +41,14 @@ class CentralWidget(QWidget):
             'display': FrameTypes.FRAME,
             'n_invalid_frames': 0,
             'centroid_ref_cord': None, 
-            'last_run_time': 0,
+            'last_frame_run': 0,
             '10th_poly': None,
             '10th_der': None, 
             'der_threshold': 1e-2, # Temporal
             'linear_region': None,
             'linear_poly': None,
             'sp': None,
+            'last_poly_run': 0,
         }
 
 
@@ -121,11 +122,19 @@ class CentralWidget(QWidget):
 
         print('Ending poly analysis. CHANGE THIS')
 
+        # Stop timer
+        self.infoBar.setStatus(InformationStatus.DONE)
+        # Get last run for poly
+        self.process_controls['last_poly_run'] = self.infoBar.getLastTime()
+        
         # Clean thread
         self.polyThread = None
 
         # Show invisibles plots
         self.TabHolder.toggleInvinsibles()
+
+        # Update information
+        self.infoTab.updatePolyTab(self.process_controls)
 
     def requestPolynomialAnalysis(self):
         if(self.polyThread != None):
@@ -139,6 +148,7 @@ class CentralWidget(QWidget):
         self.polyThread.linear_error.connect(lambda: print('ERROR on linear region'))
         self.polyThread.sp_plot.connect(self.plotSmokePoint)
         self.polyThread.finished.connect(self.polynomialAnalysisDone)
+        self.polyThread.started.connect(lambda: self.infoBar.setStatus(InformationStatus.POLYNOMIAL))
         self.polyThread.start()
 
 
@@ -146,9 +156,9 @@ class CentralWidget(QWidget):
         # Change status
         self.infoBar.setStatus(InformationStatus.FRAMES_DONE)
         # Get last run time
-        self.process_controls['last_run_time'] = self.infoBar.getLastTime()
+        self.process_controls['last_frame_run'] = self.infoBar.getLastTime()
         # Update info summary
-        self.infoTab.updateTabs(self.process_controls)
+        self.infoTab.updateFrameTab(self.process_controls)
 
         # Set current tab 
         self.TabHolder.showResultTab() 

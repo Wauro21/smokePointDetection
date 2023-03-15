@@ -168,6 +168,8 @@ class InformationStatus(Enum):
     IDLE = 'IDLE'
     FRAMES = 'Frame Analysis'
     FRAMES_DONE = 'Frames Done'
+    POLYNOMIAL = 'SP Analysis'
+    DONE = 'Done'
 
 INFORMATION_BAR_OPERATION_LABEL = 'Operation :'
 INFORMATION_BAR_ELAPSED_LABEL = 'Elapsed Time :'
@@ -193,4 +195,14 @@ INFORMATION_PROCESSED_ROW_H_POINTS = 'N° of contour height points (h):'
 INFORMATION_PROCESSED_ROW_TIME = 'Processing time:'
 INFORMATION_PROCESSED_ROW_CENTROID = 'Centroid reference x:'
 INFORMATION_PROCESSED_ROW_TIP_POINTS = 'N° of tip height points (H):'
+INFORMATION_PROCESSED_TAB_TITLE = 'Frame process summary'
 
+
+# -> Information tab polynomial analysis
+INFORMATION_POLYNOMIAL_TAB_TITLE = 'Polynomial analysis summary'
+INFORMATION_POLYNOMIAL_PLACEHOLDER = '-'
+INFORMATION_POLYNOMIAL_THRESHOLD_VALUE = 'Derivative threshold used:'
+INFORMATION_POLYNOMIAL_N_POINT_LINEAR_REGION = 'N° of points found in the linear region:'
+INFORMATION_POLYNOMIAL_SP_VALUE_FOUND = 'SP found at:'
+INFORMATION_POLYNOMIAL_SP_VALUE_FIELD = '{:.2f} px'
+INFORMATION_POLYNOMIAL_PROCESSING_TIME = 'Processing time:'

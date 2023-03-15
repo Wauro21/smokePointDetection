@@ -6,7 +6,7 @@ from datetime import datetime, date
 from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFormLayout, QProgressBar, QGroupBox
 from PyQt5.QtGui import QPixmap, QColor, QImage
 from PyQt5 import QtCore
-from GUI_CONSTANTS import INFORMATION_BAR_ELAPSED_FIELD, INFORMATION_BAR_ELAPSED_LABEL, INFORMATION_BAR_OPERATION_LABEL, INFORMATION_LABELS_WIDTH, INFORMATION_PROCESSED_CENTROID_DECIMALS, INFORMATION_PROCESSED_CENTROID_LABEL, INFORMATION_PROCESSED_CONTOUR_LABEL, INFORMATION_PROCESSED_CORE_LABEL, INFORMATION_PROCESSED_FRAMES_PLACEHOLDER, INFORMATION_PROCESSED_ROW_CENTROID, INFORMATION_PROCESSED_ROW_H_POINTS, INFORMATION_PROCESSED_ROW_INVALID_FRAMES, INFORMATION_PROCESSED_ROW_NUMBER_FRAMES, INFORMATION_PROCESSED_ROW_TIME, INFORMATION_PROCESSED_ROW_TIP_POINTS, INFORMATION_PROCESSED_THRESHOLD_FIELD, INFORMATION_TAB_DISPLAY_HEIGHT, INFORMATION_TAB_DISPLAY_WIDTH, PLOT_WIDGET_WIDTH, PREPROCESSING_AREA_INFORMATION_PARSER, PREPROCESSING_HEIGHT_INFORMATION_PARSER, PREPROCESSING_INFORMATION_TABLE_COLUMN_HEIGHT, PREPROCESSING_INFORMATION_TABLE_WIDTH, PREPROCESSING_START_ERROR, PREPROCESSING_TABLE_PADDING, PREPROCESSING_THESHOLD_CONTROLS_TITLE, PREPROCESSING_THRESHOLD_DESC, PREPROCESSING_THRESHOLD_FRAME_TITLE, PREPROCESSING_THRESHOLD_INFORMATION, PREPROCESSING_THRESHOLD_LOAD, PREPROCESSING_THRESHOLD_PERCENTAGE, PREPROCESSING_THRESHOLD_SAVE, PREPROCESSING_THRESHOLD_SPIN_WIDTH, PREPROCESSING_THRESHOLD_SUFFIX, PREPROCESSSING_ERROR_THRESHOLD_IMAGE, VIDEO_PLAYER_BG_COLOR, VIDEO_PLAYER_WIDTH_DEFAULT, InformationStatus
+from GUI_CONSTANTS import INFORMATION_BAR_ELAPSED_FIELD, INFORMATION_BAR_ELAPSED_LABEL, INFORMATION_BAR_OPERATION_LABEL, INFORMATION_LABELS_WIDTH,INFORMATION_POLYNOMIAL_N_POINT_LINEAR_REGION, INFORMATION_POLYNOMIAL_PLACEHOLDER, INFORMATION_POLYNOMIAL_PROCESSING_TIME, INFORMATION_POLYNOMIAL_SP_VALUE_FIELD, INFORMATION_POLYNOMIAL_SP_VALUE_FOUND, INFORMATION_POLYNOMIAL_TAB_TITLE, INFORMATION_POLYNOMIAL_THRESHOLD_VALUE, INFORMATION_PROCESSED_CENTROID_DECIMALS, INFORMATION_PROCESSED_CENTROID_LABEL, INFORMATION_PROCESSED_CONTOUR_LABEL, INFORMATION_PROCESSED_CORE_LABEL, INFORMATION_PROCESSED_FRAMES_PLACEHOLDER, INFORMATION_PROCESSED_ROW_CENTROID, INFORMATION_PROCESSED_ROW_H_POINTS, INFORMATION_PROCESSED_ROW_INVALID_FRAMES, INFORMATION_PROCESSED_ROW_NUMBER_FRAMES, INFORMATION_PROCESSED_ROW_TIME, INFORMATION_PROCESSED_ROW_TIP_POINTS, INFORMATION_PROCESSED_TAB_TITLE, INFORMATION_PROCESSED_THRESHOLD_FIELD, INFORMATION_TAB_DISPLAY_HEIGHT, INFORMATION_TAB_DISPLAY_WIDTH, PLOT_WIDGET_WIDTH, InformationStatus
 from CONSTANTS import MAX_PIXEL_VALUE, NUMBER_OF_CONNECTED_COMPONENTS
 from MessageBox import ErrorBox, InformationBox
 from Preprocessing.CommonButtons import LowerButtons
@@ -23,8 +23,10 @@ class InformationTab(QWidget):
         self.process_controls = process_controls
         self.title = 'Process Summary'
 
+
         # Widgets
         self.frame_info = FrameInformation(self)
+        self.poly_info = PolynomialInformation(self)
 
         # Init 
 
@@ -35,14 +37,91 @@ class InformationTab(QWidget):
         # Layout
         layout = QVBoxLayout()
         layout.addWidget(self.frame_info)
+        layout.addWidget(self.poly_info)
 
         self.setLayout(layout)
 
+    def updateFrameTab(self, process_controls):
+        self.frame_info.updateInformation(process_controls)
+
+    def updatePolyTab(self, process_controls):
+        self.poly_info.updateInformation(process_controls)
+
     def updateTabs(self, process_controls):
         self.frame_info.updateInformation(process_controls)
+        self.poly_info.updateInformation(process_controls)
 
     def getTitle(self):
         return self.title
+    
+class PolynomialInformation(QWidget):
+
+    def __init__(self, parent=None):
+        
+        super().__init__(parent)
+
+        # Objects
+
+        # Widgets
+        group = QGroupBox(INFORMATION_POLYNOMIAL_TAB_TITLE, self)
+        self.n_points_linear = QLabel(INFORMATION_POLYNOMIAL_PLACEHOLDER, self)
+        self.der_threshold = QLabel(INFORMATION_POLYNOMIAL_PLACEHOLDER, self)
+        self.sp_value = QLabel(INFORMATION_POLYNOMIAL_PLACEHOLDER, self)
+        self.processing_time = QLabel(INFORMATION_POLYNOMIAL_PLACEHOLDER, self)
+        self.labels = [self.n_points_linear, self.der_threshold, self.sp_value, self.processing_time]
+        
+        # init routines
+        self.setFixedWidth(INFORMATION_TAB_DISPLAY_WIDTH)
+        self.setFixedHeight(INFORMATION_TAB_DISPLAY_HEIGHT)
+        group.setStyleSheet('QGroupBox { font-weight: bold;}')
+
+        for label in self.labels:
+            label.setStyleSheet(
+                'margin-left:20px;'
+            )
+            label.setAlignment(QtCore.Qt.AlignRight)
+
+
+        # Signals and Slots
+
+        # Layout
+        layout = QVBoxLayout()
+
+        # -> Info display
+        display = QHBoxLayout()
+
+        # -> Left display
+        info_left = QFormLayout()
+        info_left.addRow(INFORMATION_POLYNOMIAL_THRESHOLD_VALUE, self.der_threshold)
+        info_left.addRow(INFORMATION_POLYNOMIAL_SP_VALUE_FOUND, self.sp_value)
+
+        # -> Right display
+        info_right = QFormLayout()
+        info_right.addRow(INFORMATION_POLYNOMIAL_N_POINT_LINEAR_REGION, self.n_points_linear)
+        info_right.addRow(INFORMATION_POLYNOMIAL_PROCESSING_TIME, self.processing_time)
+
+        display.addLayout(info_left)
+        display.addLayout(info_right)
+
+        group.setLayout(display)
+        layout.addWidget(group)
+
+        self.setLayout(layout)
+
+    def updateInformation(self, process_controls):
+        der_threshold = str(process_controls['der_threshold'])
+        n_points_linear = str(len(process_controls['linear_region']))
+        sp_value = process_controls['sp'][0] # Only contour height
+        processing_time = str(process_controls['last_poly_run'])
+
+        self.der_threshold.setText(der_threshold)
+        self.n_points_linear.setText(n_points_linear)
+        self.sp_value.setText(INFORMATION_POLYNOMIAL_SP_VALUE_FIELD.format(sp_value))
+        self.processing_time.setText(processing_time)
+
+
+
+
 
 class FrameInformation(QWidget):
     
@@ -53,8 +132,7 @@ class FrameInformation(QWidget):
         # Objects
 
         # Widgets
-        self.title = 'DEMO'
-        group = QGroupBox('Frame process summary',self)
+        group = QGroupBox(INFORMATION_PROCESSED_TAB_TITLE,self)
         self.core = QLabel(INFORMATION_PROCESSED_FRAMES_PLACEHOLDER, group)
         self.contour = QLabel(INFORMATION_PROCESSED_FRAMES_PLACEHOLDER, group)
         self.n_frames = QLabel(INFORMATION_PROCESSED_FRAMES_PLACEHOLDER, group)
@@ -82,7 +160,7 @@ class FrameInformation(QWidget):
         layout = QVBoxLayout()
 
         # -> info display
-        display = QHBoxLayout(self)
+        display = QHBoxLayout()
         
         info_left = QFormLayout()
         info_left.addRow(INFORMATION_PROCESSED_CORE_LABEL, self.core)
@@ -110,7 +188,7 @@ class FrameInformation(QWidget):
         n_frames = str(process_controls['n_frames'])
         n_invalid_frames = str(process_controls['n_invalid_frames'])
         centroid = str(round(process_controls['centroid_ref_cord'], INFORMATION_PROCESSED_CENTROID_DECIMALS))
-        last_time = str(process_controls['last_run_time'])
+        last_time = str(process_controls['last_frame_run'])
         h_points = str(len(process_controls['h']))
         H_points = str(len(process_controls['H']))
 
@@ -181,11 +259,11 @@ class InformationBar(QWidget):
     def setStatus(self, status):
         self.status = status
         self.operation_field.setText(self.status.value)
-        if(self.status is InformationStatus.FRAMES):
+        if(self.status is InformationStatus.FRAMES or self.status is InformationStatus.POLYNOMIAL):
             # Start elapsed time 
             self.start()
 
-        if(self.status is InformationStatus.FRAMES_DONE):
+        if(self.status is InformationStatus.FRAMES_DONE or self.status is InformationStatus.POLYNOMIAL):
             # Restart the timer
             self.restart()
 
