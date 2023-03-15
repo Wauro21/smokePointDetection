@@ -56,9 +56,9 @@ class CentralWidget(QWidget):
         self.infoTab = InformationTab(self)
 
         # Init routines
-        self.PreprocessingTabs.addTab(self.CutWindow, 'Cut frame', True)
-        self.PreprocessingTabs.addTab(self.ThresholdWindow, 'Threshold controls', False)
-        self.PreprocessingTabs.addTab(self.DisplayWindow, 'Run settings', False)
+        self.PreprocessingTabs.addTab(self.CutWindow, True)
+        self.PreprocessingTabs.addTab(self.ThresholdWindow, False)
+        self.PreprocessingTabs.addTab(self.DisplayWindow, False)
         self.DisplayWindow.applyHandler(self.enableStart)
         
         # -> Add tabs to tab holder 
@@ -103,7 +103,6 @@ class CentralWidget(QWidget):
 
         # Update start button status
         self.LoadWidget.externalStartButton(StartStates.ENABLED)
-
 
         # Restore stop flag
         self.process_controls['stop'] = False
@@ -241,9 +240,14 @@ class CentralWidget(QWidget):
         self.PreprocessingTabs.setCurrentIndex(2)
 
     def requestStart(self):
+        # Clear older runs
+        self.clearPreviousRun()
+        # Handle the info bar display and timer
         self.infoBar.setStatus(InformationStatus.FRAMES)
-        self.requestPlayback()
+        # Handle the start button status
         self.LoadWidget.externalStartButton(StartStates.STOP)
+        # Start the thread for video playback
+        self.VideoWidget.startPlayback(self.video_path, self.HeightPlot.update, self.centroidSignalHandler)
 
     def requestThreshold(self):
         # Update run settings display
@@ -266,9 +270,6 @@ class CentralWidget(QWidget):
     def setPrefix(self, values):
         self.video_path, self.demo_frame_path = values
 
-    def requestPlayback(self):
-        self.clearPreviousRun()
-        self.VideoWidget.startPlayback(self.video_path, self.HeightPlot.update, self.centroidSignalHandler)
 
 
 if __name__ == '__main__':

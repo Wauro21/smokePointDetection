@@ -50,6 +50,10 @@ PREPROCESSING_WINDOW_TITLE = 'Preprocessing'
 PREPROCESSING_TITLE_MESSAGE= 'Select the region of interest to cut the frames and save processing time'
 PREPROCESSING_DESC_MESSAGE = 'Left click on the approximate center of the flame and adjust the width of the region, scrolling the mouse wheel. You can use the controls to fine tune the area. You can also save/load this presets for future use.'
 
+PREPROCESSING_CUT_WIDGET_TAB_TITLE = 'Cut Frame'
+PREPROCESSING_THRESHOLD_WIDGET_TAB_TITLE = 'Threshold controls'
+PREPROCESSING_DISPLAY_WIDGET_TAB_TITLE = 'Run settings'
+
 # -> For saving/loading jsons
 PREPROCESSING_SAVE_CUT = 'Save the current cut profile onto a file'
 PREPROCESSING_LOAD_CUT = 'Load cut profile from file'

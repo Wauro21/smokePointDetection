@@ -24,8 +24,8 @@ class PreprocessingWidget(QWidget):
     def requestClose(self):
         self.close()
 
-    def addTab(self, widget, label, enabled):
-        index = self.tabs.addTab(widget, label)
+    def addTab(self, widget, enabled):
+        index = self.tabs.addTab(widget, widget.getTitle())
         self.tabs.setTabEnabled(index, enabled)
 
     def setTabEnabled(self, index, value):

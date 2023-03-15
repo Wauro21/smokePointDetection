@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QFormLayout, QSpinBox, QPushButton
 from PyQt5.QtGui import QPixmap, QColor, QImage
-from GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_AUTO_CUT_PADDING, PREPROCESSING_AUTO_CUT_THRESHOLD_PERCENTAGE, PREPROCESSING_DESC_MESSAGE, PREPROCESSING_LINES_WIDTH, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SCROLL_WIDTH_STEP, PREPROCESSING_TITLE_MESSAGE, PREPROCESSING_WIDTH_LINE_COLOR, PREPROCESSING_WINDOW_TITLE, PREPROESSING_CENTER_LINE_COLOR, VIDEO_PLAYER_BG_COLOR
+from GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_AUTO_CUT_PADDING, PREPROCESSING_AUTO_CUT_THRESHOLD_PERCENTAGE, PREPROCESSING_CUT_WIDGET_TAB_TITLE, PREPROCESSING_DESC_MESSAGE, PREPROCESSING_LINES_WIDTH, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SCROLL_WIDTH_STEP, PREPROCESSING_TITLE_MESSAGE, PREPROCESSING_WIDTH_LINE_COLOR, PREPROCESSING_WINDOW_TITLE, PREPROESSING_CENTER_LINE_COLOR, VIDEO_PLAYER_BG_COLOR
 from CONSTANTS import MAX_PIXEL_VALUE, NUMBER_OF_CONNECTED_COMPONENTS
 from .CutButtonsWidget import CutButtonsWidget
 from utils import convert2QT, getConnectedComponents
@@ -19,6 +19,7 @@ class CutWidget(QWidget):
         super().__init__(parent)
 
         # Objects
+        self.tab_title = PREPROCESSING_CUT_WIDGET_TAB_TITLE
         self.process_controls = process_controls
         self.frame = None
         self.resize_dict = {
@@ -44,6 +45,9 @@ class CutWidget(QWidget):
         layout.addWidget(self.ButtonsWidget)
 
         self.setLayout(layout)
+
+    def getTitle(self):
+        return self.tab_title
 
     def preprocessingDone(self):
         self.process_controls['cut'] = self.getCutInfo()
