@@ -4,7 +4,7 @@ import json
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QLineEdit, QPushButton, QFileDialog
 
-from GUI_CONSTANTS import LOAD_WIDGET_FILE_DEFAULT_MESSAGE, LOAD_WIDGET_FILE_DIALOG_HEADER_TITLE, LOAD_WIDGET_LOAD_JSON
+from GUI_CONSTANTS import LOAD_START_BUTTON_ENABLED_TEXT, LOAD_START_BUTTON_STOP_TEXT, LOAD_WIDGET_FILE_DEFAULT_MESSAGE, LOAD_WIDGET_FILE_DIALOG_HEADER_TITLE, LOAD_WIDGET_LOAD_JSON, StartStates
 from MessageBox import ErrorBox, InformationBox, LoadBox, WarningBox
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
@@ -13,6 +13,8 @@ __author__ = 'maurio.aravena@sansano.usm.cl'
 class LoadWidget(QWidget):
 
     # Custom signals
+    start = QtCore.pyqtSignal()
+    stop = QtCore.pyqtSignal()
     path_signal = QtCore.pyqtSignal(list)
     cut_info = QtCore.pyqtSignal()
 
@@ -21,6 +23,7 @@ class LoadWidget(QWidget):
         
         # Objects 
         self.processControls = process_controls
+        self.start_btn_state = StartStates.LOCKED
 
         # Widgets 
 
@@ -33,13 +36,10 @@ class LoadWidget(QWidget):
         self.load_presets = QPushButton('Load settings')
 
         # -> Start button
-        self.start_button = QPushButton('Start')
+        self.start_button = QPushButton(LOAD_START_BUTTON_ENABLED_TEXT, self)
         
         #  Init routine
-        self.start_button.setStyleSheet(
-            'background-color: #3ede49'
-        )
-        self.start_button.setEnabled(False)
+        self.handleStartButton()
 
         self.configure_button.setEnabled(False)
         self.load_presets.setEnabled(False)
@@ -60,6 +60,7 @@ class LoadWidget(QWidget):
         # Signals and slots
         self.open_button.clicked.connect(self.getFiles)
         self.load_presets.clicked.connect(self.loadJSON)
+        self.start_button.clicked.connect(self.startButtonSignalHandler)
 
         # Layout
         layout = QHBoxLayout()
@@ -71,6 +72,51 @@ class LoadWidget(QWidget):
         layout.addWidget(self.start_button)
 
         self.setLayout(layout)
+
+
+    def startButtonSignalHandler(self):        
+        if(self.start_btn_state is StartStates.ENABLED):
+            self.start.emit()
+
+        elif(self.start_btn_state is StartStates.STOP):
+            self.stop.emit()
+
+    def externalStartButton(self, state):
+        self.start_btn_state = state
+        self.handleStartButton()
+
+
+    def handleStartButton(self):
+
+        # Restore color
+        self.start_button.setStyleSheet(
+            'background-color: #3ede49'
+        )
+
+        if(self.start_btn_state is StartStates.LOCKED):
+            # Disable button
+            self.start_button.setEnabled(False)
+            
+
+        elif(self.start_btn_state is StartStates.ENABLED):
+            # Enable button
+            self.start_button.setEnabled(True)
+
+            # Display text 
+            self.start_button.setText(LOAD_START_BUTTON_ENABLED_TEXT)
+
+        elif(self.start_btn_state is StartStates.STOP):
+
+            # Display text
+            self.start_button.setText(LOAD_START_BUTTON_STOP_TEXT)
+
+            # Change color 
+            self.start_button.setStyleSheet(
+            'background-color: #FF4242'
+            )
+            
+
+
 
     def loadJSON(self):
             fileDialog = QFileDialog(self, windowTitle=LOAD_WIDGET_LOAD_JSON)
@@ -101,18 +147,12 @@ class LoadWidget(QWidget):
                 self.processControls['contour_%'] = contour
                 self.processControls['cut'] = cut
 
-                self.start_button.setEnabled(True)
+                self.externalStartButton(StartStates.ENABLED)
                 
 
                 # Inform user
                 message = LoadBox('Presets loaded!', self.processControls)
                 message.exec_()
-
-    def startHandler(self, function):
-        self.start_button.clicked.connect(function)
-
-    def startEnable(self):
-        self.start_button.setEnabled(True)
 
     def getDemoFrame(self):
         return self.demo_frame

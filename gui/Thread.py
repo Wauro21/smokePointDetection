@@ -120,8 +120,12 @@ class VideoReader(QThread):
         invalid_frame_counter = 0        
 
         # Frame per frame processing
-
         while media.isOpened():
+
+            # Check if stop is requested
+            if(self.process_controls['stop']):
+                return None
+
             ret, frame = media.read()
             if(not ret):
                 # End of media

@@ -54,6 +54,10 @@ class InformationTab(QWidget):
     def getTitle(self):
         return self.title
     
+    def clearTabs(self):
+        self.frame_info.clearInformation()
+        self.poly_info.clearInformation()
+    
 class PolynomialInformation(QWidget):
 
     def __init__(self, parent=None):
@@ -118,6 +122,11 @@ class PolynomialInformation(QWidget):
         self.n_points_linear.setText(n_points_linear)
         self.sp_value.setText(INFORMATION_POLYNOMIAL_SP_VALUE_FIELD.format(sp_value))
         self.processing_time.setText(processing_time)
+
+    def clearInformation(self):
+        for label in self.labels:
+            label.setText(INFORMATION_POLYNOMIAL_PLACEHOLDER)
+
 
 
 
@@ -201,7 +210,9 @@ class FrameInformation(QWidget):
         self.n_points_h.setText(h_points)
         self.n_points_H.setText(H_points)
 
-        
+    def clearInformation(self):
+        for label in self.labels:
+            label.setText(INFORMATION_PROCESSED_FRAMES_PLACEHOLDER)
 
 
 class InformationBar(QWidget):

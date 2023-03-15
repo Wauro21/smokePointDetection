@@ -10,6 +10,14 @@ LOAD_WIDGET_FILE_DEFAULT_MESSAGE = 'Select a frame folder to process'
 LOAD_WIDGET_FILE_DIALOG_HEADER_TITLE = 'Select a folder to process'
 LOAD_WIDGET_LOAD_JSON = 'Load settings from file'
 
+# -> Start button states
+class StartStates(Enum):
+    LOCKED = 0
+    ENABLED = 1
+    STOP = 2
+
+LOAD_START_BUTTON_ENABLED_TEXT = 'Start'
+LOAD_START_BUTTON_STOP_TEXT = 'Stop'
 
 # VideoPlayer
 

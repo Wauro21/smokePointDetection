@@ -48,6 +48,14 @@ class ProcessPlotWidget(QWidget):
 
         self.setLayout(layout)
 
+    def clearPlot(self):
+        self.frames = []
+        self.contour = []
+        self.core = []
+        self.tip = []
+        self.restoreAx()
+
+
     def getTitle(self):
         return self.title
 

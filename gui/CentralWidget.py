@@ -6,7 +6,7 @@ from Plot.CentroidPlot import CentroidPlotWidget
 from LoadWidget import LoadWidget
 from Frameplayer.VideoPlayer import FrameHolder
 from Plot.ProcessPlot import ProcessPlotWidget
-from GUI_CONSTANTS import CentroidTypes, FrameTypes, InformationStatus
+from GUI_CONSTANTS import CentroidTypes, FrameTypes, InformationStatus, StartStates
 from TabHolder import TabHolder
 from Preprocessing.CutWidget import CutWidget
 from Preprocessing.Preprocessing import PreprocessingWidget
@@ -29,27 +29,9 @@ class CentralWidget(QWidget):
         self.polyThread = None
 
         # -> Control dictionary 
-        self.process_controls = {
-            'n_frames': 0,
-            'core_%': 0,
-            'contour_%': 0,
-            'cut': None,
-            'bboxes': False,
-            'centroids': False, 
-            'h': None,
-            'H': None,
-            'display': FrameTypes.FRAME,
-            'n_invalid_frames': 0,
-            'centroid_ref_cord': None, 
-            'last_frame_run': 0,
-            '10th_poly': None,
-            '10th_der': None, 
-            'der_threshold': 1e-2, # Temporal
-            'linear_region': None,
-            'linear_poly': None,
-            'sp': None,
-            'last_poly_run': 0,
-        }
+        self.process_controls = {}
+        # Init the controls
+        self.clearControls()
 
 
         # Widgets
@@ -78,7 +60,6 @@ class CentralWidget(QWidget):
         self.PreprocessingTabs.addTab(self.ThresholdWindow, 'Threshold controls', False)
         self.PreprocessingTabs.addTab(self.DisplayWindow, 'Run settings', False)
         self.DisplayWindow.applyHandler(self.enableStart)
-        self.LoadWidget.startHandler(self.requestStart)
         
         # -> Add tabs to tab holder 
         self.TabHolder.addTab(self.HeightPlot)
@@ -91,6 +72,8 @@ class CentralWidget(QWidget):
         # Signals and Slots
         self.LoadWidget.path_signal.connect(self.setPrefix)
         self.LoadWidget.configureHandler(self.requestCutting)
+        self.LoadWidget.start.connect(self.requestStart)
+        self.LoadWidget.stop.connect(self.requestStop)
         self.CutWindow.preprocess_done.connect(self.requestThreshold)
         self.ThresholdWindow.done_signal.connect(self.requestDisplay)
         self.VideoWidget.frame_process_done.connect(self.frameProcessDone)
@@ -109,6 +92,66 @@ class CentralWidget(QWidget):
         
         self.setLayout(layout)
 
+
+    def requestStop(self):
+        self.process_controls['stop'] = True
+
+    def stopClean(self):
+        # Clean the plots
+        self.HeightPlot.clearPlot()
+        self.CentroidPlot.clearPlot()
+
+        # Update start button status
+        self.LoadWidget.externalStartButton(StartStates.ENABLED)
+
+
+        # Restore stop flag
+        self.process_controls['stop'] = False
+
+
+    def clearPreviousRun(self):
+        # Clean process results stored
+        self.process_controls['h'] = None
+        self.process_controls['H'] = None
+        self.process_controls['n_invalid_frames'] = 0
+        self.process_controls['centroid_ref_cord'] = None
+        self.process_controls['last_frame_run'] = 0
+        self.process_controls['10th_poly'] = None
+        self.process_controls['10th_der'] = None
+        self.process_controls['der_threshold'] : 1e-2 # REMOVE
+        self.process_controls['linear_region'] = None
+        self.process_controls['linear_poly'] = None
+        self.process_controls['sp'] = None
+        self.process_controls['last_poly_run'] = 0
+
+        # Clean the info tabs
+        self.infoTab.clearTabs()
+
+    def clearControls(self):
+        self.process_controls = {
+            'stop': False,
+            'n_frames': 0,
+            'core_%': 0,
+            'contour_%': 0,
+            'cut': None,
+            'bboxes': False,
+            'centroids': False, 
+            'h': None,
+            'H': None,
+            'display': FrameTypes.FRAME,
+            'n_invalid_frames': 0,
+            'centroid_ref_cord': None, 
+            'last_frame_run': 0,
+            '10th_poly': None,
+            '10th_der': None, 
+            'der_threshold': 1e-2, # Temporal
+            'linear_region': None,
+            'linear_poly': None,
+            'sp': None,
+            'last_poly_run': 0,
+        }
+
+
     def plotSmokePoint(self):
         self.SmokePointPlot.plot(self.process_controls)
 
@@ -119,9 +162,6 @@ class CentralWidget(QWidget):
         self.PolyHeightPlot.plot(self.process_controls)
 
     def polynomialAnalysisDone(self):
-
-        print('Ending poly analysis. CHANGE THIS')
-
         # Stop timer
         self.infoBar.setStatus(InformationStatus.DONE)
         # Get last run for poly
@@ -135,6 +175,11 @@ class CentralWidget(QWidget):
 
         # Update information
         self.infoTab.updatePolyTab(self.process_controls)
+
+        # Update start button status
+        self.LoadWidget.externalStartButton(StartStates.ENABLED)
+
+        # Clean the information to be re-written
 
     def requestPolynomialAnalysis(self):
         if(self.polyThread != None):
@@ -153,6 +198,10 @@ class CentralWidget(QWidget):
 
 
     def frameProcessDone(self):
+        if(self.process_controls['stop']):
+            self.stopClean()
+            return False
+        
         # Change status
         self.infoBar.setStatus(InformationStatus.FRAMES_DONE)
         # Get last run time
@@ -163,8 +212,9 @@ class CentralWidget(QWidget):
         # Set current tab 
         self.TabHolder.showResultTab() 
 
-        # REMOVE LATER ONLY TEMPORAL
         self.requestPolynomialAnalysis()
+
+        return True
 
     def centroidSignalHandler(self, message):
         # Update centroid plot
@@ -182,7 +232,7 @@ class CentralWidget(QWidget):
 
     def enableStart(self):
         self.PreprocessingTabs.requestClose()
-        self.LoadWidget.startEnable()
+        self.LoadWidget.externalStartButton(StartStates.ENABLED)
 
     def requestDisplay(self):
         # Update run settings display
@@ -193,6 +243,7 @@ class CentralWidget(QWidget):
     def requestStart(self):
         self.infoBar.setStatus(InformationStatus.FRAMES)
         self.requestPlayback()
+        self.LoadWidget.externalStartButton(StartStates.STOP)
 
     def requestThreshold(self):
         # Update run settings display
@@ -216,6 +267,7 @@ class CentralWidget(QWidget):
         self.video_path, self.demo_frame_path = values
 
     def requestPlayback(self):
+        self.clearPreviousRun()
         self.VideoWidget.startPlayback(self.video_path, self.HeightPlot.update, self.centroidSignalHandler)
 
 

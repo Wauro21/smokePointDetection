@@ -46,6 +46,10 @@ class CentroidPlotWidget(QWidget):
         layout.addWidget(self.pltCanvas)
         self.setLayout(layout)
 
+    def clearPlot(self):
+        self.resetData()
+        self.restoreAx()
+
     def restoreAx(self):
         self.axs.cla()
         self.axs.grid()
