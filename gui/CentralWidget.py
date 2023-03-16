@@ -15,6 +15,7 @@ from Preprocessing.InfoWidget import DisplaySettings
 from RunInformation import InformationBar, InformationTab
 from MessageBox import WarningBox
 from Thread import PolyAnalizer
+from Preprocessing.CameraCalibration import CameraCalibration
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 
@@ -42,6 +43,7 @@ class CentralWidget(QWidget):
         self.CutWindow = CutWidget(self.process_controls, self.PreprocessingTabs)
         self.ThresholdWindow = ThresholdWidget(self.process_controls, self.PreprocessingTabs)
         self.DisplayWindow = DisplaySettings(self.process_controls, self.PreprocessingTabs)
+        self.CameraCalibration = CameraCalibration(self.process_controls, self.PreprocessingTabs)
         self.TabHolder = TabHolder(self)
 
         # -> Plots 
@@ -58,6 +60,7 @@ class CentralWidget(QWidget):
         # Init routines
         self.PreprocessingTabs.addTab(self.CutWindow, True)
         self.PreprocessingTabs.addTab(self.ThresholdWindow, False)
+        self.PreprocessingTabs.addTab(self.CameraCalibration, True)
         self.PreprocessingTabs.addTab(self.DisplayWindow, False)
         self.DisplayWindow.applyHandler(self.enableStart)
         
@@ -178,7 +181,6 @@ class CentralWidget(QWidget):
         # Update start button status
         self.LoadWidget.externalStartButton(StartStates.ENABLED)
 
-        # Clean the information to be re-written
 
     def requestPolynomialAnalysis(self):
         if(self.polyThread != None):
