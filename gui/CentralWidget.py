@@ -139,7 +139,7 @@ class CentralWidget(QWidget):
             'core_%': 0,
             'contour_%': 0,
             'cut': None,
-            'conv_factor': None,
+            'conv_factor': 0,
             'bboxes': False,
             'centroids': False, 
             'h': None,
