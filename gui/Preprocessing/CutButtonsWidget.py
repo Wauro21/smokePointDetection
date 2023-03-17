@@ -108,37 +108,27 @@ class CutButtonsWidget(QWidget):
             file = fileDialog.selectedFiles()
             
             # Check if json is valid
-            try:
-                with open(file[0], 'r') as json_file:
-                    json_dict = json.load(json_file)
+            with open(file[0], 'r') as json_file:
+                json_dict = json.load(json_file)
 
-                    try:
-                        left = json_dict['left']
-                        right = json_dict['right']
+                try:
+                    left = json_dict['left']
+                    right = json_dict['right']
+                    # Succesfully loaded the dict
+                    width = right-left
+                    center = left + width//2
 
-                    except:
-                        message = ErrorBox('The provided JSON file is not in the correct format! Try with another file.')
-                        message.exec_()
-            except:
-                message = ErrorBox('Not a valid JSON file.')
-                message.exec_()
+                    self.updateCenterlinePos(center)
+                    self.updateWidth(width)
 
-            # Succesfully loaded the dict
-            width = right-left
-            center = left + width//2
+                    # Inform user
+                    message = InformationBox('Presets loaded!')
+                    message.exec_()
+                    self.cut_signal.emit()
 
-            self.updateCenterlinePos(center)
-            self.updateWidth(width)
-
-            # Inform user
-            message = InformationBox('Presets loaded!')
-            message.exec_()
-            self.cut_signal.emit()
-
-        
-
-        
-
+                except:
+                    message = ErrorBox('The provided JSON file is not in the correct format! Try with another file.')
+                    message.exec_()
 
     def getCutDict(self):
         return self.cut_dict

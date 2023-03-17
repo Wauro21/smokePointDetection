@@ -127,32 +127,27 @@ class LoadWidget(QWidget):
                 file = fileDialog.selectedFiles()
                 
                 # Check if json is valid
-                try:
-                    with open(file[0], 'r') as json_file:
-                        json_dict = json.load(json_file)
+                with open(file[0], 'r') as json_file:
+                    json_dict = json.load(json_file)
 
-                        try:
-                            core = json_dict['core_%']
-                            contour = json_dict['contour_%']
-                            cut = json_dict['cut']
+                    try:
+                        core = json_dict['core_%']
+                        contour = json_dict['contour_%']
+                        cut = json_dict['cut']
 
-                        except:
-                            message = ErrorBox('The provided JSON file is not in the correct format! Try with another file.')
-                            message.exec_()
-                except:
-                    message = ErrorBox('Not a valid JSON file.')
-                    message.exec_()
+                        self.processControls['core_%'] = core
+                        self.processControls['contour_%'] = contour
+                        self.processControls['cut'] = cut
+                        self.externalStartButton(StartStates.ENABLED)
+                        
+                        # Inform user
+                        message = LoadBox('Presets loaded!', self.processControls)
+                        message.exec_()
 
-                self.processControls['core_%'] = core
-                self.processControls['contour_%'] = contour
-                self.processControls['cut'] = cut
-
-                self.externalStartButton(StartStates.ENABLED)
+                    except:
+                        message = ErrorBox('The provided JSON file is not in the correct format! Try with another file.')
+                        message.exec_()
                 
-
-                # Inform user
-                message = LoadBox('Presets loaded!', self.processControls)
-                message.exec_()
 
     def getDemoFrame(self):
         return self.demo_frame

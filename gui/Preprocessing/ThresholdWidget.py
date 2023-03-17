@@ -128,27 +128,22 @@ class ThresholdWidget(QWidget):
             file = fileDialog.selectedFiles()
             
             # Check if json is valid
-            try:
-                with open(file[0], 'r') as json_file:
-                    json_dict = json.load(json_file)
+            with open(file[0], 'r') as json_file:
+                json_dict = json.load(json_file)
 
-                    try:
-                        core = json_dict['core_%']
-                        contour = json_dict['contour_%']
+                try:
+                    core = json_dict['core_%']
+                    contour = json_dict['contour_%']
+                    self.core_controls.loadValues(core)
+                    self.contour_controls.loadValues(contour)
 
-                    except:
-                        message = ErrorBox('The provided JSON file is not in the correct format! Try with another file.')
-                        message.exec_()
-            except:
-                message = ErrorBox('Not a valid JSON file.')
-                message.exec_()
+                    # Inform user
+                    message = InformationBox('Presets loaded!')
+                    message.exec_()
+                except:
+                    message = ErrorBox('The provided JSON file is not in the correct format! Try with another file.')
+                    message.exec_()
 
-            self.core_controls.loadValues(core)
-            self.contour_controls.loadValues(contour)
-
-            # Inform user
-            message = InformationBox('Presets loaded!')
-            message.exec_()
 
 class ThresholdControls(QWidget):
     update_frame = pyqtSignal()

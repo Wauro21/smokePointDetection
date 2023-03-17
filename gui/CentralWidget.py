@@ -1,12 +1,14 @@
 import sys
+import json
 import os
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout
+import datetime
+from PyQt5.QtWidgets import QFileDialog, QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout
 from Plot.FixedPlots import FixedPlot, LinearRegionPlot, PolyHeightPlot, SmokePointPlot
 from Plot.CentroidPlot import CentroidPlotWidget
 from LoadWidget import LoadWidget
 from Frameplayer.VideoPlayer import FrameHolder
 from Plot.ProcessPlot import ProcessPlotWidget
-from GUI_CONSTANTS import CentroidTypes, FrameTypes, InformationStatus, StartStates
+from GUI_CONSTANTS import PREPROCESSING_CAMERA_CALIBRATION_SAVE_DESC, PREPROCESSING_CAMERA_CALIBRATION_SAVE_TITLE, CentroidTypes, FrameTypes, InformationStatus, StartStates
 from TabHolder import TabHolder
 from Preprocessing.CutWidget import CutWidget
 from Preprocessing.Preprocessing import PreprocessingWidget
@@ -78,7 +80,8 @@ class CentralWidget(QWidget):
         self.LoadWidget.start.connect(self.requestStart)
         self.LoadWidget.stop.connect(self.requestStop)
         self.CutWindow.preprocess_done.connect(self.requestThreshold)
-        self.ThresholdWindow.done_signal.connect(self.requestDisplay)
+        self.ThresholdWindow.done_signal.connect(self.requestCalibration)
+        self.CameraCalibration.calibration_done.connect(self.requestDisplay)
         self.VideoWidget.frame_process_done.connect(self.frameProcessDone)
 
         # Layout
@@ -136,6 +139,7 @@ class CentralWidget(QWidget):
             'core_%': 0,
             'contour_%': 0,
             'cut': None,
+            'conv_factor': None,
             'bboxes': False,
             'centroids': False, 
             'h': None,
@@ -235,11 +239,15 @@ class CentralWidget(QWidget):
         self.PreprocessingTabs.requestClose()
         self.LoadWidget.externalStartButton(StartStates.ENABLED)
 
+    def requestCalibration(self):
+        self.PreprocessingTabs.setTabEnabled(2, True)
+        self.PreprocessingTabs.setCurrentIndex(2)
+
     def requestDisplay(self):
         # Update run settings display
         self.DisplayWindow.updateInfo()
-        self.PreprocessingTabs.setTabEnabled(2, True)
-        self.PreprocessingTabs.setCurrentIndex(2)
+        self.PreprocessingTabs.setTabEnabled(3, True)
+        self.PreprocessingTabs.setCurrentIndex(3)
 
     def requestStart(self):
         # Clear older runs
