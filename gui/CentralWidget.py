@@ -62,7 +62,7 @@ class CentralWidget(QWidget):
         # Init routines
         self.PreprocessingTabs.addTab(self.CutWindow, True)
         self.PreprocessingTabs.addTab(self.ThresholdWindow, False)
-        self.PreprocessingTabs.addTab(self.CameraCalibration, True)
+        self.PreprocessingTabs.addTab(self.CameraCalibration, False)
         self.PreprocessingTabs.addTab(self.DisplayWindow, False)
         self.DisplayWindow.applyHandler(self.enableStart)
         
