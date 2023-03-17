@@ -18,6 +18,7 @@ from RunInformation import InformationBar, InformationTab
 from MessageBox import WarningBox
 from Thread import PolyAnalizer
 from Preprocessing.CameraCalibration import CameraCalibration
+from gui.CONSTANTS import DERIVATIVE_LOW_BOUND
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 
@@ -30,6 +31,8 @@ class CentralWidget(QWidget):
         self.video_path = None
         self.demo_frame_path = None
         self.polyThread = None
+        self.preprocessing_tab_index = []
+        self.autocut = True
 
         # -> Control dictionary 
         self.process_controls = {}
@@ -60,10 +63,10 @@ class CentralWidget(QWidget):
         self.infoTab = InformationTab(self)
 
         # Init routines
-        self.PreprocessingTabs.addTab(self.CutWindow, True)
-        self.PreprocessingTabs.addTab(self.ThresholdWindow, False)
-        self.PreprocessingTabs.addTab(self.CameraCalibration, False)
-        self.PreprocessingTabs.addTab(self.DisplayWindow, False)
+        self.preprocessing_tab_index.append(self.PreprocessingTabs.addTab(self.CutWindow, True))
+        self.preprocessing_tab_index.append(self.PreprocessingTabs.addTab(self.ThresholdWindow, False))
+        self.preprocessing_tab_index.append(self.PreprocessingTabs.addTab(self.CameraCalibration, False))
+        self.preprocessing_tab_index.append(self.PreprocessingTabs.addTab(self.DisplayWindow, False))
         self.DisplayWindow.applyHandler(self.enableStart)
         
         # -> Add tabs to tab holder 
@@ -79,6 +82,7 @@ class CentralWidget(QWidget):
         self.LoadWidget.configureHandler(self.requestCutting)
         self.LoadWidget.start.connect(self.requestStart)
         self.LoadWidget.stop.connect(self.requestStop)
+        self.LoadWidget.load_config.connect(self.updatePreprocessing)
         self.CutWindow.preprocess_done.connect(self.requestThreshold)
         self.ThresholdWindow.done_signal.connect(self.requestCalibration)
         self.CameraCalibration.calibration_done.connect(self.requestDisplay)
@@ -97,6 +101,27 @@ class CentralWidget(QWidget):
         layout.addWidget(self.infoBar)
         
         self.setLayout(layout)
+
+    def updatePreprocessing(self):
+        # Enable all tabs
+        for tab in self.preprocessing_tab_index:
+            self.PreprocessingTabs.setTabEnabled(tab, True)
+
+        # Force update
+        # -> cutWidget
+        self.autocut=False
+        self.CutWindow.setFrame(self.demo_frame_path, autocut=False)
+        self.CutWindow.forceUpdate()
+
+        # -> threshold widget
+        self.ThresholdWindow.setFrame(self.demo_frame_path)
+        self.ThresholdWindow.forceUpdate()
+
+        # -> Camera widget
+        self.CameraCalibration.forceUpdate()
+
+        # -> info widget
+        self.DisplayWindow.forceUpdate()
 
 
     def requestStop(self):
@@ -123,7 +148,7 @@ class CentralWidget(QWidget):
         self.process_controls['last_frame_run'] = 0
         self.process_controls['10th_poly'] = None
         self.process_controls['10th_der'] = None
-        self.process_controls['der_threshold'] : 1e-2 # REMOVE
+        self.process_controls['der_threshold'] : DERIVATIVE_LOW_BOUND#1e-2 # REMOVE
         self.process_controls['linear_region'] = None
         self.process_controls['linear_poly'] = None
         self.process_controls['sp'] = None
@@ -271,7 +296,7 @@ class CentralWidget(QWidget):
 
     def requestCutting(self):
         # Set the frame for the process
-        self.CutWindow.setFrame(self.demo_frame_path)
+        self.CutWindow.setFrame(self.demo_frame_path, self.autocut)
         #self.ThresholdWindow.setFrame(self.demo_frame_path)
         self.PreprocessingTabs.show()
 

@@ -160,6 +160,10 @@ class CameraCalibration(QWidget):
         
         self.setLayout(layout)
 
+
+    def forceUpdate(self):
+        self.px_mm_field.setValue(self.process_controls['conv_factor'])
+
     def validateFactor(self):
         factor = self.px_mm_field.value()
         if(factor > 0):

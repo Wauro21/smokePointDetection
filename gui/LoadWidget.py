@@ -17,6 +17,7 @@ class LoadWidget(QWidget):
     stop = QtCore.pyqtSignal()
     path_signal = QtCore.pyqtSignal(list)
     cut_info = QtCore.pyqtSignal()
+    load_config = QtCore.pyqtSignal()
 
     def __init__(self, process_controls,  parent=None):
         super().__init__(parent)
@@ -145,6 +146,7 @@ class LoadWidget(QWidget):
                         self.externalStartButton(StartStates.ENABLED)
                         
                         # Inform user
+                        self.load_config.emit()
                         message = LoadBox('Presets loaded!', self.processControls)
                         message.exec_()
 

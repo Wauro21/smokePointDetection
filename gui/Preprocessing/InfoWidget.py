@@ -106,6 +106,10 @@ class DisplaySettings(QWidget):
         layout.addWidget(general_group)
         self.setLayout(layout)
 
+    def forceUpdate(self):
+        self.constants_widget.forceUpdate()
+        self.updateInfo()
+
     def getTitle(self):
         return self.tab_title
 

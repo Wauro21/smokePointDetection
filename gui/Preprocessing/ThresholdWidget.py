@@ -73,6 +73,11 @@ class ThresholdWidget(QWidget):
         layout.addLayout(controls)
 
         self.setLayout(layout)
+    
+    def forceUpdate(self):
+        self.core_controls.forceUpdate()
+        self.contour_controls.forceUpdate()
+
 
     def getTitle(self):
         return self.tab_title
@@ -238,6 +243,8 @@ class ThresholdControls(QWidget):
         self.info_table.setItem(0,0, QTableWidgetItem(PREPROCESSING_HEIGHT_INFORMATION_PARSER.format(height)))
         self.info_table.setItem(1,0, QTableWidgetItem(PREPROCESSING_AREA_INFORMATION_PARSER.format(area)))
 
+    def forceUpdate(self):
+        self.threshold.setValue(self.process_controls[self.key])
 
     def updateValue(self):
         self.process_controls[self.key] = self.threshold.value()

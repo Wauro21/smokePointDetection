@@ -81,6 +81,14 @@ class CutWidget(QWidget):
             message = ErrorBox('Selection results in a null image area. Try again.')
             message.exec_()
             return False
+        
+    def forceUpdate(self):
+        width = (self.process_controls['cut']['right'] - self.process_controls['cut']['left'])
+        center = self.process_controls['cut']['left'] + (width//2)
+        
+        self.ButtonsWidget.updateWidth(width)
+        self.ButtonsWidget.updateCenterlinePos(center)
+
 
     def preprocessingDone(self):
         if(self.validateCutinfo()):
@@ -96,7 +104,7 @@ class CutWidget(QWidget):
         self.frame_label.setPixmap(gray_fill)
         self.frame = None
 
-    def setFrame(self, frame_path):
+    def setFrame(self, frame_path, autocut=True):
         
         # Load cv2 image
         self.frame = cv2.imread(frame_path, -1)
@@ -114,7 +122,11 @@ class CutWidget(QWidget):
         self.ButtonsWidget.initSpinsBoxes(0, w_original)
 
         # Autocut 
-        self.autoCut()
+        if(autocut):
+            self.autoCut()
+        else:
+            self.updateAreaofInterest()
+
 
     def updateAreaofInterest(self):
         x_cord = self.ButtonsWidget.getCenterlinePos()

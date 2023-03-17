@@ -69,6 +69,9 @@ class GeneralConstants(QWidget):
         layout.addStretch(1)
         self.setLayout(layout)
 
+    def forceUpdate(self):
+        self.der_thresh.setValue(self.process_controls['der_threshold'])
+
     def validateThreshold(self):
         der_threshold = self.der_thresh.value()
         if(der_threshold > 0):

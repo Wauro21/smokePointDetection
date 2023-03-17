@@ -27,6 +27,7 @@ class PreprocessingWidget(QWidget):
     def addTab(self, widget, enabled):
         index = self.tabs.addTab(widget, widget.getTitle())
         self.tabs.setTabEnabled(index, enabled)
+        return index
 
     def setTabEnabled(self, index, value):
         self.tabs.setTabEnabled(index, value)
