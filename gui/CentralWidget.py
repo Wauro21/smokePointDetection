@@ -18,7 +18,7 @@ from RunInformation import InformationBar, InformationTab
 from MessageBox import WarningBox
 from Thread import PolyAnalizer
 from Preprocessing.CameraCalibration import CameraCalibration
-from gui.CONSTANTS import DERIVATIVE_LOW_BOUND
+from CONSTANTS import DERIVATIVE_LOW_BOUND
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 
