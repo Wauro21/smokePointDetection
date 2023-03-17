@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QVBoxLay
 from PyQt5.QtGui import QPixmap, QColor, QImage
 from GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_AUTO_CUT_PADDING, PREPROCESSING_AUTO_CUT_THRESHOLD_PERCENTAGE, PREPROCESSING_CUT_WIDGET_TAB_TITLE, PREPROCESSING_DESC_MESSAGE, PREPROCESSING_LINES_WIDTH, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SCROLL_WIDTH_STEP, PREPROCESSING_TITLE_MESSAGE, PREPROCESSING_WIDTH_LINE_COLOR, PREPROCESSING_WINDOW_TITLE, PREPROESSING_CENTER_LINE_COLOR, VIDEO_PLAYER_BG_COLOR
 from CONSTANTS import MAX_PIXEL_VALUE, NUMBER_OF_CONNECTED_COMPONENTS
+from MessageBox import ErrorBox
 from .CutButtonsWidget import CutButtonsWidget
 from utils import convert2QT, getConnectedComponents
 from PyQt5.QtCore import pyqtSignal
@@ -60,9 +61,31 @@ class CutWidget(QWidget):
     def getTitle(self):
         return self.tab_title
 
+    def validateCutinfo(self):
+
+        # Apply cut to the frame
+        frame = self.frame.copy()
+        cut_info = self.getCutInfo()
+        frame = frame[:, cut_info['left']: cut_info['right']]
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # Get CC to check if area is not null
+        ret, thresh = cv2.threshold(gray, 0, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
+        thresholded_cc = getConnectedComponents(thresh, NUMBER_OF_CONNECTED_COMPONENTS)
+        area = thresholded_cc['area']
+
+        if(area > 0):
+            return True
+        
+        else:
+            message = ErrorBox('Selection results in a null image area. Try again.')
+            message.exec_()
+            return False
+
     def preprocessingDone(self):
-        self.process_controls['cut'] = self.getCutInfo()
-        self.preprocess_done.emit()
+        if(self.validateCutinfo()):
+            self.process_controls['cut'] = self.getCutInfo()
+            self.preprocess_done.emit()
 
     def getCutInfo(self):
         return self.ButtonsWidget.getCutDict()

@@ -250,6 +250,7 @@ class CameraCalibration(QWidget):
 
                 else:
                     valid = True
+                    self.load_display_img.setText(image_path)
                     self.controls_group.setEnabled(True)
                     self.loadFrame()
             else:

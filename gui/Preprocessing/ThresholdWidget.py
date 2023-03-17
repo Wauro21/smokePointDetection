@@ -311,7 +311,7 @@ class ThresholdFrame(QWidget):
         _, thresholded = cv2.threshold(frame, thresh_value, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
         thresholded_cc = getConnectedComponents(thresholded, NUMBER_OF_CONNECTED_COMPONENTS)
 
-        if (thresholded_cc['area'] >= 0):
+        if (thresholded_cc['area'] > 0):
 
             thresh_mask = resizeFrame(thresholded_cc['cmask'])
 
