@@ -134,10 +134,14 @@ class LoadWidget(QWidget):
                         core = json_dict['core_%']
                         contour = json_dict['contour_%']
                         cut = json_dict['cut']
+                        conv_factor = json_dict['conv_factor']
+                        der_threshold = json_dict['der_threshold']
 
                         self.processControls['core_%'] = core
                         self.processControls['contour_%'] = contour
                         self.processControls['cut'] = cut
+                        self.processControls['conv_factor'] = conv_factor
+                        self.processControls['der_threshold'] = der_threshold
                         self.externalStartButton(StartStates.ENABLED)
                         
                         # Inform user

@@ -240,6 +240,7 @@ class CentralWidget(QWidget):
         self.LoadWidget.externalStartButton(StartStates.ENABLED)
 
     def requestCalibration(self):
+        self.DisplayWindow.updateInfo()
         self.PreprocessingTabs.setTabEnabled(2, True)
         self.PreprocessingTabs.setCurrentIndex(2)
 

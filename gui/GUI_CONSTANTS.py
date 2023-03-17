@@ -110,6 +110,13 @@ PREPROCESSING_THRESHOLD_SPIN_WIDTH = 75
 PREPROCESSING_THRESHOLD_SAVE = 'Save the current threshold values onto a file'
 PREPROCESSING_THRESHOLD_LOAD = 'Load threshold values from file'
 
+# -> Derivative threshold
+PREPROCESSING_CONSTANTS_DECIMALS = 5
+PREPROCESSING_CONSTANTS_STEP = 0.00001
+PREPROCESSING_CONSTANTS_TITLE = 'General Settings'
+PREPROCESSING_CONSTANTS_DESC = 'Change general settings and constants used during the analysis'
+PREPROCESSING_CONSTANTS_DER_THRESHOLD = 'Derivative threshold:'
+
 # -> For display information
 PREPROCESSING_DISPLAY_TITLE = 'Run summary'
 PREPROCESSING_DISPLAY_DESC = 'This are the settings that will be applied to the Smoke Point run. You can change them going back to the corresponding tabs. You can also save this general settings for future use.'
@@ -118,6 +125,10 @@ PREPROCESSING_DISPLAY_CUT_WIDTH = 'Cut width'
 PREPROCESSING_DISPLAY_THRESHOLD = '{} threshold value'
 PREPROCESSING_DISPLAY_WIDTH_VALUE = '{} px'
 PREPROCESSING_DISPLAY_THRESHOLD_VALUE = '{} %'
+PREPROCESSING_DISPLAY_FACTOR = 'Px to mm conversion factor'
+PREPROCESSING_DISPLAY_FACTOR_VALUE = '{} mm/px'
+PREPROCESSING_DISPLAY_DERIVATIVE_THRESHOLD = 'Derivative threshold'
+PREPROCESSING_DISPLAY_DERIVATIVE_THRESHOLD_VALUE = '{:.5f}'
 PREPROCESSING_DISPLAY_INFO_WIDTH = 300
 PREPROCESSING_DISPLAY_INFO_HEIGHT = 125
 
