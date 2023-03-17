@@ -3,7 +3,7 @@ import sys
 import os
 import cv2
 import numpy as np
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QFormLayout, QSpinBox, QPushButton, QFileDialog
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QFormLayout, QSpinBox, QPushButton, QFileDialog, QGroupBox, QVBoxLayout
 from PyQt5.QtGui import QPixmap, QColor, QImage
 from GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_DESC_MESSAGE, PREPROCESSING_LOAD_CUT, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SAVE_CUT, PREPROCESSING_SCROLL_WIDTH_STEP, PREPROCESSING_TITLE_MESSAGE, PREPROCESSING_WINDOW_TITLE, VIDEO_PLAYER_BG_COLOR
 from MessageBox import ErrorBox, InformationBox
@@ -31,13 +31,14 @@ class CutButtonsWidget(QWidget):
         }
 
         #Widgets
-        self.title_label = QLabel(PREPROCESSING_TITLE_MESSAGE)
-        self.desc_label = QLabel(PREPROCESSING_DESC_MESSAGE)
-        self.center_line = QSpinBox(self)
-        self.width = QSpinBox(self)
-        self.lock_center_line = QPushButton('Lock')
-        self.lock_width = QPushButton('Lock')
-        self.auto = QPushButton('Auto')
+        group = QGroupBox(self)
+        self.title_label = QLabel(PREPROCESSING_TITLE_MESSAGE, group)
+        self.desc_label = QLabel(PREPROCESSING_DESC_MESSAGE, group)
+        self.center_line = QSpinBox(group)
+        self.width = QSpinBox(group)
+        self.lock_center_line = QPushButton('Lock', group)
+        self.lock_width = QPushButton('Lock', group)
+        self.auto = QPushButton('Auto', group)
         self.bottom_actions = LowerButtons(self)
 
         # Init routines
@@ -45,7 +46,7 @@ class CutButtonsWidget(QWidget):
         self.desc_label.setWordWrap(True)
         self.title_label.setStyleSheet('font-weight: bold')
         self.desc_label.setStyleSheet('margin-bottom: 25px')
-        self.bottom_actions.setStyleSheet('margin-bottom: 100px')
+        #self.bottom_actions.setStyleSheet('margin-bottom: 100px')
 
         # Signals and Slots
         self.center_line.valueChanged.connect(lambda: self.update_frame.emit())
@@ -56,7 +57,7 @@ class CutButtonsWidget(QWidget):
         self.bottom_actions.save.connect(self.save2JSON)
         self.bottom_actions.load.connect(self.loadJSON)
         # Layout
-        layout = QFormLayout()
+        layout = QVBoxLayout()
 
         # -> Center line controls
         c_line_layout = QHBoxLayout()
@@ -68,13 +69,19 @@ class CutButtonsWidget(QWidget):
         width_layout.addWidget(self.width)
         width_layout.addWidget(self.lock_width)        
 
-        # -> General layout
-        layout.addRow(self.title_label)
-        layout.addRow(self.desc_label)
-        layout.addRow('Center Line (x coordinate):', c_line_layout)
-        layout.addRow('Width of Area of Interest:', width_layout)
-        layout.addRow(self.auto)
-        layout.addRow(self.bottom_actions)
+        # -> Group layout
+        group_layout = QFormLayout()
+        group_layout.addRow(self.title_label)
+        group_layout.addRow(self.desc_label)
+        group_layout.addRow('Center Line (x coordinate):', c_line_layout)
+        group_layout.addRow('Width of Area of Interest:', width_layout)
+        group_layout.addRow(self.auto)
+        group.setLayout(group_layout)
+
+        # -> General Layout
+        layout.addWidget(group)
+        layout.addWidget(self.bottom_actions)
+        layout.addStretch(1)
 
         self.setLayout(layout)
         

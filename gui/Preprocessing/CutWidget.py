@@ -3,7 +3,7 @@ import sys
 import os
 import cv2
 import numpy as np
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QFormLayout, QSpinBox, QPushButton
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSpinBox, QGroupBox
 from PyQt5.QtGui import QPixmap, QColor, QImage
 from GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_AUTO_CUT_PADDING, PREPROCESSING_AUTO_CUT_THRESHOLD_PERCENTAGE, PREPROCESSING_CUT_WIDGET_TAB_TITLE, PREPROCESSING_DESC_MESSAGE, PREPROCESSING_LINES_WIDTH, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SCROLL_WIDTH_STEP, PREPROCESSING_TITLE_MESSAGE, PREPROCESSING_WIDTH_LINE_COLOR, PREPROCESSING_WINDOW_TITLE, PREPROESSING_CENTER_LINE_COLOR, VIDEO_PLAYER_BG_COLOR
 from CONSTANTS import MAX_PIXEL_VALUE, NUMBER_OF_CONNECTED_COMPONENTS
@@ -41,8 +41,19 @@ class CutWidget(QWidget):
 
         #Layout
         layout = QHBoxLayout()
-        layout.addWidget(self.frame_label)
-        layout.addWidget(self.ButtonsWidget)
+
+        # -> Left 
+        left = QVBoxLayout()
+        left.addWidget(self.frame_label)
+        left.addStretch(1)
+
+        # -> right
+        right = QVBoxLayout()
+        right.addWidget(self.ButtonsWidget)
+        right.addStretch(1)
+
+        layout.addLayout(left)
+        layout.addLayout(right)
 
         self.setLayout(layout)
 
