@@ -43,7 +43,7 @@ class PolyAnalizer(QThread):
         if(len(linear_region) <= 2):
             # Not enough points to process
             self.linear_error.emit()
-            return False
+            return None
         
         # Save the linear region info
         self.process_controls['linear_region'] = linear_region

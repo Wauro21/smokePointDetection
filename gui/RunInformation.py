@@ -114,8 +114,15 @@ class PolynomialInformation(QWidget):
 
     def updateInformation(self, process_controls):
         der_threshold = str(process_controls['der_threshold'])
-        n_points_linear = str(len(process_controls['linear_region']))
-        sp_value = process_controls['sp'][0] # Only contour height
+        n_points = process_controls['linear_region']
+        n_points_linear = INFORMATION_POLYNOMIAL_PLACEHOLDER
+        if(n_points):
+            n_points_linear = str(len(n_points))
+        
+        sp_info = process_controls['sp']
+        sp_value = INFORMATION_POLYNOMIAL_PLACEHOLDER
+        if(sp_info):
+            sp_value = sp_info[0] # Only contour height
         processing_time = str(process_controls['last_poly_run'])
 
         self.der_threshold.setText(der_threshold)
