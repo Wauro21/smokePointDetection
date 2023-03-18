@@ -97,8 +97,6 @@ class CameraCalibration(QWidget):
         # -> controls: process
         self.controls_find_button.clicked.connect(self.updateFrame)
 
-        # -> convertion
-        self.px_mm_field.valueChanged.connect(self.validateFactor)
 
         # -> Lower actions
         self.loweractions.apply.connect(self.apply)
@@ -169,6 +167,8 @@ class CameraCalibration(QWidget):
         if(factor > 0):
             # Valid 
             self.factor = factor
+            self.process_controls['controls']['conv_factor'] = self.factor
+            self.calibration_done.emit()
 
         else:
             # Set the latest valid value and inform the user
@@ -227,8 +227,7 @@ class CameraCalibration(QWidget):
 
 
     def apply(self):
-        self.process_controls['controls']['conv_factor'] = self.factor
-        self.calibration_done.emit()
+        self.validateFactor()
 
     def getTitle(self):
         return self.tab_title

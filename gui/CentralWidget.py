@@ -18,7 +18,7 @@ from RunInformation import InformationBar, InformationTab
 from MessageBox import WarningBox
 from Thread import PolyAnalizer
 from Preprocessing.CameraCalibration import CameraCalibration
-from CONSTANTS import DERIVATIVE_LOW_BOUND
+from CONSTANTS import DERIVATIVE_LOW_BOUND, MAX_CENTROID_TOLERANCE
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 
@@ -165,7 +165,8 @@ class CentralWidget(QWidget):
                 'contour_%': 0,
                 'cut': None,
                 'conv_factor': 0,
-                'der_threshold': DERIVATIVE_LOW_BOUND
+                'der_threshold': DERIVATIVE_LOW_BOUND,
+                'centroid_tol': MAX_CENTROID_TOLERANCE,
             },
 
             # Info about the loaded media
