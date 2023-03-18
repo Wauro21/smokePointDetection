@@ -14,11 +14,12 @@ from GUI_CONSTANTS import PLOT_CENTROID_INVALID_COLOR, PLOT_CENTROID_INVALID_MAR
 
 class CentroidPlotWidget(QWidget):
 
-    def __init__(self, parent=None):
+    def __init__(self, process_controls, parent=None):
 
         super().__init__(parent)
 
         # Objects
+        self.process_controls = process_controls
         self.centroid_data = None
         self.title = PLOT_CENTROID_TAB_TITLE
         self.x_axis = PLOT_CENTROID_XLABEL
@@ -66,7 +67,7 @@ class CentroidPlotWidget(QWidget):
         self.axs.axhline(y=ref_centroid, color=PLOT_CENTROID_REFERENCE_COLOR, linestyle=PLOT_CENTROID_REFERENCE_LINE, label='Reference')
 
         # -> Plot the tolerance area
-        tolerance = self.centroid_data[CentroidTypes.REFERENCE]['tol']
+        tolerance = self.process_controls['controls']['centroid_tol']
         upper = ref_centroid + tolerance
         lower = ref_centroid - tolerance
         self.axs.axhline(y=upper, color=PLOT_CENTROID_SAFE_AREA_LIMITS_COLOR, linestyle=PLOT_CENTROID_SAFE_AREA_LIMITS_LINE)
@@ -113,7 +114,6 @@ class CentroidPlotWidget(QWidget):
         self.centroid_data = {
             CentroidTypes.REFERENCE: {
                 'ref': 0,
-                'tol': MAX_CENTROID_TOLERANCE,
             },
 
             CentroidTypes.VALID: {

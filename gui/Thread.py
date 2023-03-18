@@ -178,7 +178,7 @@ class VideoReader(QThread):
             invalid_frame_H = []
             frame_centroid = frame_processed[FrameTypes.CONTOUR_CC]['cX']
             centroid_diff = abs(frame_centroid - reference_centroid_x)
-            if(centroid_diff > MAX_CENTROID_TOLERANCE):
+            if(centroid_diff > self.process_controls['controls']['centroid_tol']):
                 invalid_frame_counter += 1
                 invalid_frame_h.append(contour_height)
                 invalid_frame_H.append(tip_height)

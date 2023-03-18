@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMessageBox, QGroupBox, QLabel, QFormLayout, QVBoxLayout, QWidget, QPushButton
 
-from GUI_CONSTANTS import PREPROCESSING_DISPLAY_CUT, PREPROCESSING_DISPLAY_CUT_WIDTH, PREPROCESSING_DISPLAY_DERIVATIVE_THRESHOLD, PREPROCESSING_DISPLAY_DERIVATIVE_THRESHOLD_VALUE, PREPROCESSING_DISPLAY_FACTOR, PREPROCESSING_DISPLAY_FACTOR_VALUE, PREPROCESSING_DISPLAY_THRESHOLD, PREPROCESSING_DISPLAY_THRESHOLD_VALUE, PREPROCESSING_DISPLAY_WIDTH_VALUE
+from GUI_CONSTANTS import PREPROCESSING_DISPLAY_CENTROID_TOL, PREPROCESSING_DISPLAY_CENTROID_TOL_VALUE, PREPROCESSING_DISPLAY_CUT, PREPROCESSING_DISPLAY_CUT_WIDTH, PREPROCESSING_DISPLAY_DERIVATIVE_THRESHOLD, PREPROCESSING_DISPLAY_DERIVATIVE_THRESHOLD_VALUE, PREPROCESSING_DISPLAY_FACTOR, PREPROCESSING_DISPLAY_FACTOR_VALUE, PREPROCESSING_DISPLAY_THRESHOLD, PREPROCESSING_DISPLAY_THRESHOLD_VALUE, PREPROCESSING_DISPLAY_WIDTH_VALUE
 
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
@@ -49,6 +49,7 @@ class LoadBox(QMessageBox):
         self.contour = QLabel(group)
         self.conv_factor = QLabel(group)
         self.der_threshold = QLabel(group)
+        self.centroid_tol = QLabel(group)
 
         wrapper = QVBoxLayout()
         group_layout = QFormLayout()
@@ -59,6 +60,7 @@ class LoadBox(QMessageBox):
         group_layout.addRow(PREPROCESSING_DISPLAY_THRESHOLD.format('Contour'), self.contour)
         group_layout.addRow(PREPROCESSING_DISPLAY_FACTOR, self.conv_factor)
         group_layout.addRow(PREPROCESSING_DISPLAY_DERIVATIVE_THRESHOLD, self.der_threshold)
+        group_layout.addRow(PREPROCESSING_DISPLAY_CENTROID_TOL, self.centroid_tol)
 
         wrapper.addLayout(group_layout)
         wrapper.addStretch(1)
@@ -92,7 +94,7 @@ class LoadBox(QMessageBox):
 
         # -> Der threshold
         self.der_threshold.setText(PREPROCESSING_DISPLAY_DERIVATIVE_THRESHOLD_VALUE.format(self.process_controls['controls']['der_threshold']))
-
+        self.centroid_tol.setText(PREPROCESSING_DISPLAY_CENTROID_TOL_VALUE.format(self.process_controls['controls']['centroid_tol']))
 
 
 if __name__ == '__main__':

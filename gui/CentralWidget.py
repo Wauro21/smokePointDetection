@@ -53,7 +53,7 @@ class CentralWidget(QWidget):
 
         # -> Plots 
         self.HeightPlot = ProcessPlotWidget(self)
-        self.CentroidPlot = CentroidPlotWidget(self)
+        self.CentroidPlot = CentroidPlotWidget(self.process_controls,self)
         self.PolyHeightPlot = PolyHeightPlot(self)
         self.LinearPolyPlot = LinearRegionPlot(self)
         self.SmokePointPlot = SmokePointPlot(self)
