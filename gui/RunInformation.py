@@ -113,17 +113,17 @@ class PolynomialInformation(QWidget):
         self.setLayout(layout)
 
     def updateInformation(self, process_controls):
-        der_threshold = str(process_controls['der_threshold'])
-        n_points = process_controls['linear_region']
+        der_threshold = str(process_controls['controls']['der_threshold'])
+        n_points = process_controls['results']['linear_region']
         n_points_linear = INFORMATION_POLYNOMIAL_PLACEHOLDER
         if(n_points):
             n_points_linear = str(len(n_points))
         
-        sp_info = process_controls['sp']
+        sp_info = process_controls['results']['sp']
         sp_value = INFORMATION_POLYNOMIAL_PLACEHOLDER
         if(sp_info):
             sp_value = sp_info[0] # Only contour height
-        processing_time = str(process_controls['last_poly_run'])
+        processing_time = str(process_controls['results']['last_poly_run'])
 
         self.der_threshold.setText(der_threshold)
         self.n_points_linear.setText(n_points_linear)
@@ -199,14 +199,14 @@ class FrameInformation(QWidget):
         self.setLayout(layout)
 
     def updateInformation(self, process_controls):
-        core = INFORMATION_PROCESSED_THRESHOLD_FIELD.format(process_controls['core_%'])
-        contour = INFORMATION_PROCESSED_THRESHOLD_FIELD.format(process_controls['contour_%'])
-        n_frames = str(process_controls['n_frames'])
-        n_invalid_frames = str(process_controls['n_invalid_frames'])
-        centroid = str(round(process_controls['centroid_ref_cord'], INFORMATION_PROCESSED_CENTROID_DECIMALS))
-        last_time = str(process_controls['last_frame_run'])
-        h_points = str(len(process_controls['h']))
-        H_points = str(len(process_controls['H']))
+        core = INFORMATION_PROCESSED_THRESHOLD_FIELD.format(process_controls['controls']['core_%'])
+        contour = INFORMATION_PROCESSED_THRESHOLD_FIELD.format(process_controls['controls']['contour_%'])
+        n_frames = str(process_controls['frames_info']['n_frames'])
+        n_invalid_frames = str(process_controls['results']['n_invalid_frames'])
+        centroid = str(round(process_controls['results']['centroid_ref_cord'], INFORMATION_PROCESSED_CENTROID_DECIMALS))
+        last_time = str(process_controls['results']['last_frame_run'])
+        h_points = str(len(process_controls['results']['h']))
+        H_points = str(len(process_controls['results']['H']))
 
         self.core.setText(core)
         self.contour.setText(contour)

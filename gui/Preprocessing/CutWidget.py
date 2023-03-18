@@ -83,8 +83,8 @@ class CutWidget(QWidget):
             return False
         
     def forceUpdate(self):
-        width = (self.process_controls['cut']['right'] - self.process_controls['cut']['left'])
-        center = self.process_controls['cut']['left'] + (width//2)
+        width = (self.process_controls['controls']['cut']['right'] - self.process_controls['controls']['cut']['left'])
+        center = self.process_controls['controls']['cut']['left'] + (width//2)
         
         self.ButtonsWidget.updateWidth(width)
         self.ButtonsWidget.updateCenterlinePos(center)
@@ -92,7 +92,7 @@ class CutWidget(QWidget):
 
     def preprocessingDone(self):
         if(self.validateCutinfo()):
-            self.process_controls['cut'] = self.getCutInfo()
+            self.process_controls['controls']['cut'] = self.getCutInfo()
             self.preprocess_done.emit()
 
     def getCutInfo(self):

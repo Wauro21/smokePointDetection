@@ -85,7 +85,9 @@ class ThresholdWidget(QWidget):
     def applyThresh(self):
 
         # Check if values are valid
-        if(self.process_controls['core_%'] > self.process_controls['contour_%']):
+        core = self.process_controls['controls']['core_%']
+        contour = self.process_controls['controls']['contour_%']
+        if( core > contour):
             self.done_signal.emit()
 
         else: 
@@ -103,8 +105,8 @@ class ThresholdWidget(QWidget):
 
         # Generate threshold dict
         save_dict = {
-            'core_%': self.process_controls['core_%'],
-            'contour_%': self.process_controls['contour_%']
+            'core_%': self.process_controls['controls']['core_%'],
+            'contour_%': self.process_controls['controls']['contour_%']
         }
 
         # Save file dialog
@@ -244,10 +246,10 @@ class ThresholdControls(QWidget):
         self.info_table.setItem(1,0, QTableWidgetItem(PREPROCESSING_AREA_INFORMATION_PARSER.format(area)))
 
     def forceUpdate(self):
-        self.threshold.setValue(self.process_controls[self.key])
+        self.threshold.setValue(self.process_controls['controls'][self.key])
 
     def updateValue(self):
-        self.process_controls[self.key] = self.threshold.value()
+        self.process_controls['controls'][self.key] = self.threshold.value()
         self.update_frame.emit()
 
     def loadValues(self, value):
@@ -309,12 +311,12 @@ class ThresholdFrame(QWidget):
         frame = cv2.imread(frame_path, 0)
         
         # -> Use the cut information
-        cut_info = self.process_controls['cut']
+        cut_info = self.process_controls['controls']['cut']
         if(cut_info):
             frame = frame[:, cut_info['left']: cut_info['right']]
 
         # -> Core frame
-        thresh_value = getThreshvalues(self.process_controls[self.key])
+        thresh_value = getThreshvalues(self.process_controls['controls'][self.key])
         _, thresholded = cv2.threshold(frame, thresh_value, MAX_PIXEL_VALUE, cv2.THRESH_BINARY)
         thresholded_cc = getConnectedComponents(thresholded, NUMBER_OF_CONNECTED_COMPONENTS)
 
@@ -335,7 +337,7 @@ class ThresholdFrame(QWidget):
             
 
             # Save last valid value
-            self.last_valid_value = self.process_controls[self.key]
+            self.last_valid_value = self.process_controls['controls'][self.key]
             
             
         else:

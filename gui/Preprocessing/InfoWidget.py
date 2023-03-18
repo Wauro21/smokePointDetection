@@ -119,13 +119,7 @@ class DisplaySettings(QWidget):
     def save2JSON(self):
 
         # Generate threshold dict
-        save_dict = {
-            'core_%': self.process_controls['core_%'],
-            'contour_%': self.process_controls['contour_%'],
-            'cut': self.process_controls['cut'],
-            'conv_factor': self.process_controls['conv_factor'],
-            'der_threshold': self.process_controls['der_threshold']
-        }
+        save_dict = self.process_controls['controls']
 
         # Save file dialog
         date = datetime.datetime.now()
@@ -154,7 +148,7 @@ class DisplaySettings(QWidget):
     def updateInfo(self):
 
         # -> Check cut info
-        cut_dict = self.process_controls['cut']
+        cut_dict = self.process_controls['controls']['cut']
         if(cut_dict):
             self.cut_left.setText(str(cut_dict['left']))
             self.cut_right.setText(str(cut_dict['right']))
@@ -168,14 +162,14 @@ class DisplaySettings(QWidget):
 
         # -> Set threshold values
 
-        self.core.setText(PREPROCESSING_DISPLAY_THRESHOLD_VALUE.format(self.process_controls['core_%']))
-        self.contour.setText(PREPROCESSING_DISPLAY_THRESHOLD_VALUE.format(self.process_controls['contour_%']))
+        self.core.setText(PREPROCESSING_DISPLAY_THRESHOLD_VALUE.format(self.process_controls['controls']['core_%']))
+        self.contour.setText(PREPROCESSING_DISPLAY_THRESHOLD_VALUE.format(self.process_controls['controls']['contour_%']))
 
         # -> Camera calibration
-        self.factor.setText(PREPROCESSING_DISPLAY_FACTOR_VALUE.format(self.process_controls['conv_factor']))
+        self.factor.setText(PREPROCESSING_DISPLAY_FACTOR_VALUE.format(self.process_controls['controls']['conv_factor']))
 
         # -> Set constants values
-        self.der_thresh.setText(PREPROCESSING_DISPLAY_DERIVATIVE_THRESHOLD_VALUE.format(self.process_controls['der_threshold']))
+        self.der_thresh.setText(PREPROCESSING_DISPLAY_DERIVATIVE_THRESHOLD_VALUE.format(self.process_controls['controls']['der_threshold']))
 
 
         

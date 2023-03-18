@@ -59,10 +59,10 @@ class LinearRegionPlot(FixedPlot):
 
     def plot(self, process_controls):
         
-        der_coef = process_controls['10th_der']
-        h = process_controls['h']
-        H = process_controls['H']
-        linear_region = process_controls['linear_region']
+        der_coef = process_controls['results']['10th_der']
+        h = process_controls['results']['h']
+        H = process_controls['results']['H']
+        linear_region = process_controls['results']['linear_region']
         l_h =  list(linear_region.keys())
         
         # Derivative show values
@@ -93,18 +93,18 @@ class SmokePointPlot(FixedPlot):
     def plot(self, process_controls):
 
         # Raw data
-        h_min = min(process_controls['h'])
-        h_max = max(process_controls['h'])
-        samples = len(process_controls['h'])
+        h_min = min(process_controls['results']['h'])
+        h_max = max(process_controls['results']['h'])
+        samples = len(process_controls['results']['h'])
         h_points = np.linspace(h_min, h_max, samples)
-        sp_h, sp_H = process_controls['sp']
+        sp_h, sp_H = process_controls['results']['sp']
 
         # Plot fitted poly for H(h)
-        tenth_poly = process_controls['10th_poly']
+        tenth_poly = process_controls['results']['10th_poly']
         tenth_poly_values = np.polyval(tenth_poly, h_points)
 
         # Plot linear poly
-        linear_poly = process_controls['linear_poly']
+        linear_poly = process_controls['results']['linear_poly']
         linear_poly_values = np.polyval(linear_poly, h_points)
 
         self.axs.plot(h_points, tenth_poly_values, color=PLOT_SP_POLY_COLOR, label=PLOT_SP_POLY_LABEL)
@@ -130,9 +130,9 @@ class PolyHeightPlot(FixedPlot):
 
     def plot(self, process_controls):
         # Raw data
-        h = process_controls['h']
-        H = process_controls['H']
-        poly_coef = process_controls['10th_poly']
+        h = process_controls['results']['h']
+        H = process_controls['results']['H']
+        poly_coef = process_controls['results']['10th_poly']
 
         # Polynomial bounds
         h_min = math.floor(min(h))

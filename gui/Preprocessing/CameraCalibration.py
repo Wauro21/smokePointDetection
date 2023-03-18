@@ -162,7 +162,7 @@ class CameraCalibration(QWidget):
 
 
     def forceUpdate(self):
-        self.px_mm_field.setValue(self.process_controls['conv_factor'])
+        self.px_mm_field.setValue(self.process_controls['controls']['conv_factor'])
 
     def validateFactor(self):
         factor = self.px_mm_field.value()
@@ -227,7 +227,7 @@ class CameraCalibration(QWidget):
 
 
     def apply(self):
-        self.process_controls['conv_factor'] = self.factor
+        self.process_controls['controls']['conv_factor'] = self.factor
         self.calibration_done.emit()
 
     def getTitle(self):

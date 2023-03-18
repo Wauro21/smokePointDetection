@@ -23,37 +23,37 @@ class PolyAnalizer(QThread):
 
     def run(self):
         
-        der_threshold = self.process_controls['der_threshold']
-        h = self.process_controls['h']
-        H = self.process_controls['H']
+        der_threshold = self.process_controls['controls']['der_threshold']
+        h = self.process_controls['results']['h']
+        H = self.process_controls['results']['H']
 
         # -> Fit 10th order poly
         tenth_poly = np.polyfit(h,H, POLYNOMIAL_ORDER)
-        self.process_controls['10th_poly'] = tenth_poly
+        self.process_controls['results']['10th_poly'] = tenth_poly
 
         # -> Derivative of the 10th order poly
         der_poly = np.polyder(tenth_poly, DERIVATIVE_ORDER)
-        self.process_controls['10th_der'] = der_poly
+        self.process_controls['results']['10th_der'] = der_poly
         
         # -> Emit h v/s H plot
         self.heights_plot.emit()
 
         # Find linear region
         linear_region = findLinearRegion(h, tenth_poly, der_poly, der_threshold)
-        if(len(linear_region) <= 2):
+        if(linear_region is None or len(linear_region) <= 2):
             # Not enough points to process
             self.linear_error.emit()
             return None
         
         # Save the linear region info
-        self.process_controls['linear_region'] = linear_region
+        self.process_controls['results']['linear_region'] = linear_region
         self.linear_plot.emit()
 
         # -> Apply linear fit to the region
         h_linear = list(linear_region.keys())
         H_linear = list(linear_region.values())
         linear_poly = np.polyfit(h_linear, H_linear, LINEAR_POLY_ORDER)
-        self.process_controls['linear_poly'] = linear_poly
+        self.process_controls['results']['linear_poly'] = linear_poly
 
         # Find the SP value
         sp_h = None
@@ -75,7 +75,7 @@ class PolyAnalizer(QThread):
             return False
     
         # Save value and emit signal
-        self.process_controls['sp'] = [sp_h, sp_H]
+        self.process_controls['results']['sp'] = [sp_h, sp_H]
         self.sp_plot.emit()
 
         
@@ -101,8 +101,8 @@ class VideoReader(QThread):
         height = int(media.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
         # Get threshold values 
-        core_threshold_value = getThreshvalues(self.process_controls['core_%'])
-        contour_threshold_value = getThreshvalues(self.process_controls['contour_%'])
+        core_threshold_value = getThreshvalues(self.process_controls['controls']['core_%'])
+        contour_threshold_value = getThreshvalues(self.process_controls['controls']['contour_%'])
         
         # Temp storage for heights
         h = []
@@ -123,7 +123,7 @@ class VideoReader(QThread):
         while media.isOpened():
 
             # Check if stop is requested
-            if(self.process_controls['stop']):
+            if(self.process_controls['signals']['stop']):
                 return None
 
             ret, frame = media.read()
@@ -131,7 +131,7 @@ class VideoReader(QThread):
                 # End of media
                 break
             
-            cut_info = self.process_controls['cut']
+            cut_info = self.process_controls['controls']['cut']
 
             frame_counter += 1
             frame_processed = frameProcess(frame, cut_info, core_threshold_value, contour_threshold_value)
@@ -163,12 +163,12 @@ class VideoReader(QThread):
             # For the rest of the frames
 
             # -> Generate height boxes to display
-            if(self.process_controls['bboxes']): 
+            if(self.process_controls['frames_info']['bboxes']): 
                 heightBox(frame_processed[FrameTypes.FRAME], frame_processed[FrameTypes.CORE_CC], CORE_BOUNDING_BOX_COLOR)
                 heightBox(frame_processed[FrameTypes.FRAME], frame_processed[FrameTypes.CONTOUR_CC], CONTOUR_BOUNDING_BOX_COLOR)
 
             # -> Draw the reference centroids and the actual centroid
-            if(self.process_controls['centroids']):
+            if(self.process_controls['frames_info']['centroids']):
                 cv2.line(frame_processed[FrameTypes.FRAME], (round(reference_centroid_x), 0), (round(reference_centroid_x), height), REFERENCE_CENTROID_COLOR, thickness=2)
                 plotCentroid(frame_processed[FrameTypes.FRAME], frame_processed[FrameTypes.CONTOUR_CC]['cX'], frame_processed[FrameTypes.CONTOUR_CC]['cY'], FRAME_CENTROID_COLOR)
                 
@@ -202,7 +202,7 @@ class VideoReader(QThread):
             # End of media reading
 
             # -> Select displayed media
-            requestedFrame = self.process_controls['display']
+            requestedFrame = self.process_controls['frames_info']['display']
             to_display = self.toDisplay(requestedFrame, frame_processed)
             self.update_frame_signal.emit(to_display)
 
@@ -210,8 +210,8 @@ class VideoReader(QThread):
             self.values_signal.emit([frame_counter, contour_height, tip_height])
 
         # When processing is done 
-        self.process_controls['h'] = h
-        self.process_controls['H'] = H
+        self.process_controls['results']['h'] = h
+        self.process_controls['results']['H'] = H
         
 
     def toDisplay(self, requestedFrame, frame_processed):

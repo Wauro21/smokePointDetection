@@ -125,7 +125,7 @@ class CentralWidget(QWidget):
 
 
     def requestStop(self):
-        self.process_controls['stop'] = True
+        self.process_controls['signals']['stop'] = True
 
     def stopClean(self):
         # Clean the plots
@@ -136,50 +136,66 @@ class CentralWidget(QWidget):
         self.LoadWidget.externalStartButton(StartStates.ENABLED)
 
         # Restore stop flag
-        self.process_controls['stop'] = False
+        self.process_controls['signals']['stop'] = False
 
 
     def clearPreviousRun(self):
-        # Clean process results stored
-        self.process_controls['h'] = None
-        self.process_controls['H'] = None
-        self.process_controls['n_invalid_frames'] = 0
-        self.process_controls['centroid_ref_cord'] = None
-        self.process_controls['last_frame_run'] = 0
-        self.process_controls['10th_poly'] = None
-        self.process_controls['10th_der'] = None
-        self.process_controls['der_threshold'] : DERIVATIVE_LOW_BOUND#1e-2 # REMOVE
-        self.process_controls['linear_region'] = None
-        self.process_controls['linear_poly'] = None
-        self.process_controls['sp'] = None
-        self.process_controls['last_poly_run'] = 0
+        # Clean previous results
+        self.process_controls['results']['h'] = None
+        self.process_controls['results']['H'] = None
+        self.process_controls['results']['n_invalid_frames'] = 0
+        self.process_controls['results']['centroid_ref_cord'] = None
+        self.process_controls['results']['last_frame_run'] = 0
+        self.process_controls['results']['10th_poly'] = None
+        self.process_controls['results']['10th_der'] = None
+        self.process_controls['results']['linear_region'] = None
+        self.process_controls['results']['linear_poly'] = None
+        self.process_controls['results']['sp'] = None
+        self.process_controls['results']['last_poly_run'] = 0
 
         # Clean the info tabs
         self.infoTab.clearTabs()
 
     def clearControls(self):
+
         self.process_controls = {
-            'stop': False,
-            'n_frames': 0,
-            'core_%': 0,
-            'contour_%': 0,
-            'cut': None,
-            'conv_factor': 0,
-            'bboxes': False,
-            'centroids': False, 
-            'h': None,
-            'H': None,
-            'display': FrameTypes.FRAME,
-            'n_invalid_frames': 0,
-            'centroid_ref_cord': None, 
-            'last_frame_run': 0,
-            '10th_poly': None,
-            '10th_der': None, 
-            'der_threshold': 1e-2, # Temporal
-            'linear_region': None,
-            'linear_poly': None,
-            'sp': None,
-            'last_poly_run': 0,
+            # Main controls of the process
+            'controls': {
+                'core_%': 0,
+                'contour_%': 0,
+                'cut': None,
+                'conv_factor': 0,
+                'der_threshold': DERIVATIVE_LOW_BOUND
+            },
+
+            # Info about the loaded media
+            'frames_info':{
+                'n_frames': 0,
+                'bboxes': False,
+                'centroids': False,
+                'display': FrameTypes.FRAME,
+            },
+
+            # Signal vector
+            'signals':{
+                'stop': False,
+            },
+
+            # Results
+            'results':{
+                'n_frames': 0,
+                'h': None,
+                'H': None,
+                'n_invalid_frames': 0,
+                'centroid_ref_cord': None, 
+                'last_frame_run': 0,
+                '10th_poly': None,
+                '10th_der': None,
+                'linear_region': None,
+                'linear_poly': None,
+                'sp': None,
+                'last_poly_run': 0,
+            }
         }
 
 
@@ -196,7 +212,7 @@ class CentralWidget(QWidget):
         # Stop timer
         self.infoBar.setStatus(InformationStatus.DONE)
         # Get last run for poly
-        self.process_controls['last_poly_run'] = self.infoBar.getLastTime()
+        self.process_controls['results']['last_poly_run'] = self.infoBar.getLastTime()
         
         # Clean thread
         self.polyThread = None
@@ -228,14 +244,15 @@ class CentralWidget(QWidget):
 
 
     def frameProcessDone(self):
-        if(self.process_controls['stop']):
+        stop = self.process_controls['signals']['stop']
+        if(stop):
             self.stopClean()
             return False
         
         # Change status
         self.infoBar.setStatus(InformationStatus.FRAMES_DONE)
         # Get last run time
-        self.process_controls['last_frame_run'] = self.infoBar.getLastTime()
+        self.process_controls['results']['last_frame_run'] = self.infoBar.getLastTime()
         # Update info summary
         self.infoTab.updateFrameTab(self.process_controls)
 
@@ -249,16 +266,16 @@ class CentralWidget(QWidget):
     def centroidSignalHandler(self, message):
         # Update centroid plot
         self.CentroidPlot.update(message)
-        self.infoBar.stepBar(self.process_controls['n_frames'])
+        self.infoBar.stepBar(self.process_controls['frames_info']['n_frames'])
 
         # If reference set it to the info
         message_type = list(message.keys())[-1]
         if(message_type is CentroidTypes.REFERENCE):
-            self.process_controls['centroid_ref_cord'] = message[message_type]
+            self.process_controls['results']['centroid_ref_cord'] = message[message_type]
 
         # Updat invalid counter
         if(message_type is CentroidTypes.INVALID):
-            self.process_controls['n_invalid_frames'] += 1
+            self.process_controls['results']['n_invalid_frames'] += 1
 
     def enableStart(self):
         self.PreprocessingTabs.requestClose()
@@ -301,7 +318,7 @@ class CentralWidget(QWidget):
         self.PreprocessingTabs.show()
 
     def updateCutInfo(self):
-        self.process_controls['cut'] = self.LoadWidget.getCutInfo()
+        self.process_controls['controls']['cut'] = self.LoadWidget.getCutInfo()
 
     def setPrefix(self, values):
         self.video_path, self.demo_frame_path = values

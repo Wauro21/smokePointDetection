@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMessageBox, QGroupBox, QLabel, QFormLayout, QVBoxLayout, QWidget, QPushButton
 
-from GUI_CONSTANTS import PREPROCESSING_DISPLAY_CUT, PREPROCESSING_DISPLAY_CUT_WIDTH, PREPROCESSING_DISPLAY_THRESHOLD, PREPROCESSING_DISPLAY_THRESHOLD_VALUE, PREPROCESSING_DISPLAY_WIDTH_VALUE
+from GUI_CONSTANTS import PREPROCESSING_DISPLAY_CUT, PREPROCESSING_DISPLAY_CUT_WIDTH, PREPROCESSING_DISPLAY_DERIVATIVE_THRESHOLD, PREPROCESSING_DISPLAY_DERIVATIVE_THRESHOLD_VALUE, PREPROCESSING_DISPLAY_FACTOR, PREPROCESSING_DISPLAY_FACTOR_VALUE, PREPROCESSING_DISPLAY_THRESHOLD, PREPROCESSING_DISPLAY_THRESHOLD_VALUE, PREPROCESSING_DISPLAY_WIDTH_VALUE
 
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
@@ -35,13 +35,10 @@ class InformationBox(QMessageBox):
         self.setWindowTitle('Information!')
 
 class LoadBox(QMessageBox):
-    def __init__(self, info, process_controls, parent=None):
+    def __init__(self, process_controls, parent=None):
         super().__init__(parent)
         self.process_controls = process_controls
-        self.setIcon(QMessageBox.Information)
-        self.setText('<b>Information:</b>')
-        self.setInformativeText(info)
-        self.setWindowTitle('Information!')
+        self.setWindowTitle('Settings loaded!')
 
         # Display the loaded presets 
         group = QGroupBox(self)
@@ -50,23 +47,31 @@ class LoadBox(QMessageBox):
         self.cut_width = QLabel(group)
         self.core = QLabel(group)
         self.contour = QLabel(group)
+        self.conv_factor = QLabel(group)
+        self.der_threshold = QLabel(group)
 
+        wrapper = QVBoxLayout()
         group_layout = QFormLayout()
         group_layout.addRow(PREPROCESSING_DISPLAY_CUT.format('left'), self.cut_left)
         group_layout.addRow(PREPROCESSING_DISPLAY_CUT.format('right'), self.cut_right)
         group_layout.addRow(PREPROCESSING_DISPLAY_CUT_WIDTH, self.cut_width)
         group_layout.addRow(PREPROCESSING_DISPLAY_THRESHOLD.format('Core'), self.core)
         group_layout.addRow(PREPROCESSING_DISPLAY_THRESHOLD.format('Contour'), self.contour)
-        group.setLayout(group_layout)
+        group_layout.addRow(PREPROCESSING_DISPLAY_FACTOR, self.conv_factor)
+        group_layout.addRow(PREPROCESSING_DISPLAY_DERIVATIVE_THRESHOLD, self.der_threshold)
+
+        wrapper.addLayout(group_layout)
+        wrapper.addStretch(1)
+        group.setLayout(wrapper)
 
         self.updateInfo()
         
-        self.layout().addWidget(group)
+        self.layout().addWidget(group, 1,1)
     
     def updateInfo(self):
 
         # -> Check cut info
-        cut_dict = self.process_controls['cut']
+        cut_dict = self.process_controls['controls']['cut']
         if(cut_dict):
             self.cut_left.setText(str(cut_dict['left']))
             self.cut_right.setText(str(cut_dict['right']))
@@ -79,9 +84,14 @@ class LoadBox(QMessageBox):
             self.cut_width.setText('-')
 
         # -> Set threshold values
-        self.core.setText(PREPROCESSING_DISPLAY_THRESHOLD_VALUE.format(self.process_controls['core_%']))
-        self.contour.setText(PREPROCESSING_DISPLAY_THRESHOLD_VALUE.format(self.process_controls['contour_%']))
+        self.core.setText(PREPROCESSING_DISPLAY_THRESHOLD_VALUE.format(self.process_controls['controls']['core_%']))
+        self.contour.setText(PREPROCESSING_DISPLAY_THRESHOLD_VALUE.format(self.process_controls['controls']['contour_%']))
 
+        # -> Conv factor
+        self.conv_factor.setText(PREPROCESSING_DISPLAY_FACTOR_VALUE.format(self.process_controls['controls']['conv_factor']))
+
+        # -> Der threshold
+        self.der_threshold.setText(PREPROCESSING_DISPLAY_DERIVATIVE_THRESHOLD_VALUE.format(self.process_controls['controls']['der_threshold']))
 
 
 

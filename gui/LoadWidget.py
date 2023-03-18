@@ -23,7 +23,7 @@ class LoadWidget(QWidget):
         super().__init__(parent)
         
         # Objects 
-        self.processControls = process_controls
+        self.process_controls = process_controls
         self.start_btn_state = StartStates.LOCKED
 
         # Widgets 
@@ -132,22 +132,15 @@ class LoadWidget(QWidget):
                     json_dict = json.load(json_file)
 
                     try:
-                        core = json_dict['core_%']
-                        contour = json_dict['contour_%']
-                        cut = json_dict['cut']
-                        conv_factor = json_dict['conv_factor']
-                        der_threshold = json_dict['der_threshold']
+                        
+                        for key in json_dict:
+                            self.process_controls['controls'][key] = json_dict[key]
 
-                        self.processControls['core_%'] = core
-                        self.processControls['contour_%'] = contour
-                        self.processControls['cut'] = cut
-                        self.processControls['conv_factor'] = conv_factor
-                        self.processControls['der_threshold'] = der_threshold
                         self.externalStartButton(StartStates.ENABLED)
                         
                         # Inform user
                         self.load_config.emit()
-                        message = LoadBox('Presets loaded!', self.processControls)
+                        message = LoadBox(self.process_controls)
                         message.exec_()
 
                     except:
@@ -200,7 +193,7 @@ class LoadWidget(QWidget):
         prefix = files[0].replace('0000', '%04d')
 
         # Save number of frames
-        self.processControls['n_frames'] = len(files)
+        self.process_controls['frames_info']['n_frames'] = len(files)
 
         if(files[0] == prefix):
             # Something didn't work on the prefix, probably some weird files

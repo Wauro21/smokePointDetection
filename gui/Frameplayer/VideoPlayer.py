@@ -40,7 +40,7 @@ class FrameHolder(QWidget):
     
     @pyqtSlot(FrameTypes)
     def selectFrame(self, frame_code):
-        self.process_controls['display'] = frame_code
+        self.process_controls['frames_info']['display'] = frame_code
 
     def initViewer(self):
         gray_fill = QPixmap(200, 480)
@@ -70,8 +70,8 @@ class FrameHolder(QWidget):
 
     @pyqtSlot(dict)
     def controlFrame(self, values):
-        self.process_controls['bboxes'] = values['bboxes']
-        self.process_controls['centroids'] = values['centroids']
+        self.process_controls['frames_info']['bboxes'] = values['bboxes']
+        self.process_controls['frames_info']['centroids'] = values['centroids']
 
     @pyqtSlot(np.ndarray)
     def updateLabel(self, frame):

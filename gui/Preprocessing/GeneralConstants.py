@@ -23,7 +23,7 @@ class GeneralConstants(QWidget):
 
         # Objects PREPROCESSING_DERIVATIVE_THRESHOLD_STEP
         self.process_controls = process_controls
-        self.der_thresh_valid = process_controls['der_threshold']
+        self.der_thresh_valid = process_controls['controls']['der_threshold']
 
         # Widgets
         group = QGroupBox(self)
@@ -70,7 +70,7 @@ class GeneralConstants(QWidget):
         self.setLayout(layout)
 
     def forceUpdate(self):
-        self.der_thresh.setValue(self.process_controls['der_threshold'])
+        self.der_thresh.setValue(self.process_controls['controls']['der_threshold'])
 
     def validateThreshold(self):
         der_threshold = self.der_thresh.value()
@@ -85,6 +85,6 @@ class GeneralConstants(QWidget):
             return False
         
     def apply(self):
-        self.process_controls['der_threshold'] = self.der_thresh_valid
+        self.process_controls['controls']['der_threshold'] = self.der_thresh_valid
         self.constants_update.emit()
 
