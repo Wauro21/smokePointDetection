@@ -1,5 +1,10 @@
 # -> Processing Constants
 
+DEFAULT_CORE_THRESHOLD=75.0#35.0
+DEFAULT_CONTOUR_THRESHOLD = 35.0#2.5
+DEFAULT_DERIVATIVE_THRESHOLD= 2e-5
+
+
 MAX_PIXEL_VALUE = 255
 MAX_CENTROID_TOLERANCE = 10 #px, converted from the 1mm by authors
 DERIVATIVE_LOW_BOUND = 2e-5
@@ -25,7 +30,7 @@ THRESHOLD_VALUES_MESSAGE = "[INFO] The threshold values are:\n\tCore: {}\n\tCont
 SUCESSFULL_PROCESSING_MESSAGE = "[INFO] End of stream, processing is done"
 CUT_ARGS_ERROR_MESSAGE = "[ERROR] Too many arguments for cut option."
 LINEAR_REGION_ERROR_MESSAGE = "No enough points ({}) were found to set the linear region with derivative threshold of {}"
-SP_FOUND_MESSAGE = 'SP height found {} at frame {}'
+SP_FOUND_MESSAGE = 'SP height found {}px'
 
 # -> Bounding Boxes for regions
 CORE_BOUNDING_BOX_COLOR = (237, 190, 108)

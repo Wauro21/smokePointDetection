@@ -1,10 +1,17 @@
 import argparse
+import datetime
 import sys
-# Default values
-DEFAULT_CORE_THRESHOLD=75.0#35.0
-DEFAULT_CONTOUR_THRESHOLD = 35.0#2.5
-DEFAULT_DERIVATIVE_THRESHOLD= 2e-5
+from core.CONSTANTS import DEFAULT_CONTOUR_THRESHOLD, DEFAULT_CORE_THRESHOLD, DEFAULT_DERIVATIVE_THRESHOLD, MAX_CENTROID_TOLERANCE, MAX_PIXEL_VALUE
 
+
+def folderName():
+    date = datetime.datetime.now()
+    date = date.strftime('%d-%m-%Y_%H-%M-%S')
+    f_name = '{}_run'.format(date)
+    return f_name
+
+def pixel2percentage(value):
+     return round(100*value/MAX_PIXEL_VALUE)
 
 class Range(object):
     def __init__(self, start, end):
@@ -16,22 +23,17 @@ class Range(object):
 def argsHandler():
         dsc = "Smoke Point Detection (SPD) is a python-based software that implements an algorithm that allows to perform smoke point characterization of fuel blends tested on the ASTM-D1322 Standarized Lamps. The software uses images taken during the lamp tests and allows to automatically detect the smoke point."
         parser = argparse.ArgumentParser(description=dsc)
-        parser.add_argument("-cmd", action='store_true', help="Only terminal mode enabled")
+        parser.add_argument("-cmd", action='store_true', help="Only terminal mode enabled. In GUI mode, none of the other arguments are used")
         parser.add_argument("-i", "--Input", required='-cmd' in sys.argv, help="Input video or image folder to process")
-        # [FIX]: Add image processing, like external frames
-        parser.add_argument("-d", "--Display", action='store_true', help="Displays the processing process")
-        parser.add_argument("-tcore", "--ThresholdCore", default=DEFAULT_CORE_THRESHOLD, type=float, help="Percentage of the max value to use as threshold for the core region. Default is {}".format(DEFAULT_CORE_THRESHOLD))
-        parser.add_argument("-tcontour", "--ThresholdContour", default=DEFAULT_CONTOUR_THRESHOLD, type=float, help="Percentage of the max value to use as threshold for the contour region. Default is {}".format(DEFAULT_CONTOUR_THRESHOLD))
+        parser.add_argument('-config', help='Loads configurations for threshold (core, contour and derivative), frame cutting information, centroid tolerance and px2mm conversion from a json file.')
+        parser.add_argument("-core", "--ThresholdCore", default=pixel2percentage(DEFAULT_CORE_THRESHOLD), type=float, help="Percentage of the max value to use as threshold for the core region. Default is {}%%".format(pixel2percentage(DEFAULT_CORE_THRESHOLD)))
+        parser.add_argument("-contour", "--ThresholdContour", default=pixel2percentage(DEFAULT_CONTOUR_THRESHOLD), type=float, help="Percentage of the max value to use as threshold for the contour region. Default is {}%%".format(pixel2percentage(DEFAULT_CONTOUR_THRESHOLD)))
         parser.add_argument("-dt", "--DerivativeThreshold", help='Lower bound for finding linear region. By default is {}'.format(DEFAULT_DERIVATIVE_THRESHOLD), type=float, default=DEFAULT_DERIVATIVE_THRESHOLD)
-        parser.add_argument("-bb","--Boxes", help="Shows bounding boxes for the regions", action='store_true')
-        parser.add_argument("-c","--Centroids", help="Shows reference and frame centroid", action='store_true')
-        parser.add_argument("-sv","--SaveValues", help="Generates a file, saving the estimated height values, the coefficientes of the polynoms and the resulting plots")
-        parser.add_argument("-mm", help= "Uses the px to mm convertion for thes calculations", action='store_true')
-        parser.add_argument("-cut", help="Cut the frames columnwise from center axis", type=int)
+        parser.add_argument("-ct", "--CentroidTolerance", help='Centroid tolerance for discarting frames. By default is {}'.format(MAX_CENTROID_TOLERANCE), type=int, default=MAX_CENTROID_TOLERANCE)
+        parser.add_argument("-sv","--SaveValues", help="", nargs='?', const=folderName()) # FILL THE HELP FILED
+        parser.add_argument("-mm", help= "A conversion factor from px to mm can provided")
+        parser.add_argument("-cut", nargs='+', help="Cut the frames columnwise from center axis")
         parser.add_argument("--Verbose", action='store_true', help='If passed enables information prints through terminal.')
-        parser.add_argument("--saveFig",help="Saves figures used in thesis.", type=int)
-        # Remove following arg
-        parser.add_argument('--runName', help="Name for the data resulting from the run", type=str,required='-cmd' in sys.argv)
         args = parser.parse_args()
         return args
 

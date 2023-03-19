@@ -8,7 +8,7 @@ from gui.GUI_CONSTANTS import PREPROCESSING_AREA_INFORMATION_PARSER, PREPROCESSI
 from core.CONSTANTS import MAX_PIXEL_VALUE, NUMBER_OF_CONNECTED_COMPONENTS
 from gui.MessageBox import ErrorBox, InformationBox
 from gui.Preprocessing.CommonButtons import LowerButtons
-from gui.utils import convert2QT, getConnectedComponents, getThreshvalues, resizeFrame
+from core.utils import convert2QT, getConnectedComponents, getThreshvalues, resizeFrame
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
 class ThresholdWidget(QWidget):

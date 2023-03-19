@@ -9,7 +9,7 @@ from gui.GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_AUTO_CUT_P
 from core.CONSTANTS import MAX_PIXEL_VALUE, NUMBER_OF_CONNECTED_COMPONENTS
 from gui.MessageBox import ErrorBox
 from .CutButtonsWidget import CutButtonsWidget
-from gui.utils import convert2QT, getConnectedComponents
+from core.utils import convert2QT, getConnectedComponents
 from PyQt5.QtCore import pyqtSignal
 
 class CutWidget(QWidget):

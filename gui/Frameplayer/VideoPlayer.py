@@ -7,7 +7,7 @@ from gui.GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR, FrameTypes
 from gui.MessageBox import WarningBox
 from gui.Thread import VideoReader
 from .VideoButtons import VideoButtons
-from gui.utils import convert2QT, resizeFrame
+from core.utils import convert2QT, resizeFrame
 
 
 class FrameHolder(QWidget):

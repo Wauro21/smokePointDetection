@@ -1,3 +1,4 @@
+import json
 from core.CONSTANTS import CENTROID_RADIUS, MAX_PIXEL_VALUE
 import cv2
 from matplotlib import pyplot as plt
@@ -194,11 +195,9 @@ def dataLoader(arg_string):
     # Check if is folder with images
     elif(os.path.isdir(arg_string)):
         files = os.listdir(arg_string)
-        #n_file = len(files)
         files.sort()
         file_ = files[0]
         prefix = file_.replace('0000', '%04d')
-        print(prefix)
         return os.path.join(arg_string, prefix)
     
     # Not a valid input exit
@@ -258,3 +257,47 @@ def resizeFrame(frame, target=[VIDEO_PLAYER_HEIGHT_DEFAULT, VIDEO_PLAYER_WIDTH_D
         f_frame[aH:aH+nH, aW:aW+nW] = resized_frame
 
         return f_frame
+
+def cutHandler(cut_arg):
+    ret_dict = {
+        'left':None,
+        'right': None,
+    }
+
+    # Check if the arg is passed at all
+    if not (cut_arg):
+        return None
+    
+    # Check if values are passed
+    n_args = len(cut_arg)
+    if(n_args == 2):
+        try:
+            ret_dict['left'] = cut_arg[0]
+            ret_dict['right'] = cut_arg[1]
+            return ret_dict
+        
+        except:
+            print('Invalid cut information. Should be two integers values separated by a space, i.e. 100 200. But received {}'.format(cut_arg))
+            exit(1)
+    
+    # Check if json cut file provided
+    arg_file = cut_arg[0]
+    if(os.path.isfile(arg_file)):
+        with open(arg_file, 'r') as json_file:
+            try:
+                json_dict = json.load(json_file)
+
+                ret_dict['left'] = json_dict['left']
+                ret_dict['right'] = json_dict['right']
+
+                return ret_dict
+            
+            except:
+                print('Invalid cut json file format!')
+                exit(1)
+
+    else:
+        print('Could not find cut json file : {}'.format(cut_arg))
+
+
+
