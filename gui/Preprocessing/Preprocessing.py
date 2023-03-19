@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QLineEdit, QPushButton, QTabWidget
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTabWidget
 
 class PreprocessingWidget(QWidget):
     

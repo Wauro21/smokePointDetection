@@ -1,16 +1,13 @@
-import cv2
-from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QApplication, QFrame
-from PyQt5.QtGui import QPixmap, QColor, QImage
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread, Qt
+from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QApplication
+from PyQt5.QtGui import QPixmap, QColor
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
 import sys
-from GUI_CONSTANTS import VIDEO_PLAYER_HEIGHT_DEFAULT, VIDEO_PLAYER_WIDTH_DEFAULT, VIDEO_PLAYER_BG_COLOR_BGR, VIDEO_PLAYER_BG_COLOR_GRAY
 import numpy as np
-from GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR, FrameTypes
-from MessageBox import WarningBox
-from Thread import VideoReader
+from gui.GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR, FrameTypes
+from gui.MessageBox import WarningBox
+from gui.Thread import VideoReader
 from .VideoButtons import VideoButtons
-from utils import convert2QT, resizeFrame
-from PIL import Image
+from gui.utils import convert2QT, resizeFrame
 
 
 class FrameHolder(QWidget):

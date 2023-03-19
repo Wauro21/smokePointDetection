@@ -1,4 +1,4 @@
-from CONSTANTS import CENTROID_RADIUS, MAX_PIXEL_VALUE
+from core.CONSTANTS import CENTROID_RADIUS, MAX_PIXEL_VALUE
 import cv2
 from matplotlib import pyplot as plt
 import math
@@ -6,7 +6,7 @@ import numpy as np
 import os
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtCore import Qt
-from GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR_BGR, VIDEO_PLAYER_BG_COLOR_GRAY, VIDEO_PLAYER_HEIGHT_DEFAULT, VIDEO_PLAYER_WIDTH_DEFAULT
+from gui.GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR_BGR, VIDEO_PLAYER_BG_COLOR_GRAY, VIDEO_PLAYER_HEIGHT_DEFAULT, VIDEO_PLAYER_WIDTH_DEFAULT
 
 # Returns the biggest linear region
 def findLinearRegion(h, poly_coef, der_coef, der_threshold):

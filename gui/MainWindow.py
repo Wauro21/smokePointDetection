@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from CentralWidget import CentralWidget
-from GUI_CONSTANTS import MAIN_WINDOW_TITLE
+from gui.CentralWidget import CentralWidget
+from gui.GUI_CONSTANTS import MAIN_WINDOW_TITLE
 import sys
 import os
 

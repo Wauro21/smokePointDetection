@@ -1,24 +1,22 @@
 import sys
-import json
 import os
-import datetime
-from PyQt5.QtWidgets import QFileDialog, QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout
-from Plot.FixedPlots import FixedPlot, LinearRegionPlot, PolyHeightPlot, SmokePointPlot
-from Plot.CentroidPlot import CentroidPlotWidget
-from LoadWidget import LoadWidget
-from Frameplayer.VideoPlayer import FrameHolder
-from Plot.ProcessPlot import ProcessPlotWidget
-from GUI_CONSTANTS import PREPROCESSING_CAMERA_CALIBRATION_SAVE_DESC, PREPROCESSING_CAMERA_CALIBRATION_SAVE_TITLE, CentroidTypes, FrameTypes, InformationStatus, StartStates
-from TabHolder import TabHolder
-from Preprocessing.CutWidget import CutWidget
-from Preprocessing.Preprocessing import PreprocessingWidget
-from Preprocessing.ThresholdWidget import ThresholdWidget
-from Preprocessing.InfoWidget import DisplaySettings
-from RunInformation import InformationBar, InformationTab
-from MessageBox import ErrorBox, WarningBox
-from Thread import PolyAnalizer
-from Preprocessing.CameraCalibration import CameraCalibration
-from CONSTANTS import DERIVATIVE_LOW_BOUND, MAX_CENTROID_TOLERANCE
+from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout
+from gui.Plot.FixedPlots import LinearRegionPlot, PolyHeightPlot, SmokePointPlot
+from gui.Plot.CentroidPlot import CentroidPlotWidget
+from gui.LoadWidget import LoadWidget
+from gui.Frameplayer.VideoPlayer import FrameHolder
+from gui.Plot.ProcessPlot import ProcessPlotWidget
+from gui.GUI_CONSTANTS import CentroidTypes, FrameTypes, InformationStatus, StartStates
+from gui.TabHolder import TabHolder
+from gui.Preprocessing.CutWidget import CutWidget
+from gui.Preprocessing.Preprocessing import PreprocessingWidget
+from gui.Preprocessing.ThresholdWidget import ThresholdWidget
+from gui.Preprocessing.InfoWidget import DisplaySettings
+from gui.RunInformation import InformationBar, InformationTab
+from gui.MessageBox import ErrorBox, WarningBox
+from gui.Thread import PolyAnalizer
+from gui.Preprocessing.CameraCalibration import CameraCalibration
+from core.CONSTANTS import DERIVATIVE_LOW_BOUND, MAX_CENTROID_TOLERANCE
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 

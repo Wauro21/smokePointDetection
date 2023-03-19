@@ -1,9 +1,8 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout,QTabWidget, QLabel
-import matplotlib.pyplot as plt
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout,QTabWidget
 import os
 import sys
 
-from GUI_CONSTANTS import TABS_WIDGET_HEIGHT, TABS_WIDGET_WIDTH
+from gui.GUI_CONSTANTS import TABS_WIDGET_HEIGHT, TABS_WIDGET_WIDTH
 
 
 class TabHolder(QWidget):

@@ -4,8 +4,8 @@ import json
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QLineEdit, QPushButton, QFileDialog
 
-from GUI_CONSTANTS import LOAD_START_BUTTON_ENABLED_TEXT, LOAD_START_BUTTON_STOP_TEXT, LOAD_WIDGET_FILE_DEFAULT_MESSAGE, LOAD_WIDGET_FILE_DIALOG_HEADER_TITLE, LOAD_WIDGET_LOAD_JSON, StartStates
-from MessageBox import ErrorBox, InformationBox, LoadBox, WarningBox
+from gui.GUI_CONSTANTS import LOAD_START_BUTTON_ENABLED_TEXT, LOAD_START_BUTTON_STOP_TEXT, LOAD_WIDGET_FILE_DEFAULT_MESSAGE, LOAD_WIDGET_FILE_DIALOG_HEADER_TITLE, LOAD_WIDGET_LOAD_JSON, StartStates
+from gui.MessageBox import ErrorBox, LoadBox, WarningBox
 __version__ ='0.1'
 __author__ = 'maurio.aravena@sansano.usm.cl'
 

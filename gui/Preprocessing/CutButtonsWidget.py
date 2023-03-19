@@ -1,14 +1,7 @@
-import math
-import sys
-import os
-import cv2
-import numpy as np
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QFormLayout, QSpinBox, QPushButton, QFileDialog, QGroupBox, QVBoxLayout
-from PyQt5.QtGui import QPixmap, QColor, QImage
-from GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_DESC_MESSAGE, PREPROCESSING_LOAD_CUT, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SAVE_CUT, PREPROCESSING_SCROLL_WIDTH_STEP, PREPROCESSING_TITLE_MESSAGE, PREPROCESSING_WINDOW_TITLE, VIDEO_PLAYER_BG_COLOR
-from MessageBox import ErrorBox, InformationBox
-from Preprocessing.CommonButtons import LowerButtons
-from utils import convert2QT
+from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QFormLayout, QSpinBox, QPushButton, QFileDialog, QGroupBox, QVBoxLayout
+from gui.GUI_CONSTANTS import PREPROCESSING_DESC_MESSAGE, PREPROCESSING_LOAD_CUT, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SAVE_CUT, PREPROCESSING_TITLE_MESSAGE
+from gui.MessageBox import ErrorBox, InformationBox
+from gui.Preprocessing.CommonButtons import LowerButtons
 from PyQt5.QtCore import pyqtSignal
 import datetime
 import json

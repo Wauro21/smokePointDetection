@@ -1,15 +1,12 @@
 
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
-import matplotlib.pyplot as plt
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
 import os
 import sys
 from matplotlib.figure import Figure
 from matplotlib.animation import FuncAnimation
-from matplotlib.backends.qt_compat import QtWidgets
 from matplotlib.backends.backend_qtagg import (
     FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
-
-from GUI_CONSTANTS import PLOT_HEIGHT_LABELS, PLOT_HEIGHT_TAB_TITLE, PLOT_HEIGHT_X_AXIS, PLOT_HEIGHT_Y_AXIS, PLOT_WIDGET_DPI, PLOT_WIDGET_HEIGHT, PLOT_WIDGET_TRACE_CONTOUR, PLOT_WIDGET_TRACE_CORE, PLOT_WIDGET_TRACE_TIP, PLOT_WIDGET_WIDTH
+from gui.GUI_CONSTANTS import PLOT_HEIGHT_LABELS, PLOT_HEIGHT_TAB_TITLE, PLOT_HEIGHT_X_AXIS, PLOT_HEIGHT_Y_AXIS, PLOT_WIDGET_DPI, PLOT_WIDGET_HEIGHT, PLOT_WIDGET_TRACE_CONTOUR, PLOT_WIDGET_TRACE_CORE, PLOT_WIDGET_TRACE_TIP, PLOT_WIDGET_WIDTH
 
 class ProcessPlotWidget(QWidget):
 
