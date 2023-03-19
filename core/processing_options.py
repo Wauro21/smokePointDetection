@@ -31,7 +31,7 @@ def argsHandler():
         parser.add_argument("-contour", "--ThresholdContour", default=pixel2percentage(DEFAULT_CONTOUR_THRESHOLD), type=float, help="Percentage of the max value to use as threshold for the contour region. Default is {}%%".format(pixel2percentage(DEFAULT_CONTOUR_THRESHOLD)))
         parser.add_argument("-dt", "--DerivativeThreshold", help='Lower bound for finding linear region. By default is {}'.format(DEFAULT_DERIVATIVE_THRESHOLD), type=float, default=DEFAULT_DERIVATIVE_THRESHOLD)
         parser.add_argument("-ct", "--CentroidTolerance", help='Centroid tolerance for discarting frames. By default is {}'.format(MAX_CENTROID_TOLERANCE), type=int, default=MAX_CENTROID_TOLERANCE)
-        parser.add_argument("-sv","--SaveValues", help="", nargs='?', const=folderName()) # FILL THE HELP FILED
+        parser.add_argument("-sv","--SaveValues", help="Save the obtained contour and tip height values and the resulting plots of analysis", nargs='?', const=folderName()) # FILL THE HELP FILED
         parser.add_argument("-mm", help= "A conversion factor from px to mm can provided")
         parser.add_argument("-cut", nargs='+', help="Cut the frames columnwise from center axis")
         parser.add_argument("--Verbose", action='store_true', help='If passed enables information prints through terminal.')
