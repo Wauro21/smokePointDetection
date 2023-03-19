@@ -296,6 +296,9 @@ class CentralWidget(QWidget):
     def requestStart(self):
         # Clear older runs
         self.clearPreviousRun()
+        # Clear plots 
+        self.HeightPlot.clearPlot()
+        self.CentroidPlot.clearPlot()
         # Handle the info bar display and timer
         self.infoBar.setStatus(InformationStatus.FRAMES)
         # Handle the start button status
