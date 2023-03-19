@@ -1,7 +1,7 @@
 from datetime import datetime
 from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFormLayout, QProgressBar, QGroupBox
 from PyQt5 import QtCore
-from gui.GUI_CONSTANTS import INFORMATION_BAR_ELAPSED_FIELD, INFORMATION_BAR_ELAPSED_LABEL, INFORMATION_BAR_OPERATION_LABEL, INFORMATION_LABELS_WIDTH,INFORMATION_POLYNOMIAL_N_POINT_LINEAR_REGION, INFORMATION_POLYNOMIAL_PLACEHOLDER, INFORMATION_POLYNOMIAL_PROCESSING_TIME, INFORMATION_POLYNOMIAL_SP_VALUE_FIELD, INFORMATION_POLYNOMIAL_SP_VALUE_FOUND, INFORMATION_POLYNOMIAL_TAB_TITLE, INFORMATION_POLYNOMIAL_THRESHOLD_VALUE, INFORMATION_PROCESSED_CENTROID_DECIMALS, INFORMATION_PROCESSED_CENTROID_LABEL, INFORMATION_PROCESSED_CONTOUR_LABEL, INFORMATION_PROCESSED_CORE_LABEL, INFORMATION_PROCESSED_FRAMES_PLACEHOLDER, INFORMATION_PROCESSED_ROW_CENTROID, INFORMATION_PROCESSED_ROW_H_POINTS, INFORMATION_PROCESSED_ROW_INVALID_FRAMES, INFORMATION_PROCESSED_ROW_NUMBER_FRAMES, INFORMATION_PROCESSED_ROW_TIME, INFORMATION_PROCESSED_ROW_TIP_POINTS, INFORMATION_PROCESSED_TAB_TITLE, INFORMATION_PROCESSED_THRESHOLD_FIELD, INFORMATION_TAB_DISPLAY_HEIGHT, INFORMATION_TAB_DISPLAY_WIDTH, PLOT_WIDGET_WIDTH, InformationStatus
+from gui.GUI_CONSTANTS import INFORMATION_BAR_ELAPSED_FIELD, INFORMATION_BAR_ELAPSED_LABEL, INFORMATION_BAR_OPERATION_LABEL, INFORMATION_LABELS_WIDTH, INFORMATION_POLYNOMIAL_CONV_FACTOR,INFORMATION_POLYNOMIAL_N_POINT_LINEAR_REGION, INFORMATION_POLYNOMIAL_PLACEHOLDER, INFORMATION_POLYNOMIAL_PROCESSING_TIME, INFORMATION_POLYNOMIAL_SP_MM_VALUE, INFORMATION_POLYNOMIAL_SP_MM_VALUE_FIELD, INFORMATION_POLYNOMIAL_SP_VALUE_FIELD, INFORMATION_POLYNOMIAL_SP_VALUE_FOUND, INFORMATION_POLYNOMIAL_TAB_TITLE, INFORMATION_POLYNOMIAL_THRESHOLD_VALUE, INFORMATION_PROCESSED_CENTROID_DECIMALS, INFORMATION_PROCESSED_CENTROID_LABEL, INFORMATION_PROCESSED_CONTOUR_LABEL, INFORMATION_PROCESSED_CORE_LABEL, INFORMATION_PROCESSED_FRAMES_PLACEHOLDER, INFORMATION_PROCESSED_ROW_CENTROID, INFORMATION_PROCESSED_ROW_H_POINTS, INFORMATION_PROCESSED_ROW_INVALID_FRAMES, INFORMATION_PROCESSED_ROW_NUMBER_FRAMES, INFORMATION_PROCESSED_ROW_TIME, INFORMATION_PROCESSED_ROW_TIP_POINTS, INFORMATION_PROCESSED_TAB_TITLE, INFORMATION_PROCESSED_THRESHOLD_FIELD, INFORMATION_TAB_DISPLAY_HEIGHT, INFORMATION_TAB_DISPLAY_WIDTH, PLOT_WIDGET_WIDTH, InformationStatus
 from PyQt5.QtCore import QTimer
 
 
@@ -63,7 +63,9 @@ class PolynomialInformation(QWidget):
         self.der_threshold = QLabel(INFORMATION_POLYNOMIAL_PLACEHOLDER, self)
         self.sp_value = QLabel(INFORMATION_POLYNOMIAL_PLACEHOLDER, self)
         self.processing_time = QLabel(INFORMATION_POLYNOMIAL_PLACEHOLDER, self)
-        self.labels = [self.n_points_linear, self.der_threshold, self.sp_value, self.processing_time]
+        self.conv_factor = QLabel(INFORMATION_POLYNOMIAL_PLACEHOLDER, self)
+        self.sp_mm = QLabel(INFORMATION_POLYNOMIAL_PLACEHOLDER, self)
+        self.labels = [self.n_points_linear, self.der_threshold, self.sp_value, self.processing_time, self.conv_factor, self.sp_mm]
         
         # init routines
         self.setFixedWidth(INFORMATION_TAB_DISPLAY_WIDTH)
@@ -89,11 +91,13 @@ class PolynomialInformation(QWidget):
         info_left = QFormLayout()
         info_left.addRow(INFORMATION_POLYNOMIAL_THRESHOLD_VALUE, self.der_threshold)
         info_left.addRow(INFORMATION_POLYNOMIAL_SP_VALUE_FOUND, self.sp_value)
+        info_left.addRow(INFORMATION_POLYNOMIAL_CONV_FACTOR, self.conv_factor)
 
         # -> Right display
         info_right = QFormLayout()
         info_right.addRow(INFORMATION_POLYNOMIAL_N_POINT_LINEAR_REGION, self.n_points_linear)
         info_right.addRow(INFORMATION_POLYNOMIAL_PROCESSING_TIME, self.processing_time)
+        info_right.addRow(INFORMATION_POLYNOMIAL_SP_MM_VALUE, self.sp_mm)
 
         display.addLayout(info_left)
         display.addLayout(info_right)
@@ -112,15 +116,21 @@ class PolynomialInformation(QWidget):
         
         sp_info = process_controls['results']['sp']
         sp_value = INFORMATION_POLYNOMIAL_PLACEHOLDER
+        sp_value_mm = INFORMATION_POLYNOMIAL_PLACEHOLDER
         if(sp_info):
             sp_value = INFORMATION_POLYNOMIAL_SP_VALUE_FIELD.format(sp_info[0]) # Only contour height
+            in_mm = sp_info[0]*process_controls['controls']['conv_factor']
+            sp_value_mm = INFORMATION_POLYNOMIAL_SP_MM_VALUE_FIELD.format(in_mm)
             
+        conv_factor = str(process_controls['controls']['conv_factor'])
         processing_time = str(process_controls['results']['last_poly_run'])
 
         self.der_threshold.setText(der_threshold)
         self.n_points_linear.setText(n_points_linear)
         self.sp_value.setText(sp_value)
         self.processing_time.setText(processing_time)
+        self.sp_mm.setText(sp_value_mm)
+        self.conv_factor.setText(conv_factor)
 
     def clearInformation(self):
         for label in self.labels:
