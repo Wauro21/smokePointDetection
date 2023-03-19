@@ -75,6 +75,12 @@ class LoadWidget(QWidget):
         self.setLayout(layout)
 
 
+    def lockUserControls(self, lock):
+        self.open_button.setEnabled(lock)
+        self.configure_button.setEnabled(lock)
+        self.load_presets.setEnabled(lock)
+
+
     def startButtonSignalHandler(self):        
         if(self.start_btn_state is StartStates.ENABLED):
             self.start.emit()

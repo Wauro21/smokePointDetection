@@ -21,6 +21,8 @@ class FixedPlot(QWidget):
 
         # Objects
         self.title = title
+        self.xlabel = None
+        self.ylabel = None
 
         # Widgets
         self.fig = Figure(figsize=(PLOT_WIDGET_WIDTH/PLOT_WIDGET_DPI, PLOT_WIDGET_HEIGHT/PLOT_WIDGET_DPI), dpi=PLOT_WIDGET_DPI)
@@ -44,6 +46,15 @@ class FixedPlot(QWidget):
 
     def getTitle(self):
         return self.title
+    
+    def clearPlot(self):
+        self.axs.cla()
+        self.axs.grid()
+        # Reset the labels
+        self.axs.set_xlabel(self.xlabel)
+        self.axs.set_ylabel(self.ylabel)
+
+
 
 
 class LinearRegionPlot(FixedPlot):
@@ -52,8 +63,11 @@ class LinearRegionPlot(FixedPlot):
         
         super().__init__(PLOT_LINEAR_TITLE_TAB, parent)
 
-        self.axs.set_xlabel(PLOT_LINEAR_XLABEL)
-        self.axs.set_ylabel(PLOT_LINEAR_YLABEL)
+        self.xlabel = PLOT_LINEAR_XLABEL
+        self.ylabel = PLOT_LINEAR_YLABEL
+
+        self.axs.set_xlabel(self.xlabel)
+        self.axs.set_ylabel(self.ylabel)
         self.axs.grid()
 
 
@@ -86,8 +100,12 @@ class SmokePointPlot(FixedPlot):
     def __init__(self, parent=None):
 
         super().__init__(PLOT_SP_TITLE_TAB, parent)
-        self.axs.set_xlabel(PLOT_SP_XLABEL)
-        self.axs.set_ylabel(PLOT_SP_YLABEL)
+
+        self.xlabel = PLOT_SP_XLABEL
+        self.ylabel = PLOT_SP_YLABEL
+
+        self.axs.set_xlabel(self.xlabel)
+        self.axs.set_ylabel(self.ylabel)
         self.axs.grid()
 
     def plot(self, process_controls):
@@ -123,8 +141,11 @@ class PolyHeightPlot(FixedPlot):
 
         super().__init__(PLOT_HEIGHT_POLY_TITLE_TAB, parent)
         # Set labels
-        self.axs.set_xlabel(PLOT_HEIGHTS_POLY_XLABEL)
-        self.axs.set_ylabel(PLOT_HEIGHTS_POLY_YLABEL)
+        self.xlabel = PLOT_HEIGHTS_POLY_XLABEL
+        self.ylabel = PLOT_HEIGHTS_POLY_YLABEL
+
+        self.axs.set_xlabel(self.xlabel)
+        self.axs.set_ylabel(self.ylabel)
         self.axs.grid()
 
 

@@ -102,6 +102,13 @@ class CentralWidget(QWidget):
         
         self.setLayout(layout)
 
+    def clearPlots(self):
+        self.HeightPlot.clearPlot()
+        self.CentroidPlot.clearPlot()
+        self.PolyHeightPlot.clearPlot()
+        self.LinearPolyPlot.clearPlot()
+        self.SmokePointPlot.clearPlot()
+
     def updatePreprocessing(self):
         # Enable all tabs
         for tab in self.preprocessing_tab_index:
@@ -224,7 +231,8 @@ class CentralWidget(QWidget):
         # Update information
         self.infoTab.updatePolyTab(self.process_controls)
 
-        # Update start button status
+        # Update start button status and unlock buttons
+        self.LoadWidget.lockUserControls(True)
         self.LoadWidget.externalStartButton(StartStates.ENABLED)
 
 
@@ -296,12 +304,17 @@ class CentralWidget(QWidget):
     def requestStart(self):
         # Clear older runs
         self.clearPreviousRun()
+
+        # Hide old result plots and set visible tab to first one 
+        self.TabHolder.setInvisibles(False)
+        self.TabHolder.setCurrentTab(0)
+
         # Clear plots 
-        self.HeightPlot.clearPlot()
-        self.CentroidPlot.clearPlot()
+        self.clearPlots()
         # Handle the info bar display and timer
         self.infoBar.setStatus(InformationStatus.FRAMES)
-        # Handle the start button status
+        # Handle the start button status and lock user controls
+        self.LoadWidget.lockUserControls(False)
         self.LoadWidget.externalStartButton(StartStates.STOP)
         # Start the thread for video playback
         self.VideoWidget.startPlayback(self.video_path, self.HeightPlot.update, self.centroidSignalHandler)

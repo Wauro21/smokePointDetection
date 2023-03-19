@@ -49,6 +49,10 @@ class TabHolder(QWidget):
             status = self.tabWidget.isTabVisible(idx)
             self.tabWidget.setTabVisible(idx, not status)
 
+    def setInvisibles(self, lock):
+        for idx in self.invisible:
+            self.tabWidget.setTabVisible(idx, lock)
+
 if __name__ == '__main__':
     app = QApplication([])
     if os.name == 'nt':
