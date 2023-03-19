@@ -26,6 +26,7 @@ def argsHandler():
         parser.add_argument("-cmd", action='store_true', help="Only terminal mode enabled. In GUI mode, none of the other arguments are used")
         parser.add_argument("-i", "--Input", required='-cmd' in sys.argv, help="Input video or image folder to process")
         parser.add_argument('-config', help='Loads configurations for threshold (core, contour and derivative), frame cutting information, centroid tolerance and px2mm conversion from a json file.')
+        parser.add_argument("-d", "--Display", action='store_true', help="Displays resulting plots")
         parser.add_argument("-core", "--ThresholdCore", default=pixel2percentage(DEFAULT_CORE_THRESHOLD), type=float, help="Percentage of the max value to use as threshold for the core region. Default is {}%%".format(pixel2percentage(DEFAULT_CORE_THRESHOLD)))
         parser.add_argument("-contour", "--ThresholdContour", default=pixel2percentage(DEFAULT_CONTOUR_THRESHOLD), type=float, help="Percentage of the max value to use as threshold for the contour region. Default is {}%%".format(pixel2percentage(DEFAULT_CONTOUR_THRESHOLD)))
         parser.add_argument("-dt", "--DerivativeThreshold", help='Lower bound for finding linear region. By default is {}'.format(DEFAULT_DERIVATIVE_THRESHOLD), type=float, default=DEFAULT_DERIVATIVE_THRESHOLD)

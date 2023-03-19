@@ -40,7 +40,7 @@ def CMDsp(args):
     if(args.mm):
         mm_val = sp * args.mm
         print('SP found at {} mm'.format(mm_val))
-    resultPlotting(sp_vals,True)
+    resultPlotting(sp_vals,args)
 
 
 

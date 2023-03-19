@@ -2,7 +2,7 @@ import datetime
 from core.CONSTANTS import CONTOUR_BOUNDING_BOX_COLOR, CORE_BOUNDING_BOX_COLOR, DERIVATIVE_ORDER, FRAME_CENTROID_COLOR, LINEAR_POLY_ORDER, LINEAR_REGION_ERROR_MESSAGE, MAX_CENTROID_TOLERANCE, MAX_PIXEL_VALUE, NUMBER_OF_CONNECTED_COMPONENTS, POLYNOMIAL_ORDER, REFERENCE_CENTROID_COLOR, SP_FOUND_MESSAGE, SP_THRESHOLD, SUCESSFULL_PROCESSING_MESSAGE, THRESHOLD_VALUES_MESSAGE
 import cv2
 import numpy as np
-from gui.GUI_CONSTANTS import FrameTypes
+from gui.GUI_CONSTANTS import CentroidTypes, FrameTypes
 from progress.bar import Bar
 import csv
 import math
@@ -138,6 +138,14 @@ def smokepoint(args):
     # -> The values are set to something impossible
     reference_centroid_x = -float('inf')
     reference_centroid_y = -float('inf')
+    
+
+    # Centroid information
+    frame_centroids = {
+        CentroidTypes.REFERENCE: None,
+        CentroidTypes.VALID: {},
+        CentroidTypes.INVALID: {},
+    }
 
     # Frame statistics 
     frame_counter = 0
@@ -165,6 +173,7 @@ def smokepoint(args):
         if(first_frame_flag):
             reference_centroid_x = frame_results[FrameTypes.CONTOUR_CC]['cX']
             reference_centroid_y = frame_results[FrameTypes.CONTOUR_CC]['cY']
+            frame_centroids[CentroidTypes.REFERENCE] = reference_centroid_x
             first_frame_flag = False
 
             # First frame heights are considerated valid
@@ -177,15 +186,18 @@ def smokepoint(args):
         # -> Calculate the centroid difference to check if is a valid frame
         invalid_frame_h = []
         invalid_frame_H = []
-        centroid_diff = abs(frame_results[FrameTypes.CONTOUR_CC]['cX'] - reference_centroid_x)
+        frame_centroid = frame_results[FrameTypes.CONTOUR_CC]['cX']
+        centroid_diff = abs(frame_centroid - reference_centroid_x)
 
         if(centroid_diff > args.CentroidTolerance):
+            frame_centroids[CentroidTypes.INVALID][frame_counter] = frame_centroid
             invalid_frame_counter += 1
             invalid_frame_h.append(contour_height)
             invalid_frame_H.append(tip_height)
             continue
         
         # If the data is valid, append it
+        frame_centroids[CentroidTypes.VALID][frame_counter] = frame_centroid
         h.append(contour_height)
         H.append(tip_height)
 
@@ -201,10 +213,12 @@ def smokepoint(args):
     polynomial_results['invalid_frames_h'] = invalid_frame_h
     polynomial_results['invalid_frames_H'] = invalid_frame_H
 
+    # Add centroid information
+    polynomial_results['centroids'] = frame_centroids
+
     if(args.SaveValues):
         np.savetxt(os.path.join(out_path,'flame_height.csv'), polynomial_results['height'],delimiter=',')
         np.savetxt(os.path.join(out_path,'tip_height.csv'), polynomial_results['tip_height'],delimiter=',')
-        np.savetxt(os.path.join(out_path,'n_invalid_frames.csv'), polynomial_results['n_invalid_frames'])
 
     return polynomial_results
         

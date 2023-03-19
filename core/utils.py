@@ -7,7 +7,7 @@ import numpy as np
 import os
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtCore import Qt
-from gui.GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR_BGR, VIDEO_PLAYER_BG_COLOR_GRAY, VIDEO_PLAYER_HEIGHT_DEFAULT, VIDEO_PLAYER_WIDTH_DEFAULT
+from gui.GUI_CONSTANTS import PLOT_CENTROID_INVALID_COLOR, PLOT_CENTROID_INVALID_MARKER, PLOT_CENTROID_REFERENCE_COLOR, PLOT_CENTROID_REFERENCE_LINE, PLOT_CENTROID_SAFE_AREA_ALPHA, PLOT_CENTROID_SAFE_AREA_COLOR, PLOT_CENTROID_SAFE_AREA_LIMITS_COLOR, PLOT_CENTROID_SAFE_AREA_LIMITS_LINE, PLOT_CENTROID_VALID_COLOR, PLOT_CENTROID_VALID_MARKER, PLOT_CENTROID_XLABEL, PLOT_CENTROID_YLABEL, PLOT_HEIGHT_LABELS, PLOT_HEIGHT_POLY_DOTS_COLOR, PLOT_HEIGHT_POLY_DOTS_LABEL, PLOT_HEIGHT_POLY_LINE_COLOR, PLOT_HEIGHT_POLY_LINE_LABEL, PLOT_HEIGHT_X_AXIS, PLOT_HEIGHT_Y_AXIS, PLOT_HEIGHTS_POLY_XLABEL, PLOT_HEIGHTS_POLY_YLABEL, PLOT_LINEAR_DER_LABEL, PLOT_LINEAR_REGION_LABEL, PLOT_LINEAR_XLABEL, PLOT_LINEAR_YLABEL, PLOT_SP_LINEAR_POLY_COLOR, PLOT_SP_LINEAR_POLY_LABEL, PLOT_SP_POINT_COLOR, PLOT_SP_POINT_LABEL, PLOT_SP_POLY_COLOR, PLOT_SP_POLY_LABEL, PLOT_SP_XLABEL, PLOT_SP_YLABEL, PLOT_WIDGET_TRACE_CONTOUR, PLOT_WIDGET_TRACE_CORE, PLOT_WIDGET_TRACE_TIP, VIDEO_PLAYER_BG_COLOR_BGR, VIDEO_PLAYER_BG_COLOR_GRAY, VIDEO_PLAYER_HEIGHT_DEFAULT, VIDEO_PLAYER_WIDTH_DEFAULT, CentroidTypes
 
 # Returns the biggest linear region
 def findLinearRegion(h, poly_coef, der_coef, der_threshold):
@@ -106,86 +106,153 @@ def heightBox(frame, cc, color):
 def plotCentroid(frame, rcX, rcY, color):
     cv2.circle(frame, (int(rcX), int(rcY)), CENTROID_RADIUS, color,-1)
 
-def resultPlotting(sp_results,display):
-    fig = plt.figure()
+def resultPlotting(sp_results,args):
     # Unpack data
-    h = sp_results['height']
-    H = sp_results['tip_height']
+    h = np.array(sp_results['height'])
+    H = np.array(sp_results['tip_height'])
     tenth_poly = sp_results['tenth_poly']
     der_poly = sp_results['tenth_der']
     linear_poly = sp_results['linear_poly']
-    linear_region_start = sp_results['linear_region_start']
-    linear_region_end = sp_results['linear_region_end']
+    linear_region = sp_results['linear_region']
     sp_height = sp_results['sp_height']
     sp_Height = sp_results['sp_Height']
     inv_x = sp_results['invalid_frames_h']
     inv_y = sp_results['invalid_frames_H']
+    centroid_info = sp_results['centroids']
 
-    # Analysis of raw data
-    fig = plt.figure()
-
-    # -> Raw height data
-    plt.scatter(h,H, color='b', label='Tip Height')
-
-    # -> Invalid points 
-    plt.scatter(inv_x, inv_y, color='k', marker='X', label='Invalid Frame')
-
-    # -> Poly fitted
-    low_bound = math.floor(min(h))
-    upp_bound = math.ceil(max(h))
-    samples = len(h)
-    show_heights = np.linspace(low_bound, upp_bound, samples)
-    show_poly_val = np.polyval(tenth_poly, show_heights)
-    plt.plot(show_heights, show_poly_val,'r',label='Tenth order poly fitted')
-    plt.xlabel('Flame height px')
-    plt.ylabel('Flame tip height px')
-    plt.grid()
-    plt.title('Raw Data Analysis')
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig('raw_data.pdf')   
-    plt.clf()
-
-    # Derivative analysis
+    # Height analysis
+    height_plots = plt.figure()
+    ax = height_plots.add_subplot(111)
     
-    h_sorted = h
-    #h_sorted.sort()
-    show_der_val = np.polyval(der_poly, h_sorted)
-    # -> plot raw der values
-    plt.scatter(h,show_der_val, color='b', label='Derivative raw data')
-    # -> plot der poly
-    plt.plot(h_sorted, show_der_val, color='b', label='Derivative of 10th poly')
-    # -> Linear region mark
-    plt.axvspan(linear_region_start, linear_region_end, color='r', alpha=0.3, label='Linear Region')
-    plt.title('Derivative Analysis')
-    plt.xlabel('Flame height px')
-    plt.ylabel('2nd derivative of tip height')
-    plt.grid()
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig('der_data.pdf') 
-    plt.clf()
+    # -> Tip data
+    core_height = h-H
+    n_valid_frames = len(h)
+    frame_vector = np.linspace(0, n_valid_frames-1, n_valid_frames)
+
+    # -> Plot
+    ax.plot(frame_vector, h, label=PLOT_HEIGHT_LABELS[0], color=PLOT_WIDGET_TRACE_CONTOUR)
+    ax.plot(frame_vector, core_height, label=PLOT_HEIGHT_LABELS[1], color=PLOT_WIDGET_TRACE_CORE)
+    ax.plot(frame_vector, H, label=PLOT_HEIGHT_LABELS[2], color=PLOT_WIDGET_TRACE_TIP)
+    ax.grid()
+    ax.set_xlabel(PLOT_HEIGHT_X_AXIS)
+    ax.set_ylabel(PLOT_HEIGHT_Y_AXIS)
+    ax.legend(bbox_to_anchor=(0, 1.02, 1,0.2), loc='lower left', ncol=3)
+
+    # Centroid analysis
+    centroid_plot = plt.figure()
+    ax = centroid_plot.add_subplot(111)
+
+    #-> Centoid Data
+    valid_points = centroid_info[CentroidTypes.VALID]
+    invalid_points = centroid_info[CentroidTypes.INVALID]
+    ref_centroid = centroid_info[CentroidTypes.REFERENCE]
+
+    # -> Plot
+
+    # ---> Reference centroid
+    ax.axhline(y=ref_centroid, color=PLOT_CENTROID_REFERENCE_COLOR, linestyle=PLOT_CENTROID_REFERENCE_LINE, label='Reference')
+
+    # ---> Tolerance area
+    tolerance = args.CentroidTolerance
+    upper = ref_centroid + tolerance
+    lower = ref_centroid - tolerance
+    ax.axhline(y=upper, color=PLOT_CENTROID_SAFE_AREA_LIMITS_COLOR, linestyle=PLOT_CENTROID_SAFE_AREA_LIMITS_LINE)
+    ax.axhline(y=lower, color=PLOT_CENTROID_SAFE_AREA_LIMITS_COLOR, linestyle=PLOT_CENTROID_SAFE_AREA_LIMITS_LINE)
+    ax.axhspan(lower, upper, color=PLOT_CENTROID_SAFE_AREA_COLOR, alpha=PLOT_CENTROID_SAFE_AREA_ALPHA, label='Safe area')
+
+    # ---> Scatter valid centroids
+    valid_points_frames = list(valid_points.keys())
+    valid_points_values = list(valid_points.values())
+    ax.scatter(valid_points_frames, valid_points_values, color=PLOT_CENTROID_VALID_COLOR, marker=PLOT_CENTROID_VALID_MARKER, label='Valid')
+
+    # ---> Scatter invalid centroid
+    invalid_points_frames = list(invalid_points.keys())
+    invalid_points_values = list(invalid_points.values())
+    ax.scatter(invalid_points_frames, invalid_points_values, color=PLOT_CENTROID_INVALID_COLOR, marker=PLOT_CENTROID_INVALID_MARKER, label='Invalid')
+    
+    ax.legend(bbox_to_anchor=(0, 1.02, 1,0.2), loc='lower left', ncol=4)
+    ax.set_xlabel(PLOT_CENTROID_XLABEL)
+    ax.set_ylabel(PLOT_CENTROID_YLABEL)
+    ax.grid()
+    
+
+    # SP polynomial plot
+    polyPlot = plt.figure()
+    ax = polyPlot.add_subplot(111)
+
+    # -> Data
+    h_min = math.floor(min(h))
+    h_max = math.ceil(max(h))
+    samples = len(h)
+    poly_h = np.linspace(h_min, h_max, samples)
+    poly_values = np.polyval(tenth_poly, poly_h)
+
+    # -> Plot
+    ax.scatter(h, H, color=PLOT_HEIGHT_POLY_DOTS_COLOR, label=PLOT_HEIGHT_POLY_DOTS_LABEL)
+    ax.plot(poly_h, poly_values, color=PLOT_HEIGHT_POLY_LINE_COLOR, label=PLOT_HEIGHT_POLY_LINE_LABEL)
+
+    ax.legend(bbox_to_anchor=(0, 1.02, 1,0.2), loc='lower left', ncol=4)
+    ax.set_xlabel(PLOT_HEIGHTS_POLY_XLABEL)
+    ax.set_ylabel(PLOT_HEIGHTS_POLY_YLABEL)
+    ax.grid()
+    
+    # Linear region analysis
+    # -> Check if linear region was found
+    if(linear_region):
+
+        linearPlot = plt.figure()
+        ax = linearPlot.add_subplot(111)
+
+        # -> Data
+        der_values = np.polyval(der_poly, poly_h)
+        l_h = list(linear_region.keys())
+
+        # -> Plot
+        ax.plot(poly_h, der_values, label=PLOT_LINEAR_DER_LABEL)
+        # Plot linear region area
+        ax.axvspan(l_h[0], l_h[-1], color='r', alpha=0.3, label=PLOT_LINEAR_REGION_LABEL)
+        
+        ax.legend(bbox_to_anchor=(0, 1.02, 1,0.2), loc='lower left', ncol=4)
+        ax.set_xlabel(PLOT_LINEAR_XLABEL)
+        ax.set_ylabel(PLOT_LINEAR_YLABEL)
+        ax.grid()
 
     # SP plot
-    plt.plot(show_heights, show_poly_val, color='r', label='10th order poly')
-    # -> Linear region reference
-    show_linear_poly = np.polyval(linear_poly, h)
-    plt.plot(h_sorted, show_linear_poly, color='c', label='Linear Fit')
-    # -> Plot SP
-    plt.scatter(sp_height, sp_Height, s=50, color='m', label='Smoke Point {} px'.format(sp_height))
-    plt.axhline(y=sp_Height, color='k', linestyle='dashed')
-    plt.axvline(x=sp_height, color='k', linestyle='dashed')
-    #plt.text(0.2,0.7, 'SP HEIGHT {} px'.format(sp_height), transform=plt.gca().transAxes)
-    plt.legend()
-    plt.grid()
-    plt.tight_layout()
-    plt.savefig('sp_data.pdf')
+    if(sp_height):
+        spPlot = plt.figure()
+        ax = spPlot.add_subplot(111)
 
-    if(display):
+        # -> Data
+
+        linear_poly_values = np.polyval(linear_poly, poly_h)
+
+        # -> Plot
+        ax.plot(poly_h, poly_values, color=PLOT_SP_POLY_COLOR, label=PLOT_SP_POLY_LABEL)
+        ax.plot(poly_h, linear_poly_values, color=PLOT_SP_LINEAR_POLY_COLOR, label=PLOT_SP_LINEAR_POLY_LABEL)
+        # Plot sp
+        ax.axhline(y=sp_Height, color='k', linestyle='dashed')
+        ax.axvline(x=sp_height, color='k', linestyle='dashed')
+        ax.scatter(sp_height, sp_Height, s=50, color=PLOT_SP_POINT_COLOR, label=PLOT_SP_POINT_LABEL.format(sp_height))
+        
+        ax.legend(bbox_to_anchor=(0, 1.02, 1,0.2), loc='lower left', ncol=4)
+        ax.set_xlabel(PLOT_SP_XLABEL)
+        ax.set_ylabel(PLOT_SP_YLABEL)
+        ax.grid()
+    
+    if(args.Display):
         plt.show()
 
-    
-    
+    if(args.SaveValues):
+        out_path = '{}_run'.format(args.SaveValues)
+        if not(os.path.isdir(out_path)):
+            print('Save path does not exists!')
+            exit(1)
+        
+        height_plots.savefig(os.path.join(out_path, 'height_analysis.pdf'))
+        polyPlot.savefig(os.path.join(out_path, 'polynomial_analysis.pdf'))
+        if(linear_region): linearPlot.savefig(os.path.join(out_path, 'linear_region_analysis.pdf'))
+        if(sp_height): spPlot.savefig(os.path.join(out_path, 'sp_analysis.pdf'))
+
 
 def dataLoader(arg_string):
     # Check if arg is file

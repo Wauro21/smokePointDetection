@@ -139,7 +139,7 @@ class LoadWidget(QWidget):
 
                     try:
                         
-                        for key in json_dict:
+                        for key in self.process_controls['controls']:
                             self.process_controls['controls'][key] = json_dict[key]
 
                         self.externalStartButton(StartStates.ENABLED)
