@@ -122,12 +122,13 @@ class PolynomialInformation(QWidget):
         sp_info = process_controls['results']['sp']
         sp_value = INFORMATION_POLYNOMIAL_PLACEHOLDER
         if(sp_info):
-            sp_value = sp_info[0] # Only contour height
+            sp_value = INFORMATION_POLYNOMIAL_SP_VALUE_FIELD.format(sp_info[0]) # Only contour height
+            
         processing_time = str(process_controls['results']['last_poly_run'])
 
         self.der_threshold.setText(der_threshold)
         self.n_points_linear.setText(n_points_linear)
-        self.sp_value.setText(INFORMATION_POLYNOMIAL_SP_VALUE_FIELD.format(sp_value))
+        self.sp_value.setText(sp_value)
         self.processing_time.setText(processing_time)
 
     def clearInformation(self):

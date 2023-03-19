@@ -15,7 +15,7 @@ from Preprocessing.Preprocessing import PreprocessingWidget
 from Preprocessing.ThresholdWidget import ThresholdWidget
 from Preprocessing.InfoWidget import DisplaySettings
 from RunInformation import InformationBar, InformationTab
-from MessageBox import WarningBox
+from MessageBox import ErrorBox, WarningBox
 from Thread import PolyAnalizer
 from Preprocessing.CameraCalibration import CameraCalibration
 from CONSTANTS import DERIVATIVE_LOW_BOUND, MAX_CENTROID_TOLERANCE
@@ -33,6 +33,7 @@ class CentralWidget(QWidget):
         self.polyThread = None
         self.preprocessing_tab_index = []
         self.autocut = True
+        self.invisibles_idx = {}
 
         # -> Control dictionary 
         self.process_controls = {}
@@ -72,9 +73,9 @@ class CentralWidget(QWidget):
         # -> Add tabs to tab holder 
         self.TabHolder.addTab(self.HeightPlot)
         self.TabHolder.addTab(self.CentroidPlot)
-        self.TabHolder.addTab(self.PolyHeightPlot, False)
-        self.TabHolder.addTab(self.LinearPolyPlot, False)
-        self.TabHolder.addTab(self.SmokePointPlot, False, True)
+        self.invisibles_idx['poly'] = self.TabHolder.addTab(self.PolyHeightPlot, False)
+        self.invisibles_idx['linear'] = self.TabHolder.addTab(self.LinearPolyPlot, False)
+        self.invisibles_idx['poly'] = self.TabHolder.addTab(self.SmokePointPlot, False, True)
         self.TabHolder.addTab(self.infoTab)
 
         # Signals and Slots
@@ -101,6 +102,16 @@ class CentralWidget(QWidget):
         layout.addWidget(self.infoBar)
         
         self.setLayout(layout)
+
+    def linearError(self):
+        self.process_controls['signals']['linear_error'] = True
+        message = ErrorBox('The selected derivative threshold ({}) resulted in a linear region with less than two points. Try with another threshold!'.format(self.process_controls['controls']['der_threshold']))
+        message.exec_()
+
+    def spError(self):
+        self.process_controls['signals']['sp_error'] = True
+        message = WarningBox('The sp could not be found with the provided settings!')
+        message.exec_()
 
     def clearPlots(self):
         self.HeightPlot.clearPlot()
@@ -187,6 +198,8 @@ class CentralWidget(QWidget):
             # Signal vector
             'signals':{
                 'stop': False,
+                'linear_error': False,
+                'sp_error': False,
             },
 
             # Results
@@ -225,9 +238,20 @@ class CentralWidget(QWidget):
         # Clean thread
         self.polyThread = None
 
-        # Show invisibles plots
-        self.TabHolder.toggleInvinsibles()
+        if(self.process_controls['signals']['linear_error']):
+            # Only show the poly plot
+            self.TabHolder.setVisible(self.invisibles_idx['poly'])
 
+        elif(self.process_controls['signals']['sp_error']):
+            # Show poly and linear region
+            self.TabHolder.setVisible(self.invisibles_idx['poly'])
+            self.TabHolder.setVisible(self.invisibles_idx['linear'])
+
+        else:
+            # Show invisibles plots
+            self.TabHolder.toggleInvinsibles()
+
+        
         # Update information
         self.infoTab.updatePolyTab(self.process_controls)
 
@@ -245,10 +269,11 @@ class CentralWidget(QWidget):
         self.polyThread = PolyAnalizer(self.process_controls)
         self.polyThread.heights_plot.connect(self.plotHeightsPoly)
         self.polyThread.linear_plot.connect(self.plotLinearPoly)
-        self.polyThread.linear_error.connect(lambda: print('ERROR on linear region'))
         self.polyThread.sp_plot.connect(self.plotSmokePoint)
         self.polyThread.finished.connect(self.polynomialAnalysisDone)
         self.polyThread.started.connect(lambda: self.infoBar.setStatus(InformationStatus.POLYNOMIAL))
+        self.polyThread.linear_error.connect(self.linearError)
+        self.polyThread.sp_error.connect(self.spError)
         self.polyThread.start()
 
 

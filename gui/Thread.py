@@ -72,7 +72,7 @@ class PolyAnalizer(QThread):
                     break
         if not(sp_H):
             self.sp_error.emit()
-            return False
+            return None
     
         # Save value and emit signal
         self.process_controls['results']['sp'] = [sp_h, sp_H]
