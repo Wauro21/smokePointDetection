@@ -1,3 +1,4 @@
+from PySide2 import QtGui
 from PySide2.QtWidgets import QApplication, QMainWindow
 from gui.CentralWidget import CentralWidget
 from gui.GUI_CONSTANTS import MAIN_WINDOW_TITLE
@@ -17,6 +18,7 @@ class SPDMain(QMainWindow):
         # init routines
         self.setWindowTitle(MAIN_WINDOW_TITLE)
         self.setCentralWidget(self.SPD_Widget)
+        self.setWindowIcon(QtGui.QIcon('rsrcs/icon.png'))
 
         # signals and slots
 

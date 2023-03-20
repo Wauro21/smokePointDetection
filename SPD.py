@@ -8,7 +8,6 @@ from core.processing_options import argsHandler
 from gui.MainWindow import SPDMain
 from core.utils import resultPlotting
 
-
 def jsonLoader(args):
     config = args.config
 
