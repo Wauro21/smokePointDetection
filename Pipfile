@@ -8,9 +8,10 @@ progress = "*"
 matplotlib = "*"
 pyqt5 = "*"
 opencv-python-headless = "*"
-pyinstaller = "*"
 
 [dev-packages]
+pyinstaller = "*"
+pip-licenses = "*"
 
 [requires]
 python_version = "3.8"
