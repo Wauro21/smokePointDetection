@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pyside2 = "*"
+matplotlib = "*"
+opencv-python-headless = "*"
+progress = "*"
+
+[dev-packages]
+pip-licenses = "*"
+pyinstaller = "*"
+
+[requires]
+python_version = "3.8"

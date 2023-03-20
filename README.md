@@ -44,7 +44,7 @@ The software was developed using `Python 3.8`, and all of the following dependen
 | opencv-python-headless | 4.7.0.72 | Operations with images. The headless version was used because there were some conflicts between pyqt and opencv when using the normal version.| [MIT](https://github.com/opencv/opencv-python/blob/4.x/LICENSE.txt) [External](https://github.com/opencv/opencv-python/blob/4.x/LICENSE-3RD-PARTY.txt)|
 | contourpy | 1.0.7 | Used by Matplotlib | [BSD](https://github.com/contourpy/contourpy/blob/main/LICENSE) | 
 | cycler | 0.11.0 | Used by Matplotlib | [BSD](https://github.com/matplotlib/cycler/blob/main/LICENSE) | 
-| fonttools | 4.39.2 | Used by Matplotlib | [MIT](https://github.com/fonttools/fonttools/blob/main/LICENSE)  [External **\***](https://github.com/fonttools/fonttools/blob/main/LICENSE.external) | 
+| fonttools | 4.39.2 | Used by Matplotlib | [MIT](https://github.com/fonttools/fonttools/blob/main/LICENSE)  [External](https://github.com/fonttools/fonttools/blob/main/LICENSE.external) | 
 | importlib-resources | 5.12.0 | Used by Matplotlib | [Apache 2](https://github.com/python/importlib_resources/blob/main/LICENSE) |
 | kiwisolver | 1.4.4 | Used by Matplotlib | [New BSD](https://github.com/nucleic/kiwi/blob/main/LICENSE) |
 | numpy | 1.24.2 | Used for frame and matrix-like numerical operations. Also used by Matplotlib | [BSD](https://github.com/numpy/numpy/blob/main/LICENSE.txt) [External](https://github.com/numpy/numpy/blob/main/LICENSES_bundled.txt) | 
