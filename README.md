@@ -13,17 +13,23 @@ Corral-Gomez, L., Rodriguez-Rosa, D., Juarez-Perez, S., Martín-Parra, A., Gomez
 
 - [Smoke Point Detection](#smoke-point-detection)
   - [Index](#index)
-    - [Installation](#installation)
+  - [Installation](#installation)
+    - [From sources (Linux, OSX, Windows)](#from-sources-linux-osx-windows)
       - [Requirements](#requirements)
         - [pipenv installation](#pipenv-installation)
-      - [From sources](#from-sources)
-    - [Use example](#use-example)
-    - [How it works?](#how-it-works)
-    - [Constants decription](#constants-decription)
+        - [pip installation](#pip-installation)
+      - [Post installation:](#post-installation)
+  - [Use example](#use-example)
+  - [How it works?](#how-it-works)
+  - [Constants decription](#constants-decription)
 
 
 
-### Installation
+## Installation
+
+### From sources (Linux, OSX, Windows)
+
+To install from sources you only need a copy of this repository!
 
 #### Requirements
 
@@ -48,12 +54,52 @@ Although not requiered to run the software, this dependencies were used to compi
 
 ##### pipenv installation
 
+To install the dependencies use the `Pipfile` and `Pipfile.lock` provided with the repository. Using the following command from the root of the project to install them:
 
-#### From sources
+```[bash]
+$ pipenv install 
+```
+
+If you also want to install the `dev` dependencies (i.e to package for Windows), use the following command:
+
+```
+$ pipenv install -dev
+```
+
+After installation you need to activate the virtual environment running:
+
+```[bash]
+$ pipenv shell
+```
+
+##### pip installation
+
+To install the dependencies use the `requirements.txt` provided with the repository. Using the following command from the roof of the project to install them: 
+
+```[bash]
+$ pip install -r requirements.txt
+```
+
+#### Post installation:
+
+After installing the dependencies, you should be able to run the code. You can try to run it using the following commands from the root of the project.
+
+**CLI mode:**
+
+```[bash]
+python SPD.py -cmd
+```
+
+**GUI mode**:
+```[bash]
+python SPD.py
+```
+
+![Gui-Success](rsrcs/github-gifs/gui_success_launch.gif)
 
 
-### Use example
+## Use example
 
-### How it works?
+## How it works?
 
-### Constants decription
+## Constants decription
