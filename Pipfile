@@ -8,7 +8,6 @@ progress = "*"
 matplotlib = "*"
 pyqt5 = "*"
 opencv-python-headless = "*"
-opencv-python = "*"
 
 [dev-packages]
 

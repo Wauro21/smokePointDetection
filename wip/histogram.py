@@ -6,6 +6,8 @@ from matplotlib import pyplot as plt
 import csv
 import os
 from progress.bar import Bar
+import matplotlib
+matplotlib.use('tkAgg')
 
 def argHandler():
     dsc='Histogram analysis of the input image'
@@ -40,8 +42,8 @@ def histo(args):
     height = int(media.get(cv2.CAP_PROP_FRAME_HEIGHT))
     bar = Bar('Histogram analysis', max=n_frames)
     
-    save_histos = [1, n_frames//2, n_frames]
-
+    #save_histos = [1, n_frames//2, n_frames]
+    save_histos = []
     frame_counter = 0
     while media.isOpened():
         ret, frame = media.read()
@@ -96,32 +98,83 @@ def histo(args):
 
     # Plot general histogram and save values
     general_histo = general_histo/n_frames # To get average 
-
-    plt.plot(general_histo)
-    plt.grid()
-    plt.xlim([0,255])
-    plt.xlabel('Bins')
-    plt.ylabel('Pixeles')
-    plt.title('Average histogram analysis')
-    plt.savefig(os.path.join(args.of, 'average_histogram.pdf'))
-
-    # Zoom view
-    bin_start = 1
-    bin_end = -1
-        
-    for i,bin in enumerate(general_histo):
-        if(bin[0] == 0):
-            bin_end = i
-            break
-    plt.xlim([bin_start, bin_end])
-    plt.ylim([0, general_histo[bin_start][0]])        
-    plt.savefig(os.path.join(args.of, '_average_zoom.pdf'))
-    plt.show()
-
-    
+   
     if(save_file):
         save_file.close()
 
+
+    flame_pixels = 0
+    pivot = 0#5
+    regions = {}
+    for i, bin in enumerate(range(pivot,256)):
+        flame_pixels += general_histo[bin][0]
+        regions[i] = flame_pixels
+
+    # Print results 
+    print('Total flame pixels {}'.format(flame_pixels))
+    prev_value = 0
+    delta = 0
+    contour_bin = float('-inf')
+    contour_pixels = 0
+    contour_bin_flag = True
+    general_acum = 0
+    for key in regions: 
+        delta = 100*(regions[key] - prev_value)/flame_pixels
+        if(delta < 1.0 and contour_bin_flag):
+            contour_bin = key
+            contour_bin_flag = False
+            contour_pixels = flame_pixels - regions[key]
+
+        prev_value = regions[key]
+        print("Bin {} = {} pixels | {} %".format(key+pivot, regions[key], 100*regions[key]/flame_pixels))
+    
+    
+    print("Contour found at: {}".format(contour_bin))
+    print('Contour formed with {} pixels'.format(contour_pixels))
+    
+    # Core
+    acum = 0
+    core_bin = 0
+    for key in regions:
+        if(key <= contour_bin):
+            continue
+        
+        acum += regions[key]
+        if(acum >= round(30*contour_pixels/100)):
+            core_bin = key
+            print("Core found at {}".format(key))
+            break
+
+    # Plots 
+    # -> General histogram - Contour
+    fig = plt.figure()
+    #fig.set_size_inches(20,11.25)
+    plt.plot(general_histo)
+    plt.xlabel('Bins')
+    plt.ylabel('Pixels')
+    plt.title('Average Histogram Analysis')
+    #plt.xticks(np.arange(0,255, step=10))
+    plt.axvline(x=contour_bin, color='r', linestyle='dashed',label='Contour Threshold {} px'.format(contour_bin))
+    plt.grid()
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(args.of,'contour_histo.pdf'))
+    plt.clf()
+
+    # -> Histo zoom to flame-conbtour - core
+    plt.plot(general_histo)
+    plt.xlabel('Bins')
+    plt.ylabel('Pixels')
+    plt.title('Average Histogram Analysis')
+    #plt.xticks(np.arange(0,255, step=10))
+    plt.xlim([contour_bin, 255])
+    plt.ylim([0,general_histo[contour_bin]])
+    plt.axvline(x=core_bin, color='r', linestyle='dashed',label='Core Threshold {} px'.format(core_bin))
+    plt.grid()
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(args.of,'core_histo.pdf'))
+    #plt.show()
     bar.finish()
 
 
