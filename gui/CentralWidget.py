@@ -1,6 +1,6 @@
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout
+from PySide2.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout
 from gui.Plot.FixedPlots import LinearRegionPlot, PolyHeightPlot, SmokePointPlot
 from gui.Plot.CentroidPlot import CentroidPlotWidget
 from gui.LoadWidget import LoadWidget

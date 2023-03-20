@@ -1,11 +1,11 @@
 import sys
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QApplication, QRadioButton, QCheckBox
-from PyQt5.QtCore import pyqtSignal
+from PySide2.QtWidgets import QWidget, QLabel, QVBoxLayout, QApplication, QRadioButton, QCheckBox
+from PySide2.QtCore import Signal
 from gui.GUI_CONSTANTS import VIDEO_BUTTONS_WIDGET_WIDTH, FrameTypes
 
 class VideoButtons(QWidget):
-    frame_selection = pyqtSignal(FrameTypes)
-    frame_controls = pyqtSignal(dict)
+    frame_selection = Signal(FrameTypes)
+    frame_controls = Signal(dict)
     def __init__(self, parent=None):
         super().__init__(parent)
 

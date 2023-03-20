@@ -1,10 +1,10 @@
-from PyQt5.QtWidgets import QPushButton, QWidget, QHBoxLayout
-from PyQt5.QtCore import pyqtSignal
+from PySide2.QtWidgets import QPushButton, QWidget, QHBoxLayout
+from PySide2.QtCore import Signal
 
 class LowerButtons(QWidget):
-    apply = pyqtSignal()
-    save = pyqtSignal()
-    load = pyqtSignal()
+    apply = Signal()
+    save = Signal()
+    load = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)

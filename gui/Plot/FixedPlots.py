@@ -1,5 +1,5 @@
 import math
-from PyQt5.QtWidgets import QWidget, QVBoxLayout
+from PySide2.QtWidgets import QWidget, QVBoxLayout
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qtagg import (

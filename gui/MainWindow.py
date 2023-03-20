@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PySide2.QtWidgets import QApplication, QMainWindow
 from gui.CentralWidget import CentralWidget
 from gui.GUI_CONSTANTS import MAIN_WINDOW_TITLE
 import sys

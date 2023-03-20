@@ -1,5 +1,5 @@
 
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
+from PySide2.QtWidgets import QApplication, QWidget, QVBoxLayout
 import os
 import sys
 from matplotlib.figure import Figure

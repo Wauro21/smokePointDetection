@@ -1,13 +1,13 @@
-from PyQt5.QtWidgets import QGroupBox, QWidget, QLabel, QVBoxLayout, QFormLayout, QPushButton, QDoubleSpinBox, QSpinBox
-from PyQt5 import QtCore
+from PySide2.QtWidgets import QGroupBox, QWidget, QLabel, QVBoxLayout, QFormLayout, QPushButton, QDoubleSpinBox, QSpinBox
+from PySide2 import QtCore
 from gui.GUI_CONSTANTS import PREPROCESSING_CONSTANTS_CENTROID_TOLERANCE, PREPROCESSING_CONSTANTS_CENTROID_TOLERANCE_SUFFIX, PREPROCESSING_CONSTANTS_DECIMALS, PREPROCESSING_CONSTANTS_DER_THRESHOLD, PREPROCESSING_CONSTANTS_DESC, PREPROCESSING_CONSTANTS_STEP, PREPROCESSING_CONSTANTS_TITLE
 from gui.MessageBox import ErrorBox
-from PyQt5.QtCore import pyqtSignal
+from PySide2.QtCore import Signal
 
 
 class GeneralConstants(QWidget):
 
-    constants_update = pyqtSignal()
+    constants_update = Signal()
 
     def __init__(self, process_controls, parent=None):
         super().__init__(parent)

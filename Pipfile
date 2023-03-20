@@ -6,8 +6,8 @@ name = "pypi"
 [packages]
 progress = "*"
 matplotlib = "*"
-pyqt5 = "*"
 opencv-python-headless = "*"
+pyside2 = "*"
 
 [dev-packages]
 pyinstaller = "*"

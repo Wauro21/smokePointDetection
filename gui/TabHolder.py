@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout,QTabWidget
+from PySide2.QtWidgets import QApplication, QWidget, QVBoxLayout,QTabWidget
 import os
 import sys
 

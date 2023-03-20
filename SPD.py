@@ -2,7 +2,7 @@
 import json
 import sys
 import os
-from PyQt5.QtWidgets import QApplication
+from PySide2.QtWidgets import QApplication
 from core.processing import smokepoint
 from core.processing_options import argsHandler
 from gui.MainWindow import SPDMain
@@ -65,4 +65,4 @@ if __name__ == '__main__':
         h = window.height()
         w = window.width()
         window.setFixedSize(w, h)
-        sys.exit(app.exec())
+        sys.exit(app.exec_())

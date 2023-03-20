@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QApplication
-from PyQt5.QtGui import QPixmap, QColor
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PySide2.QtWidgets import QWidget, QLabel, QHBoxLayout, QApplication
+from PySide2.QtGui import QPixmap, QColor
+from PySide2.QtCore import Signal, Slot
 import sys
 import numpy as np
 from gui.GUI_CONSTANTS import VIDEO_PLAYER_BG_COLOR, FrameTypes
@@ -11,7 +11,7 @@ from core.utils import convert2QT, resizeFrame
 
 
 class FrameHolder(QWidget):
-    frame_process_done = pyqtSignal()
+    frame_process_done = Signal()
     def __init__(self, process_controls, parent=None):
         super().__init__(parent)
 
@@ -35,7 +35,7 @@ class FrameHolder(QWidget):
 
         self.setLayout(layout)
     
-    @pyqtSlot(FrameTypes)
+    @Slot(FrameTypes)
     def selectFrame(self, frame_code):
         self.process_controls['frames_info']['display'] = frame_code
 
@@ -65,12 +65,12 @@ class FrameHolder(QWidget):
         self.thread = None
         self.frame_process_done.emit()
 
-    @pyqtSlot(dict)
+    @Slot(dict)
     def controlFrame(self, values):
         self.process_controls['frames_info']['bboxes'] = values['bboxes']
         self.process_controls['frames_info']['centroids'] = values['centroids']
 
-    @pyqtSlot(np.ndarray)
+    @Slot(np.ndarray)
     def updateLabel(self, frame):
         # Resize to fit inside defined dimensions of player
         r_frame = resizeFrame(frame)

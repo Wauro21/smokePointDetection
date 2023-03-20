@@ -2,17 +2,17 @@ from core.CONSTANTS import CONTOUR_BOUNDING_BOX_COLOR, CORE_BOUNDING_BOX_COLOR, 
 from core.processing import frameProcess
 from gui.GUI_CONSTANTS import CentroidTypes, FrameTypes
 from core.utils import findLinearRegion, getThreshvalues, heightBox, plotCentroid
-from PyQt5.QtCore import pyqtSignal, QThread
+from PySide2.QtCore import Signal, QThread
 import numpy as np
 import cv2
 
 
 class PolyAnalizer(QThread):
-    heights_plot = pyqtSignal()
-    linear_plot = pyqtSignal()
-    linear_error = pyqtSignal()
-    sp_plot = pyqtSignal()
-    sp_error = pyqtSignal()
+    heights_plot = Signal()
+    linear_plot = Signal()
+    linear_error = Signal()
+    sp_plot = Signal()
+    sp_error = Signal()
 
     def __init__(self, process_controls):
         
@@ -82,9 +82,9 @@ class PolyAnalizer(QThread):
 
 class VideoReader(QThread):
 
-    update_frame_signal = pyqtSignal(np.ndarray)
-    values_signal = pyqtSignal(list)
-    centroid_signal = pyqtSignal(dict)
+    update_frame_signal = Signal(np.ndarray)
+    values_signal = Signal(list)
+    centroid_signal = Signal(dict)
     
     def __init__(self, video_path, process_controls):
         super().__init__()

@@ -1,14 +1,14 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QFormLayout, QSpinBox, QPushButton, QFileDialog, QGroupBox, QVBoxLayout
+from PySide2.QtWidgets import QWidget, QLabel, QHBoxLayout, QFormLayout, QSpinBox, QPushButton, QFileDialog, QGroupBox, QVBoxLayout
 from gui.GUI_CONSTANTS import PREPROCESSING_DESC_MESSAGE, PREPROCESSING_LOAD_CUT, PREPROCESSING_MINIMUM_WIDTH, PREPROCESSING_SAVE_CUT, PREPROCESSING_TITLE_MESSAGE
 from gui.MessageBox import ErrorBox, InformationBox
 from gui.Preprocessing.CommonButtons import LowerButtons
-from PyQt5.QtCore import pyqtSignal
+from PySide2.QtCore import Signal
 import datetime
 import json
 
 class CutButtonsWidget(QWidget):
-    cut_signal = pyqtSignal()
-    update_frame = pyqtSignal()
+    cut_signal = Signal()
+    update_frame = Signal()
     def __init__(self, parent=None):
         super().__init__(parent)
 

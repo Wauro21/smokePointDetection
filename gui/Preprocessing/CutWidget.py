@@ -3,18 +3,18 @@ import sys
 import os
 import cv2
 import numpy as np
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QVBoxLayout
-from PyQt5.QtGui import QPixmap, QColor
+from PySide2.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QVBoxLayout
+from PySide2.QtGui import QPixmap, QColor
 from gui.GUI_CONSTANTS import MOUSE_EVENT_PIXEL_OFFSET, PREPROCESSING_AUTO_CUT_PADDING, PREPROCESSING_AUTO_CUT_THRESHOLD_PERCENTAGE, PREPROCESSING_CUT_WIDGET_TAB_TITLE, PREPROCESSING_LINES_WIDTH, PREPROCESSING_SCROLL_WIDTH_STEP, PREPROCESSING_WIDTH_LINE_COLOR, PREPROCESSING_WINDOW_TITLE, PREPROESSING_CENTER_LINE_COLOR, VIDEO_PLAYER_BG_COLOR
 from core.CONSTANTS import MAX_PIXEL_VALUE, NUMBER_OF_CONNECTED_COMPONENTS
 from gui.MessageBox import ErrorBox
 from .CutButtonsWidget import CutButtonsWidget
 from core.utils import convert2QT, getConnectedComponents
-from PyQt5.QtCore import pyqtSignal
+from PySide2.QtCore import Signal
 
 class CutWidget(QWidget):
     
-    preprocess_done = pyqtSignal()
+    preprocess_done = Signal()
 
     def __init__(self, process_controls, parent=None):
         super().__init__(parent)

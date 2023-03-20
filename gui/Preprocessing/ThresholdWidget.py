@@ -1,18 +1,18 @@
 import cv2
 import json
 import datetime
-from PyQt5.QtWidgets import QHeaderView, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFormLayout, QDoubleSpinBox, QTableWidget, QTableWidgetItem, QAbstractItemView, QFileDialog, QGroupBox
-from PyQt5.QtGui import QPixmap, QColor
-from PyQt5 import QtCore
+from PySide2.QtWidgets import QHeaderView, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFormLayout, QDoubleSpinBox, QTableWidget, QTableWidgetItem, QAbstractItemView, QFileDialog, QGroupBox
+from PySide2.QtGui import QPixmap, QColor
+from PySide2 import QtCore
 from gui.GUI_CONSTANTS import PREPROCESSING_AREA_INFORMATION_PARSER, PREPROCESSING_HEIGHT_INFORMATION_PARSER, PREPROCESSING_INFORMATION_TABLE_COLUMN_HEIGHT, PREPROCESSING_INFORMATION_TABLE_WIDTH, PREPROCESSING_START_ERROR, PREPROCESSING_TABLE_PADDING, PREPROCESSING_THESHOLD_CONTROLS_TITLE, PREPROCESSING_THRESHOLD_DESC, PREPROCESSING_THRESHOLD_FRAME_TITLE, PREPROCESSING_THRESHOLD_INFORMATION, PREPROCESSING_THRESHOLD_LOAD, PREPROCESSING_THRESHOLD_PERCENTAGE, PREPROCESSING_THRESHOLD_SAVE, PREPROCESSING_THRESHOLD_SPIN_WIDTH, PREPROCESSING_THRESHOLD_SUFFIX, PREPROCESSING_THRESHOLD_WIDGET_TAB_TITLE, PREPROCESSSING_ERROR_THRESHOLD_IMAGE, VIDEO_PLAYER_BG_COLOR
 from core.CONSTANTS import MAX_PIXEL_VALUE, NUMBER_OF_CONNECTED_COMPONENTS
 from gui.MessageBox import ErrorBox, InformationBox
 from gui.Preprocessing.CommonButtons import LowerButtons
 from core.utils import convert2QT, getConnectedComponents, getThreshvalues, resizeFrame
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PySide2.QtCore import Signal, Slot
 
 class ThresholdWidget(QWidget):
-    done_signal = pyqtSignal()
+    done_signal = Signal()
     def __init__(self, process_controls,  parent=None):
         
         super().__init__(parent)
@@ -151,7 +151,7 @@ class ThresholdWidget(QWidget):
 
 
 class ThresholdControls(QWidget):
-    update_frame = pyqtSignal()
+    update_frame = Signal()
     def __init__(self, title, key, process_controls, parent=None):
         super().__init__(parent)
 
@@ -237,7 +237,7 @@ class ThresholdControls(QWidget):
         layout.addWidget(group)
         self.setLayout(layout)
     
-    @pyqtSlot(list)
+    @Slot(list)
     def updateInfo(self, values):
         height, area = values
         self.info_table.setItem(0,0, QTableWidgetItem(PREPROCESSING_HEIGHT_INFORMATION_PARSER.format(height)))
@@ -253,7 +253,7 @@ class ThresholdControls(QWidget):
     def loadValues(self, value):
         self.threshold.setValue(value)
 
-    @pyqtSlot(int)
+    @Slot(int)
     def invalidValue(self, old_valid):
         self.threshold.setValue(old_valid)
         message = ErrorBox(PREPROCESSSING_ERROR_THRESHOLD_IMAGE)
@@ -265,8 +265,8 @@ class ThresholdControls(QWidget):
 
 class ThresholdFrame(QWidget):
 
-    invalid_area = pyqtSignal(int)
-    info_update = pyqtSignal(list)
+    invalid_area = Signal(int)
+    info_update = Signal(list)
     
     def __init__(self, process_controls, title, key, parent=None):
         
