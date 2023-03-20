@@ -40,10 +40,25 @@ The software was developed using `Python 3.8`, and all of the following dependen
 |----------------|-------------|-----------------|------------|
 | progress | 1.6 | Used to provide a progress bar in the CLI mode | [ISC](https://github.com/verigak/progress/blob/master/LICENSE)
 | matplotlib | 3.7.1 | Handles all the requiered plots | [PSF based](https://github.com/matplotlib/matplotlib/blob/main/LICENSE/LICENSE)
-| PySide2 | 5.15.2.1 | Used to build the GUI | [LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.en.html)
-| opencv-python-headless | 4.7.0.72 | Operations with images. The headless version was used because there were some conflicts between pyqt and opencv when using the normal version.| [Apache 2](https://github.com/opencv/opencv/blob/master/LICENSE)|
+| PySide2 | 5.15.2.1 | Used to build the GUI | [LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.en.html)|
+| opencv-python-headless | 4.7.0.72 | Operations with images. The headless version was used because there were some conflicts between pyqt and opencv when using the normal version.| [MIT](https://github.com/opencv/opencv-python/blob/4.x/LICENSE.txt) [External](https://github.com/opencv/opencv-python/blob/4.x/LICENSE-3RD-PARTY.txt)|
 | contourpy | 1.0.7 | Used by Matplotlib | [BSD](https://github.com/contourpy/contourpy/blob/main/LICENSE) | 
-| cycler | 0.11.0 | Used by Matplotlib | [BSD](https://github.com/matplotlib/cycler/blob/main/LICENSE) | [MIT](https://github.com/fonttools/fonttools/blob/main/LICENSE)  [External **\***](https://github.com/fonttools/fonttools/blob/main/LICENSE.external) | 
+| cycler | 0.11.0 | Used by Matplotlib | [BSD](https://github.com/matplotlib/cycler/blob/main/LICENSE) | 
+| fonttools | 4.39.2 | Used by Matplotlib | [MIT](https://github.com/fonttools/fonttools/blob/main/LICENSE)  [External **\***](https://github.com/fonttools/fonttools/blob/main/LICENSE.external) | 
+| importlib-resources | 5.12.0 | Used by Matplotlib | [Apache 2](https://github.com/python/importlib_resources/blob/main/LICENSE) |
+| kiwisolver | 1.4.4 | Used by Matplotlib | [New BSD](https://github.com/nucleic/kiwi/blob/main/LICENSE) |
+| numpy | 1.24.2 | Used for frame and matrix-like numerical operations. Also used by Matplotlib | [BSD](https://github.com/numpy/numpy/blob/main/LICENSE.txt) [External](https://github.com/numpy/numpy/blob/main/LICENSES_bundled.txt) | 
+| packaging | 23.0 | Used by Matplotlib | [Apache](https://github.com/pypa/packaging/blob/main/LICENSE.APACHE) [BSD](https://github.com/pypa/packaging/blob/main/LICENSE.BSD) |
+| pillow | 9.4.0 | Used by Matplotlib | [HPND](https://github.com/python-pillow/Pillow/blob/main/LICENSE) | 
+| pyparsing | 3.0.9 | Used by Matplotlib | [MIT](https://github.com/pyparsing/pyparsing/blob/master/LICENSE) |
+| python-dateutil | 2.8.2 | Used by Matplotlib | [Apache 2](https://github.com/dateutil/dateutil/blob/master/LICENSE) |
+| shiboken2 | 5.15.2.1 | Used by PySide2 | [LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.en.html) |
+| six | 1.16.0 | Used by Matplotlib | [MIT](https://github.com/benjaminp/six/blob/master/LICENSE) |
+| zipp | 3.15.0 | Used by Matplotlib | [MIT](https://github.com/jaraco/zipp/blob/main/LICENSE) |
+
+
+
+
 
 **\* External refers to third-party software used by the dependency itself.**
 
