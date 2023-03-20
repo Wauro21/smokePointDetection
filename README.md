@@ -36,13 +36,16 @@ To install from sources you only need a copy of this repository!
 The software was developed using `Python 3.8`, and all of the following dependencies are listed with this version in mind. However, it is possible that the software is compatible with newer versions of the interpreter and dependencies. This includes the Pipfiles and requirements.txt files.
 
 
-| **Dependency** | **Version** | **Description** |
-|----------------|-------------|-----------------|
-| progress | 1.6 | Used to provide a progress bar in the CLI mode |
-| matplotlib | 3.7.1 | Handles all the requiered plots | 
-| pyQt5 | 5.16.9 | Used to build the GUI |
-| opencv-python-headless | 4.7.0.72 | Operations with images. The headless version was used because there were some conflicts between pyqt and opencv when using the normal version.|
+| **Dependency** | **Version** | **Description** | **License**|
+|----------------|-------------|-----------------|------------|
+| progress | 1.6 | Used to provide a progress bar in the CLI mode | [ISC](https://github.com/verigak/progress/blob/master/LICENSE)
+| matplotlib | 3.7.1 | Handles all the requiered plots | [PSF based](https://github.com/matplotlib/matplotlib/blob/main/LICENSE/LICENSE)
+| PySide2 | 5.15.2.1 | Used to build the GUI | [LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.en.html)
+| opencv-python-headless | 4.7.0.72 | Operations with images. The headless version was used because there were some conflicts between pyqt and opencv when using the normal version.| [Apache 2](https://github.com/opencv/opencv/blob/master/LICENSE)|
+| contourpy | 1.0.7 | Used by Matplotlib | [BSD](https://github.com/contourpy/contourpy/blob/main/LICENSE) | 
+| cycler | 0.11.0 | Used by Matplotlib | [BSD](https://github.com/matplotlib/cycler/blob/main/LICENSE) | [MIT](https://github.com/fonttools/fonttools/blob/main/LICENSE)  [External **\***](https://github.com/fonttools/fonttools/blob/main/LICENSE.external) | 
 
+**\* External refers to third-party software used by the dependency itself.**
 
 Although not requiered to run the software, this dependencies were used to compiled the package (`exe`) for Windows:
 
@@ -89,6 +92,7 @@ After installing the dependencies, you should be able to run the code. You can t
 ```[bash]
 python SPD.py -cmd
 ```
+![Cli-Success](rsrcs/github-gifs/cli_success_launch.gif)
 
 **GUI mode**:
 ```[bash]
