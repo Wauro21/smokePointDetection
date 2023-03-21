@@ -151,6 +151,9 @@ class CentralWidget(QWidget):
         # Update start button status
         self.LoadWidget.externalStartButton(StartStates.ENABLED)
 
+        # Enable load widget controls
+        self.LoadWidget.lockUserControls(True)
+
         # Restore stop flag
         self.process_controls['signals']['stop'] = False
 
