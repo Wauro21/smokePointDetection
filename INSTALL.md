@@ -14,7 +14,6 @@ In the following sections, the available installation methods and instructions a
   - [Index](#index)
   - [From releases (Just Windows for the moment) -- Alpha release](#from-releases-just-windows-for-the-moment----alpha-release)
     - [Full-Installation](#full-installation)
-    - [Portable](#portable)
   - [From sources (Linux, OSX, Windows)](#from-sources-linux-osx-windows)
     - [Requirements](#requirements)
       - [pipenv installation](#pipenv-installation)
@@ -26,7 +25,7 @@ In the following sections, the available installation methods and instructions a
 
 The easiest way to run the software is to download the packaged versions from the [Releases](https://github.com/Wauro21/smokePointDetection/releases), at the time of writing this guide, version `v0.1.0-alpha` have just been released!
 
-In the release section you will find four files, two zip-files corresponding to the full-installation (`SPD.zip`) and portable version (`SPD_Portable.zip`) along with two files corresponding to the source code (zip and tar). 
+In the release section you will find three files, a zip-file corresponding to the full-installation (`SPD.zip`) along with two files corresponding to the source code (zip and tar). 
 
 ### Full-Installation
 
@@ -35,19 +34,6 @@ Download `SPD.zip` and unzip it where you want it. Inside there will be a SPD fo
 ![package-installation-windows](rsrcs/github-gifs/package_install_windows.gif)
 
 You can put the folder anywhere you want, and then generate a desktop shortcut of `SPD.exe`. 
-
-
-### Portable
-
-Download `SPD_Portable.zip` and unzip where you want it. Inside the SPD folder is the executable and some basic resources (mainly the program icon), along with all the licenses. Just click on the executable and the program should launch.
-
-
-![package-installation-windows](rsrcs/github-gifs/portable_install_windows.gif )
-
-You can put the folder anywhere you want, and then generate a desktop shortcut of `SPD_Portable.exe`. 
-
-
-
 
 ## From sources (Linux, OSX, Windows)
 
