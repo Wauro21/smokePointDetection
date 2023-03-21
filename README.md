@@ -20,10 +20,7 @@ Corral-Gomez, L., Rodriguez-Rosa, D., Juarez-Perez, S., Martín-Parra, A., Gomez
 - [Smoke Point Detection](#smoke-point-detection)
   - [Index](#index)
   - [Installation](#installation)
-  - [Use](#use)
-    - [GUI](#gui)
-  - [How it works?](#how-it-works)
-  - [Constants decription](#constants-decription)
+  - [Example use](#example-use)
   - [LICENSE](#license)
 
 
@@ -32,19 +29,16 @@ Corral-Gomez, L., Rodriguez-Rosa, D., Juarez-Perez, S., Martín-Parra, A., Gomez
 Instructions to install either from packages (Windows) or sources (Linux, Windows, OSX) and the requirements are provided on [INSTALL.md](INSTALL.md)
 
 
-## Use
+## Example use
 
-The SPD can be used in both forms (GUI/CLI) to perform analysis over a frame folder containing the resulting images capturated from a SP experiment on the ASTM-D1322 Standarized Lamp. 
+Complete examples for both the GUI and CLI version can be found on [EXAMPLE.md](EXAMPLE.md)
 
+![example-results](rsrcs/github-gifs/example_results.gif)
 
-
-
-### GUI
-
-
-
-## How it works?
-
-## Constants decription
+![example-cli-results](rsrcs/github-gifs/example_cli_results_display.gif)
 
 ## LICENSE
+
+**The SPD software is under the [LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.en.html) license.**
+
+All dependencies included in the compiled version of the software distribuited on the release page of the repository include a copy of their license according to their own terms. The licenses of the dependencies can be checked on [DEPENDENCY_LICENSES](/DEPENDENCY_LICENSES/).

@@ -1,5 +1,11 @@
 # Installation
 
+<p align="center">
+  <img height=250 src="rsrcs/icon.png" />
+</p>
+
+
+
 In the following sections, the available installation methods and instructions are provided. 
 
 ## Index
