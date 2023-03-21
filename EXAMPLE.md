@@ -142,7 +142,7 @@ The resulting SP will be informed by terminal output
 If you want to see the same plots than in the GUI, you can add the `-d` flag:
 
 ```[bash]
-$ python SPD.py -cmd -i sp_experiment_folder/  -core 3.0 -contour 0.8 -dt 0.035 -ct 10 -cut 910 1010
+$ python SPD.py -cmd -i sp_experiment_folder/  -core 3.0 -contour 0.8 -dt 0.035 -ct 10 -cut 910 1010 -d
 ```
 
 This will result in all the plots displaying at the end of the analysis:
