@@ -20,6 +20,7 @@ Corral-Gomez, L., Rodriguez-Rosa, D., Juarez-Perez, S., Martín-Parra, A., Gomez
 - [Smoke Point Detection](#smoke-point-detection)
   - [Index](#index)
   - [Installation](#installation)
+  - [Experimental Setup](#experimental-setup)
   - [Example use](#example-use)
   - [LICENSE](#license)
 
@@ -27,6 +28,10 @@ Corral-Gomez, L., Rodriguez-Rosa, D., Juarez-Perez, S., Martín-Parra, A., Gomez
 ## Installation
 
 Instructions to install either from packages (Windows) or sources (Linux, Windows, OSX) and the requirements are provided on [INSTALL.md](INSTALL.md)
+
+## Experimental Setup
+
+The recomended experimental setup, including camera positioning in relation to the standarized lamp, the camera configuration and calibration, can be found on [EXPERIMENT.md](EXPERIMENT.md)
 
 
 ## Example use
