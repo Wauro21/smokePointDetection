@@ -8,7 +8,7 @@
 
 
 
-**The algorithm is a python implementation of the work described in the work of :** 
+**The algorithm is a python implementation of the work described in:** 
 
 ```
 Corral-Gomez, L., Rodriguez-Rosa, D., Juarez-Perez, S., Martín-Parra, A., Gomez, G. R., & Moya-Fernandez, F. (2020). A novel device for automated determination of the smoke point with non-invasive adaptation of ASTM D1322 normalized lamps. Measurement Science and Technology, 31(11), 115004.
