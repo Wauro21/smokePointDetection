@@ -107,17 +107,38 @@ class VideoReader(QThread):
         # Temp storage for heights
         h = []
         H = []
-
-        # For first frame, get reference centroids
-        
-        first_frame_flag = True
-        # -> The values are set to something impossible
-        reference_centroid_x = -float('inf')
-        reference_centroid_y = -float('inf')
+        centroids = []
 
         # Frame statistics 
         frame_counter = 0
         invalid_frame_counter = 0        
+
+        # Centroid auto analysis
+        
+        while media.isOpened():
+            ret, frame = media.read()
+            if(not ret):
+                # End of media
+                break
+            
+            cut_info = self.process_controls['controls']['cut']
+            frame_processed = frameProcess(frame, cut_info, core_threshold_value, contour_threshold_value)
+            centroid_value = frame_processed[FrameTypes.CONTOUR_CC]['cX']
+            centroids.append(centroid_value)
+
+        # Process centroid data
+        centroid_mean = np.mean(centroids)
+        centroid_std = np.std(centroids)
+
+        print('Centoid mean {} | Centroid std {}'.format(centroid_mean, centroid_std))
+
+        centroid_message = {
+            CentroidTypes.REFERENCE: centroid_mean
+        }
+
+        self.centroid_signal.emit(centroid_message)
+
+        media = cv2.VideoCapture(self.video_path, 0)
 
         # Frame per frame processing
         while media.isOpened():
@@ -141,25 +162,6 @@ class VideoReader(QThread):
             # -> Consider that (0,0) is top left corner
             tip_height = frame_processed[FrameTypes.CORE_CC]['y'] - frame_processed[FrameTypes.CONTOUR_CC]['y']
 
-            if(first_frame_flag):
-                reference_centroid_x = frame_processed[FrameTypes.CONTOUR_CC]['cX']
-                reference_centroid_y = frame_processed[FrameTypes.CONTOUR_CC]['cY']
-                first_frame_flag = False
-
-                # First frame heights are considerated valid
-                h.append(contour_height)
-                H.append(tip_height)
-
-                # Centroid reference emit
-
-                centroid_message = {
-                    CentroidTypes.REFERENCE: reference_centroid_x
-                    }
-
-                self.centroid_signal.emit(centroid_message)
-
-                continue
-
             # For the rest of the frames
 
             # -> Generate height boxes to display
@@ -169,7 +171,7 @@ class VideoReader(QThread):
 
             # -> Draw the reference centroids and the actual centroid
             if(self.process_controls['frames_info']['centroids']):
-                cv2.line(frame_processed[FrameTypes.FRAME], (round(reference_centroid_x), 0), (round(reference_centroid_x), height), REFERENCE_CENTROID_COLOR, thickness=2)
+                cv2.line(frame_processed[FrameTypes.FRAME], (round(centroid_mean), 0), (round(centroid_mean), height), REFERENCE_CENTROID_COLOR, thickness=2)
                 plotCentroid(frame_processed[FrameTypes.FRAME], frame_processed[FrameTypes.CONTOUR_CC]['cX'], frame_processed[FrameTypes.CONTOUR_CC]['cY'], FRAME_CENTROID_COLOR)
                 
             
@@ -177,8 +179,8 @@ class VideoReader(QThread):
             invalid_frame_h = []
             invalid_frame_H = []
             frame_centroid = frame_processed[FrameTypes.CONTOUR_CC]['cX']
-            centroid_diff = abs(frame_centroid - reference_centroid_x)
-            if(centroid_diff > self.process_controls['controls']['centroid_tol']):
+            centroid_diff = abs(frame_centroid - centroid_mean)
+            if(centroid_diff > centroid_std):
                 invalid_frame_counter += 1
                 invalid_frame_h.append(contour_height)
                 invalid_frame_H.append(tip_height)
