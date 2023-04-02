@@ -1,13 +1,29 @@
 import cv2 
 import numpy as np
 import argparse
-from utils import dataLoader
 from matplotlib import pyplot as plt
 import csv
 import os
 from progress.bar import Bar
 import matplotlib
 matplotlib.use('tkAgg')
+
+def dataLoader(arg_string):
+    # Check if arg is file
+    if(os.path.isfile(arg_string)):
+        return arg_string
+
+    # Check if is folder with images
+    elif(os.path.isdir(arg_string)):
+        files = os.listdir(arg_string)
+        files.sort()
+        file_ = files[0]
+        prefix = file_.replace('0000', '%04d')
+        return os.path.join(arg_string, prefix)
+    
+    # Not a valid input exit
+    print('Not a valid input!')
+    exit(1)
 
 def argHandler():
     dsc='Histogram analysis of the input image'
@@ -145,36 +161,41 @@ def histo(args):
             print("Core found at {}".format(key))
             break
 
+    plot_bins = np.arange(0,256,1)
     # Plots 
     # -> General histogram - Contour
-    fig = plt.figure()
+    fig = plt.figure(figsize=(10,8))
     #fig.set_size_inches(20,11.25)
-    plt.plot(general_histo)
+    contour_histo  = [(np.log10(bin[0]) if bin[0] > 1 else 0) for bin in general_histo]
+    plt.bar(plot_bins, contour_histo)
     plt.xlabel('Bins')
-    plt.ylabel('Pixels')
+    plt.ylabel('log10(Pixels)')
     plt.title('Average Histogram Analysis')
     #plt.xticks(np.arange(0,255, step=10))
-    plt.axvline(x=contour_bin, color='r', linestyle='dashed',label='Contour Threshold {} px'.format(contour_bin))
+    #plt.axvline(x=contour_bin, color='r', linestyle='dashed',label='Contour Threshold {} px'.format(contour_bin))
+    plt.axvspan(contour_bin, 255, color='#E7BB41', alpha=0.3, label='Contour Threshold {} px'.format(contour_bin))
     plt.grid()
     plt.legend()
     plt.tight_layout()
-    plt.savefig(os.path.join(args.of,'contour_histo.pdf'))
+    plt.savefig(os.path.join(args.of,'contour_histo.png'))
+    plt.show()
     plt.clf()
 
     # -> Histo zoom to flame-conbtour - core
-    plt.plot(general_histo)
+    core_histo = [(np.log10(bin[0]) if bin[0] > 1 else 0) for bin in general_histo]
+    plt.bar(plot_bins, core_histo)
     plt.xlabel('Bins')
-    plt.ylabel('Pixels')
+    plt.ylabel('log10(Pixels)')
     plt.title('Average Histogram Analysis')
     #plt.xticks(np.arange(0,255, step=10))
-    plt.xlim([contour_bin, 255])
-    plt.ylim([0,general_histo[contour_bin]])
-    plt.axvline(x=core_bin, color='r', linestyle='dashed',label='Core Threshold {} px'.format(core_bin))
+    #plt.xlim([contour_bin, 255])
+    #plt.ylim([0,general_histo[contour_bin]])
+    #plt.axvline(x=core_bin, color='r', linestyle='dashed',label='Core Threshold {} px'.format(core_bin))
+    plt.axvspan(core_bin, 255, color='#C73E1D', alpha=0.3, label='Core Threshold {} px'.format(core_bin))
     plt.grid()
     plt.legend()
     plt.tight_layout()
-    plt.savefig(os.path.join(args.of,'core_histo.pdf'))
-    #plt.show()
+    plt.savefig(os.path.join(args.of,'core_histo.png'))
     bar.finish()
 
 
