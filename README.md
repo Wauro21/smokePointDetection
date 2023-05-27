@@ -1,6 +1,6 @@
 # Smoke Point Detection
 
-**Smoke Point Detection (SPD)** is a python-based software that implements an algorithm that allows to perform smoke point characterization of fuel blends tested on the ASTM-D1322 Standarized Lamps. The software uses images taken during the lamp tests and allows to automatically detect the smoke point. 
+**Smoke Point Detection (SPD)** is a python-based software that implements an state-of-the-art algorithm that allows to perform smoke point characterization of fuel blends tested on the ASTM-D1322 Standarized Lamps. The software uses images taken during the lamp tests and allows to automatically detect the smoke point. 
 
 <p align="center">
   <img height=250 src="rsrcs/icon.png" />
